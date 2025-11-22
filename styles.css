@@ -135,7 +135,7 @@ body::before {
 
 /* Estilos para logo personalizado */
 .logo-personalizado {
-    width: 450px;      /* Tamaño aumentado */
+    width: 150px;      /* Tamaño aumentado */
     height: 150px;     /* Tamaño aumentado */
     object-fit: contain;
     filter: drop-shadow(0 4px 12px rgba(255, 138, 184, 0.4));
@@ -1350,4 +1350,5 @@ select:focus {
     to {
         transform: translate(-50%, -50%) rotate(360deg);
     }
+
 }
