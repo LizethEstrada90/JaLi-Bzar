@@ -6,6 +6,10 @@
     <title>JaLi Bzar - Sistema Kawaii 🎀</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body>
     <!-- DECORACIONES KAWAII FLOTANTES -->
@@ -29,7 +33,68 @@
                         <!-- AQUÍ PUEDES PONER TU LOGO PERSONALIZADO -->
                         <!-- Opción 1: Usar tu imagen subida (recomendado) -->
                         <!-- Descomenta esta línea y pon la ruta de tu imagen: -->
-                        <img src="bolsi-logo.png" alt="Bolsi" class="logo-personalizado">
+                        <!-- <img src="ruta-de-tu-logo.png" alt="Bolsi" class="logo-personalizado"> -->
+                        
+                        <!-- Opción 2: SVG por defecto (si no tienes imagen) -->
+                        <svg width="70" height="85" viewBox="0 0 100 110" class="bolsi-svg">
+                            <!-- Cuerpo principal - bolsa cuadrada rosa -->
+                            <rect x="28" y="45" width="44" height="45" rx="5" fill="#FFB6D9" stroke="#E91E8C" stroke-width="2.5"/>
+                            
+                            <!-- Detalle superior de la bolsa -->
+                            <rect x="28" y="42" width="44" height="8" fill="#FFB6D9" stroke="#E91E8C" stroke-width="2.5"/>
+                            
+                            <!-- Asa izquierda ARQUEADA como U invertida -->
+                            <path d="M 35 42 Q 32 25, 35 25 Q 38 25, 38 42" 
+                                  fill="none" stroke="#E91E8C" stroke-width="2.5" stroke-linecap="round"/>
+                            
+                            <!-- Asa derecha ARQUEADA como U invertida -->
+                            <path d="M 62 42 Q 68 25, 65 25 Q 62 25, 62 42" 
+                                  fill="none" stroke="#E91E8C" stroke-width="2.5" stroke-linecap="round"/>
+                            
+                            <!-- Ojitos grandes kawaii -->
+                            <circle cx="40" cy="60" r="5" fill="#000"/>
+                            <circle cx="60" cy="60" r="5" fill="#000"/>
+                            
+                            <!-- Brillitos en los ojos -->
+                            <circle cx="41.5" cy="58.5" r="2" fill="#fff"/>
+                            <circle cx="61.5" cy="58.5" r="2" fill="#fff"/>
+                            <circle cx="42" cy="61" r="0.8" fill="#fff" opacity="0.7"/>
+                            <circle cx="62" cy="61" r="0.8" fill="#fff" opacity="0.7"/>
+                            
+                            <!-- Mejillas rosaditas -->
+                            <circle cx="30" cy="63" r="4.5" fill="#FFB6D9" opacity="0.6"/>
+                            <circle cx="70" cy="63" r="4.5" fill="#FFB6D9" opacity="0.6"/>
+                            
+                            <!-- Boquita sonriente tipo "w" -->
+                            <path d="M 45 68 Q 47 70, 50 70 Q 53 70, 55 68" 
+                                  stroke="#E91E8C" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            
+                            <!-- Bracitos sosteniendo corazón -->
+                            <ellipse cx="20" cy="72" rx="5" ry="7" fill="#FFB6D9" stroke="#E91E8C" stroke-width="1.5"/>
+                            <ellipse cx="80" cy="72" rx="5" ry="7" fill="#FFB6D9" stroke="#E91E8C" stroke-width="1.5"/>
+                            
+                            <!-- Corazón en las manos -->
+                            <path d="M 50 75 
+                                     C 50 70, 42 70, 42 76 
+                                     C 42 80, 50 85, 50 85
+                                     C 50 85, 58 80, 58 76
+                                     C 58 70, 50 70, 50 75 Z" 
+                                  fill="#FF69B4" stroke="#E91E8C" stroke-width="1.5"/>
+                            
+                            <!-- Shine en el corazón -->
+                            <ellipse cx="47" cy="76" rx="2" ry="3" fill="#fff" opacity="0.5"/>
+                            
+                            <!-- Piernitas -->
+                            <ellipse cx="40" cy="95" rx="6" ry="5" fill="#FFB6D9" stroke="#E91E8C" stroke-width="1.5"/>
+                            <ellipse cx="60" cy="95" rx="6" ry="5" fill="#FFB6D9" stroke="#E91E8C" stroke-width="1.5"/>
+                            
+                            <!-- Detallitos en los pies -->
+                            <circle cx="40" cy="96" r="1.5" fill="#fff" opacity="0.4"/>
+                            <circle cx="60" cy="96" r="1.5" fill="#fff" opacity="0.4"/>
+                            
+                            <!-- Sombrita -->
+                            <ellipse cx="50" cy="100" rx="30" ry="4" fill="#000" opacity="0.08"/>
+                        </svg>
                     </div>
                 </div>
                 <nav class="main-nav">
@@ -52,6 +117,12 @@
             </div>
         </div>
     </header>
+
+    <!-- INDICADOR DE ESTADO FIREBASE -->
+    <div id="firebaseStatus" style="position: fixed; top: 15px; right: 15px; z-index: 9999; padding: 10px 18px; border-radius: 25px; font-size: 0.85rem; font-weight: 600; background: #E0E0E0; color: #666; box-shadow: 0 4px 15px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 8px; cursor: pointer;" title="Click para más información">
+        <span id="firebaseIcon">⚠️</span>
+        <span id="firebaseText">Verificando...</span>
+    </div>
 
     <!-- CONTENEDOR PRINCIPAL -->
     <main class="main-container">
@@ -273,7 +344,7 @@
     <div id="modalVenta" class="modal">
         <div class="modal-content modal-wide">
             <div class="modal-header">
-                <h3>Nueva Venta 🛍️</h3>
+                <h3 id="tituloModalVenta">Nueva Venta 🛍️</h3>
                 <button class="close-modal">&times;</button>
             </div>
             <form id="formVenta">
@@ -295,10 +366,6 @@
                         <input type="text" id="ventaGrupo" readonly>
                     </div>
                     <div class="form-group">
-                        <label>Producto</label>
-                        <input type="text" id="ventaProducto" required>
-                    </div>
-                    <div class="form-group">
                         <label>Estado de Pago</label>
                         <select id="ventaPago" required>
                             <option value="">Seleccionar...</option>
@@ -307,19 +374,50 @@
                             <option value="NO REALIZÓ EL PAGO">NO REALIZÓ EL PAGO</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Cantidad</label>
-                        <input type="number" id="ventaCantidad" min="1" value="1" required>
+                </div>
+
+                <!-- SECCIÓN DE PRODUCTOS -->
+                <div style="margin: 25px 0; padding: 20px; background: linear-gradient(145deg, #fff5f9, #ffffff); border-radius: 16px; border: 2px solid #FFB6D9;">
+                    <h4 style="color: #E91E8C; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                        🛒 Productos
+                    </h4>
+                    
+                    <!-- Formulario para agregar producto -->
+                    <div class="form-grid" style="margin-bottom: 15px;">
+                        <div class="form-group">
+                            <label>Nombre del Producto</label>
+                            <input type="text" id="nombreProducto" placeholder="Ej: Bolsa rosa">
+                        </div>
+                        <div class="form-group">
+                            <label>Cantidad</label>
+                            <input type="number" id="cantidadProducto" min="1" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Precio Unitario</label>
+                            <input type="number" id="precioProducto" min="0" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button type="button" class="btn-kawaii btn-success" id="btnAgregarProducto" style="width: 100%;">
+                                ➕ Agregar
+                            </button>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Precio Unitario</label>
-                        <input type="number" id="ventaPrecio" min="0" step="0.01" required>
+
+                    <!-- Lista de productos agregados -->
+                    <div id="listaProductos" style="max-height: 200px; overflow-y: auto;">
+                        <p style="text-align: center; color: #999; padding: 20px;" id="msgSinProductos">
+                            No hay productos agregados
+                        </p>
                     </div>
-                    <div class="form-group">
-                        <label>Total (automático)</label>
-                        <input type="text" id="ventaTotal" readonly>
+
+                    <!-- Total de la venta -->
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #FFB6D9; text-align: right;">
+                        <span style="font-size: 1.2rem; font-weight: bold; color: #E91E8C;">
+                            TOTAL: <span id="totalVentaModal">$0.00</span>
+                        </span>
                     </div>
                 </div>
+
                 <div class="form-actions">
                     <button type="submit" class="btn-kawaii btn-success">✨ Guardar</button>
                     <button type="button" class="btn-kawaii btn-info" id="btnImprimirTicket">🧾 Ticket</button>
@@ -334,6 +432,7 @@
         <!-- Contenido del ticket generado dinámicamente -->
     </div>
 
+    <script src="firebase-config.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
