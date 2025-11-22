@@ -132,13 +132,31 @@ const state = {
     ventasActuales: [],
     historialSemanas: [],
     semanaActual: 1,
-    ventaEnEdicion: null
+    ventaEnEdicion: null,
+    productosTemporal: [] // Array temporal para múltiples productos
 };
 
 // ===== INICIALIZACIÓN =====
 document.addEventListener('DOMContentLoaded', () => {
+    // Inicializar Firebase primero
+    if (typeof initFirebase !== 'undefined') {
+        const configurado = verificarConfiguracionFirebase();
+        if (configurado) {
+            initFirebase();
+            console.log('🔥 Firebase inicializado');
+        } else {
+            console.warn('⚠️ Firebase no configurado. Sistema funcionará solo localmente.');
+            console.warn('📖 Para sincronizar en varios dispositivos, configura Firebase.');
+        }
+    }
+    
+    // Cargar datos
     cargarDatos();
+    
+    // Inicializar eventos
     inicializarEventos();
+    
+    // Actualizar interfaz
     actualizarDashboard();
     actualizarTablaVentas();
     actualizarListaClientes();
@@ -163,6 +181,7 @@ function inicializarEventos() {
     document.getElementById('btnAgregarRecolector').addEventListener('click', () => abrirModal('modalRecolector'));
     document.getElementById('btnAgregarVenta').addEventListener('click', () => abrirModal('modalVenta'));
     document.getElementById('btnNuevaSemana').addEventListener('click', crearNuevaSemana);
+    document.getElementById('btnAgregarProducto').addEventListener('click', agregarProductoALista);
 
     // Cerrar modales
     document.querySelectorAll('.close-modal').forEach(btn => {
@@ -180,8 +199,6 @@ function inicializarEventos() {
     // Cálculos automáticos en formulario de venta
     document.getElementById('ventaCliente').addEventListener('change', actualizarGrupoVenta);
     document.getElementById('ventaRecolector').addEventListener('change', actualizarGrupoVenta);
-    document.getElementById('ventaCantidad').addEventListener('input', calcularTotalVenta);
-    document.getElementById('ventaPrecio').addEventListener('input', calcularTotalVenta);
 
     // Impresión de ticket
     document.getElementById('btnImprimirTicket').addEventListener('click', imprimirTicket);
@@ -226,7 +243,10 @@ function abrirModal(modalId) {
     // Si es el modal de venta, actualizar los selectores
     if (modalId === 'modalVenta') {
         actualizarSelectoresVenta();
-        limpiarFormularioVenta();
+        // Si NO estamos editando, limpiar formulario
+        if (!state.ventaEnEdicion) {
+            limpiarFormularioVenta();
+        }
     }
 }
 
@@ -240,6 +260,13 @@ function cerrarModal(modalId) {
     // Limpiar formularios
     const form = modal.querySelector('form');
     if (form) form.reset();
+    
+    // Si cerramos modal de ventas, limpiar estado de edición
+    if (modalId === 'modalVenta') {
+        state.ventaEnEdicion = null;
+        state.productosTemporal = [];
+        document.getElementById('tituloModalVenta').textContent = 'Nueva Venta 🛍️';
+    }
 }
 
 // ===== GESTIÓN DE CLIENTES =====
@@ -378,6 +405,127 @@ function actualizarSelectoresVenta() {
     });
 }
 
+// Agregar producto a la lista temporal
+function agregarProductoALista() {
+    const nombre = document.getElementById('nombreProducto').value.trim();
+    const cantidad = parseFloat(document.getElementById('cantidadProducto').value) || 0;
+    const precio = parseFloat(document.getElementById('precioProducto').value) || 0;
+
+    if (!nombre || cantidad <= 0 || precio <= 0) {
+        alert('⚠️ Por favor llena todos los campos del producto');
+        return;
+    }
+
+    const producto = {
+        id: Date.now(),
+        nombre: nombre,
+        cantidad: cantidad,
+        precioUnitario: precio,
+        subtotal: cantidad * precio
+    };
+
+    state.productosTemporal.push(producto);
+    
+    // Limpiar campos
+    document.getElementById('nombreProducto').value = '';
+    document.getElementById('cantidadProducto').value = '1';
+    document.getElementById('precioProducto').value = '';
+    
+    // Sonar éxito
+    sonarPop();
+    
+    actualizarListaProductosModal();
+}
+
+// Actualizar la lista visual de productos en el modal
+function actualizarListaProductosModal() {
+    const container = document.getElementById('listaProductos');
+    const msgSinProductos = document.getElementById('msgSinProductos');
+    
+    if (state.productosTemporal.length === 0) {
+        msgSinProductos.style.display = 'block';
+        container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;" id="msgSinProductos">No hay productos agregados</p>';
+    } else {
+        container.innerHTML = state.productosTemporal.map(prod => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: white; border-radius: 12px; margin-bottom: 8px; border: 2px solid #FFE8F0;">
+                <div style="flex: 1;">
+                    <strong style="color: #E91E8C;">${prod.nombre}</strong><br>
+                    <span style="font-size: 0.9rem; color: #666;">${prod.cantidad} × $${prod.precioUnitario.toFixed(2)} = $${prod.subtotal.toFixed(2)}</span>
+                </div>
+                <button type="button" onclick="eliminarProductoTemporal(${prod.id})" class="btn-delete" style="padding: 8px 12px;">
+                    🗑️
+                </button>
+            </div>
+        `).join('');
+    }
+    
+    // Actualizar total
+    const total = state.productosTemporal.reduce((sum, p) => sum + p.subtotal, 0);
+    document.getElementById('totalVentaModal').textContent = `$${total.toFixed(2)}`;
+}
+
+// Eliminar producto de la lista temporal
+function eliminarProductoTemporal(id) {
+    state.productosTemporal = state.productosTemporal.filter(p => p.id !== id);
+    sonarClick();
+    actualizarListaProductosModal();
+}
+
+// Limpiar formulario de venta
+function limpiarFormularioVenta() {
+    document.getElementById('formVenta').reset();
+    state.productosTemporal = [];
+    state.ventaEnEdicion = null; // IMPORTANTE: Resetear estado de edición
+    document.getElementById('tituloModalVenta').textContent = 'Nueva Venta 🛍️';
+    actualizarListaProductosModal();
+}
+
+// Editar venta existente
+function editarVenta(id) {
+    const venta = state.ventasActuales.find(v => v.id === id);
+    if (!venta) return;
+    
+    state.ventaEnEdicion = id;
+    
+    // Abrir modal
+    abrirModal('modalVenta');
+    
+    // Cambiar título
+    document.getElementById('tituloModalVenta').textContent = 'Editar Venta ✏️';
+    
+    // Llenar datos
+    const clienteId = state.clientes.find(c => c.nombre === venta.cliente)?.id || '';
+    const recolectorId = state.recolectores.find(r => r.nombre === venta.recolector)?.id || '';
+    
+    document.getElementById('ventaCliente').value = clienteId;
+    document.getElementById('ventaRecolector').value = recolectorId;
+    document.getElementById('ventaGrupo').value = venta.grupo;
+    document.getElementById('ventaPago').value = venta.pago;
+    
+    // MANTENER productos existentes y permitir agregar más
+    if (venta.productos && venta.productos.length > 0) {
+        // Copiar productos existentes al array temporal
+        state.productosTemporal = venta.productos.map(p => ({
+            ...p,
+            id: p.id || Date.now() + Math.random() // Asegurar que tenga ID
+        }));
+    } else {
+        // Formato antiguo - convertir a nuevo formato
+        state.productosTemporal = [{
+            id: Date.now(),
+            nombre: venta.producto || 'Producto',
+            cantidad: venta.cantidad || 1,
+            precioUnitario: venta.precioUnitario || 0,
+            subtotal: venta.total || 0
+        }];
+    }
+    
+    actualizarListaProductosModal();
+    
+    // Trigger cambio de cliente/recolector para actualizar grupo
+    actualizarGrupoVenta();
+}
+
 function actualizarGrupoVenta() {
     const selectCliente = document.getElementById('ventaCliente');
     const selectRecolector = document.getElementById('ventaRecolector');
@@ -396,40 +544,50 @@ function actualizarGrupoVenta() {
     }
 }
 
-function calcularTotalVenta() {
-    const cantidad = parseFloat(document.getElementById('ventaCantidad').value) || 0;
-    const precio = parseFloat(document.getElementById('ventaPrecio').value) || 0;
-    const total = cantidad * precio;
-    document.getElementById('ventaTotal').value = `$${total.toFixed(2)}`;
-}
-
-function limpiarFormularioVenta() {
-    document.getElementById('formVenta').reset();
-    document.getElementById('ventaTotal').value = '$0.00';
-}
-
 function guardarVenta(e) {
     e.preventDefault();
 
     const clienteId = parseInt(document.getElementById('ventaCliente').value);
     const recolectorId = parseInt(document.getElementById('ventaRecolector').value);
+    
+    if (!clienteId || !recolectorId) {
+        alert('⚠️ Selecciona un cliente y un recolector');
+        return;
+    }
+    
+    if (state.productosTemporal.length === 0) {
+        alert('⚠️ Agrega al menos un producto');
+        return;
+    }
+    
     const cliente = state.clientes.find(c => c.id === clienteId);
     const recolector = state.recolectores.find(r => r.id === recolectorId);
 
     const venta = {
-        id: Date.now(),
+        id: state.ventaEnEdicion || Date.now(),
         fecha: new Date().toISOString(),
         cliente: cliente ? cliente.nombre : '',
         recolector: recolector ? recolector.nombre : '',
         grupo: document.getElementById('ventaGrupo').value,
-        producto: document.getElementById('ventaProducto').value.trim(),
         pago: document.getElementById('ventaPago').value,
-        cantidad: parseFloat(document.getElementById('ventaCantidad').value),
-        precioUnitario: parseFloat(document.getElementById('ventaPrecio').value),
-        total: parseFloat(document.getElementById('ventaCantidad').value) * parseFloat(document.getElementById('ventaPrecio').value)
+        productos: [...state.productosTemporal],
+        total: state.productosTemporal.reduce((sum, p) => sum + p.subtotal, 0),
+        cantidad: state.productosTemporal.reduce((sum, p) => sum + p.cantidad, 0)
     };
 
-    state.ventasActuales.push(venta);
+    if (state.ventaEnEdicion) {
+        // ACTUALIZAR venta existente (no duplicar)
+        const index = state.ventasActuales.findIndex(v => v.id === state.ventaEnEdicion);
+        if (index !== -1) {
+            state.ventasActuales[index] = venta;
+            mostrarNotificacion('Venta actualizada exitosamente ✨', 'success');
+        }
+    } else {
+        // Agregar nueva venta
+        state.ventasActuales.push(venta);
+        mostrarNotificacion('Venta registrada exitosamente ✨', 'success');
+    }
+
     guardarDatos();
     actualizarTablaVentas();
     actualizarDashboard();
@@ -437,7 +595,10 @@ function guardarVenta(e) {
 
     // Sonido de éxito
     sonarExito();
-    mostrarNotificacion('Venta registrada exitosamente ✨', 'success');
+    
+    // Limpiar estado de edición
+    state.ventaEnEdicion = null;
+    limpiarFormularioVenta();
 }
 
 function actualizarTablaVentas() {
@@ -461,18 +622,32 @@ function actualizarTablaVentas() {
         const pagoClass = venta.pago === 'PENDIENTE' ? 'pago-pendiente' :
                          venta.pago === 'PAGADO' ? 'pago-pagado' : 'pago-no-realizo';
         
+        // Si tiene múltiples productos, mostrarlos
+        let productoDisplay = '';
+        if (venta.productos && venta.productos.length > 0) {
+            productoDisplay = venta.productos.map(p => 
+                `${p.nombre} (${p.cantidad}x $${p.precioUnitario.toFixed(2)})`
+            ).join('<br>');
+        } else {
+            // Formato antiguo (compatibilidad)
+            productoDisplay = `${venta.producto || ''} (${venta.cantidad || 0}x $${(venta.precioUnitario || 0).toFixed(2)})`;
+        }
+        
         return `
             <tr>
                 <td>${venta.cliente}</td>
                 <td>${venta.recolector}</td>
                 <td>${venta.grupo}</td>
-                <td>${venta.producto}</td>
+                <td style="white-space: normal;">${productoDisplay}</td>
                 <td class="${pagoClass}">${venta.pago}</td>
-                <td>${venta.cantidad}</td>
-                <td>$${venta.precioUnitario.toFixed(2)}</td>
-                <td>$${venta.total.toFixed(2)}</td>
+                <td>${venta.productos ? venta.productos.reduce((sum, p) => sum + p.cantidad, 0) : venta.cantidad}</td>
+                <td>-</td>
+                <td style="font-weight: bold; color: #E91E8C;">$${venta.total.toFixed(2)}</td>
                 <td>
-                    <button class="btn-delete" onclick="eliminarVenta(${venta.id})" style="padding: 6px 12px; font-size: 0.85rem;">
+                    <button class="btn-edit" onclick="editarVenta(${venta.id})" title="Editar">
+                        ✏️
+                    </button>
+                    <button class="btn-delete" onclick="eliminarVenta(${venta.id})" title="Eliminar">
                         🗑️
                     </button>
                 </td>
@@ -563,10 +738,26 @@ function actualizarHistorial() {
                     <button class="btn-kawaii btn-success" onclick="descargarCSV(${semana.numero})">
                         📥 Descargar CSV
                     </button>
+                    <button class="btn-kawaii btn-danger" onclick="eliminarSemanaHistorial(${semana.numero})">
+                        🗑️ Eliminar
+                    </button>
                 </div>
             </div>
         `;
     }).join('');
+}
+
+function eliminarSemanaHistorial(numeroSemana) {
+    if (!confirm(`¿Estás segura de eliminar la Semana ${numeroSemana}? Esta acción no se puede deshacer.`)) {
+        return;
+    }
+    
+    state.historialSemanas = state.historialSemanas.filter(s => s.numero !== numeroSemana);
+    guardarDatos();
+    actualizarHistorial();
+    
+    sonarClick();
+    mostrarNotificacion(`Semana ${numeroSemana} eliminada del historial`, 'info');
 }
 
 function verDetallesSemana(numeroSemana) {
@@ -918,7 +1109,22 @@ function crearGraficaProductos() {
 
 // ===== IMPRESIÓN DE TICKET =====
 function imprimirTicket() {
-    // Obtener datos del formulario actual
+    // Si estamos editando una venta, usar sus datos
+    if (state.ventaEnEdicion) {
+        const ventaExistente = state.ventasActuales.find(v => v.id === state.ventaEnEdicion);
+        if (ventaExistente) {
+            imprimirTicketVenta(ventaExistente);
+            return;
+        }
+    }
+    
+    // Si es una venta nueva, verificar que haya productos en el temporal
+    if (state.productosTemporal.length === 0) {
+        alert('⚠️ Agrega al menos un producto antes de imprimir');
+        return;
+    }
+    
+    // Obtener datos del formulario para venta nueva
     const clienteId = parseInt(document.getElementById('ventaCliente').value);
     const recolectorId = parseInt(document.getElementById('ventaRecolector').value);
     
@@ -929,16 +1135,43 @@ function imprimirTicket() {
 
     const cliente = state.clientes.find(c => c.id === clienteId);
     const recolector = state.recolectores.find(r => r.id === recolectorId);
-    
-    const producto = document.getElementById('ventaProducto').value || 'Sin especificar';
-    const cantidad = parseFloat(document.getElementById('ventaCantidad').value) || 0;
-    const precioUnitario = parseFloat(document.getElementById('ventaPrecio').value) || 0;
     const pago = document.getElementById('ventaPago').value || 'PENDIENTE';
     const grupo = document.getElementById('ventaGrupo').value || '';
-    const total = cantidad * precioUnitario;
 
+    const ventaTemporal = {
+        cliente: cliente ? cliente.nombre : '',
+        recolector: recolector ? recolector.nombre : '',
+        grupo: grupo,
+        pago: pago,
+        productos: state.productosTemporal,
+        total: state.productosTemporal.reduce((sum, p) => sum + p.subtotal, 0)
+    };
+
+    imprimirTicketVenta(ventaTemporal);
+}
+
+function imprimirTicketVenta(venta) {
     // Crear ventana de impresión
     const ventanaImpresion = window.open('', '', 'width=800,height=600');
+    
+    // Generar filas de productos
+    const productos = venta.productos || [{
+        nombre: venta.producto || 'Producto',
+        cantidad: venta.cantidad || 1,
+        precioUnitario: venta.precioUnitario || 0,
+        subtotal: venta.total || 0
+    }];
+    
+    const filasProductos = productos.map(prod => `
+        <div class="fila">
+            <span>${prod.nombre}</span>
+            <span>${prod.cantidad} × $${prod.precioUnitario.toFixed(2)}</span>
+        </div>
+        <div class="fila" style="padding-left: 20px; font-size: 11px; color: #666;">
+            <span>Subtotal:</span>
+            <span>$${prod.subtotal.toFixed(2)}</span>
+        </div>
+    `).join('');
     
     ventanaImpresion.document.write(`
         <!DOCTYPE html>
@@ -1061,41 +1294,31 @@ function imprimirTicket() {
                 <div class="seccion">
                     <div class="fila">
                         <span class="label">Cliente:</span>
-                        <span>${cliente ? cliente.nombre : 'Sin cliente'}</span>
+                        <span>${venta.cliente}</span>
                     </div>
                     <div class="fila">
                         <span class="label">Recolector:</span>
-                        <span>${recolector ? recolector.nombre : 'Sin recolector'}</span>
+                        <span>${venta.recolector}</span>
                     </div>
                     <div class="fila">
                         <span class="label">Grupo:</span>
-                        <span>${grupo}</span>
+                        <span>${venta.grupo}</span>
+                    </div>
+                    <div class="fila">
+                        <span class="label">Estado:</span>
+                        <span>${venta.pago}</span>
                     </div>
                 </div>
                 
                 <div class="separador"></div>
                 
                 <div class="seccion">
-                    <div class="fila">
-                        <span class="label">Producto:</span>
-                        <span>${producto}</span>
-                    </div>
-                    <div class="fila">
-                        <span class="label">Cantidad:</span>
-                        <span>${cantidad}</span>
-                    </div>
-                    <div class="fila">
-                        <span class="label">Precio Unitario:</span>
-                        <span>$${precioUnitario.toFixed(2)}</span>
-                    </div>
-                    <div class="fila">
-                        <span class="label">Estado:</span>
-                        <span>${pago}</span>
-                    </div>
+                    <div style="font-weight: bold; margin-bottom: 10px; text-align: center;">PRODUCTOS</div>
+                    ${filasProductos}
                 </div>
                 
                 <div class="total">
-                    TOTAL: $${total.toFixed(2)}
+                    TOTAL: $${venta.total.toFixed(2)}
                 </div>
                 
                 <div class="footer">
@@ -1123,16 +1346,38 @@ function generarTicketHTML(venta) {
     return;
 }
 
-// ===== PERSISTENCIA DE DATOS (LocalStorage) =====
+// ===== PERSISTENCIA DE DATOS (LocalStorage + Firebase) =====
 function guardarDatos() {
+    // Siempre guardar en localStorage como backup
     localStorage.setItem('jali_bzar_data', JSON.stringify(state));
+    
+    // Sincronizar con Firebase si está disponible
+    if (typeof firebaseInitialized !== 'undefined' && firebaseInitialized) {
+        sincronizarTodo();
+    }
 }
 
 function cargarDatos() {
-    const datos = localStorage.getItem('jali_bzar_data');
-    if (datos) {
-        const datosParseados = JSON.parse(datos);
+    // Primero cargar de localStorage
+    const datosLocales = localStorage.getItem('jali_bzar_data');
+    if (datosLocales) {
+        const datosParseados = JSON.parse(datosLocales);
         Object.assign(state, datosParseados);
+        console.log('✅ Datos cargados desde localStorage');
+    }
+    
+    // Luego intentar sincronizar con Firebase
+    if (typeof firebaseInitialized !== 'undefined' && firebaseInitialized) {
+        cargarTodoDesdeFirebase().then((cargado) => {
+            if (cargado) {
+                // Actualizar interfaz después de cargar desde Firebase
+                actualizarDashboard();
+                actualizarTablaVentas();
+                actualizarListaClientes();
+                actualizarListaRecolectores();
+                actualizarHistorial();
+            }
+        });
     }
 }
 
