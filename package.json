@@ -1,0 +1,31 @@
+{
+  "name": "jali-bzar-sistema-kawaii",
+  "version": "1.0.0",
+  "description": "Sistema de punto de venta kawaii para JaLi Bzar con diseño Sanrio y mascota Bolsi",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server -p 8000 -o",
+    "dev": "http-server -p 8000 -o",
+    "build": "echo 'No build needed - static site'",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "pos",
+    "punto-de-venta",
+    "kawaii",
+    "sanrio",
+    "bazar",
+    "jali-bzar",
+    "bolsi"
+  ],
+  "author": "Eva - Expert Engineers",
+  "license": "UNLICENSED",
+  "private": true,
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

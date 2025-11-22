@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JaLi Bzar - Sistema Kawaii 🎀</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- DECORACIONES KAWAII FLOTANTES -->
+    <div class="kawaii-decorations">
+        <div class="float-decoration star" style="top: 10%; left: 5%; animation-delay: 0s;">✨</div>
+        <div class="float-decoration heart" style="top: 20%; right: 10%; animation-delay: 1s;">💗</div>
+        <div class="float-decoration star" style="top: 40%; left: 15%; animation-delay: 2s;">⭐</div>
+        <div class="float-decoration flower" style="top: 60%; right: 5%; animation-delay: 3s;">🌸</div>
+        <div class="float-decoration heart" style="top: 80%; left: 20%; animation-delay: 4s;">💝</div>
+        <div class="float-decoration star" style="top: 30%; right: 20%; animation-delay: 1.5s;">✨</div>
+        <div class="float-decoration flower" style="top: 70%; left: 10%; animation-delay: 2.5s;">🌺</div>
+        <div class="float-decoration heart" style="top: 50%; right: 15%; animation-delay: 3.5s;">💖</div>
+    </div>
+
+    <!-- HEADER KAWAII -->
+    <header class="header-kawaii">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="bolsi-mascot" id="bolsi-header">
+                        <!-- AQUÍ PUEDES PONER TU LOGO PERSONALIZADO -->
+                        <!-- Opción 1: Usar tu imagen subida (recomendado) -->
+                        <!-- Descomenta esta línea y pon la ruta de tu imagen: -->
+                        <img src="bolsi-logo.png" alt="Bolsi" class="logo-personalizado">
+                    </div>
+                </div>
+                <nav class="main-nav">
+                    <button class="nav-btn active" data-section="dashboard">
+                        <span>📊</span> Dashboard
+                    </button>
+                    <button class="nav-btn" data-section="ventas">
+                        <span>🛍️</span> Ventas
+                    </button>
+                    <button class="nav-btn" data-section="clientes">
+                        <span>👥</span> Clientes
+                    </button>
+                    <button class="nav-btn" data-section="recolectores">
+                        <span>🚚</span> Recolectores
+                    </button>
+                    <button class="nav-btn" data-section="historial">
+                        <span>📚</span> Historial
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="main-container">
+        <!-- SECCIÓN DASHBOARD -->
+        <section id="dashboard" class="section active">
+            <div class="container">
+                <h2 class="section-title">Dashboard Kawaii 💗</h2>
+                
+                <!-- Tarjetas de estadísticas -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <h3>Ventas del Día</h3>
+                            <p class="stat-value" id="ventasHoy">$0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <h3>Ventas de la Semana</h3>
+                            <p class="stat-value" id="ventasSemana">$0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <h3>Total Clientes</h3>
+                            <p class="stat-value" id="totalClientes">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-info">
+                            <h3>Pedidos Pendientes</h3>
+                            <p class="stat-value" id="pedidosPendientes">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <h3>Pedidos Pagados</h3>
+                            <p class="stat-value" id="pedidosPagados">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráficas -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>Ventas por Día 📈</h3>
+                        <canvas id="chartVentasDia"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Top Clientes 👑</h3>
+                        <canvas id="chartTopClientes"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Ventas por Recolector 🚚</h3>
+                        <canvas id="chartRecolectores"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Productos Más Vendidos 🌟</h3>
+                        <canvas id="chartProductos"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN VENTAS -->
+        <section id="ventas" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Registro de Ventas 🛍️</h2>
+                    <div class="action-buttons">
+                        <button class="btn-kawaii btn-primary" id="btnNuevaSemana">
+                            <span>✨</span> Crear Hoja Nueva
+                        </button>
+                        <button class="btn-kawaii btn-success" id="btnAgregarVenta">
+                            <span>➕</span> Nueva Venta
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabla de ventas responsive -->
+                <div class="table-container">
+                    <table class="kawaii-table" id="tablaVentas">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Recolector</th>
+                                <th>Grupo</th>
+                                <th>Producto</th>
+                                <th>Pago</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unit.</th>
+                                <th>Total</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ventasBody">
+                            <!-- Las ventas se agregan dinámicamente -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="7" style="text-align: right; font-weight: bold;">TOTAL:</td>
+                                <td colspan="2" style="font-weight: bold; color: #FF8AB8;" id="totalVentas">$0.00</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN CLIENTES -->
+        <section id="clientes" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Gestión de Clientes 👥</h2>
+                    <button class="btn-kawaii btn-primary" id="btnAgregarCliente">
+                        <span>➕</span> Nuevo Cliente
+                    </button>
+                </div>
+
+                <div class="cards-grid">
+                    <div id="listaClientes" class="lista-items">
+                        <!-- Los clientes se agregan dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN RECOLECTORES -->
+        <section id="recolectores" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Gestión de Recolectores 🚚</h2>
+                    <button class="btn-kawaii btn-primary" id="btnAgregarRecolector">
+                        <span>➕</span> Nuevo Recolector
+                    </button>
+                </div>
+
+                <div class="cards-grid">
+                    <div id="listaRecolectores" class="lista-items">
+                        <!-- Los recolectores se agregan dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN HISTORIAL -->
+        <section id="historial" class="section">
+            <div class="container">
+                <h2 class="section-title">Historial de Semanas 📚</h2>
+                <div id="listaHistorial" class="historial-container">
+                    <!-- El historial se agrega dinámicamente -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL AGREGAR CLIENTE -->
+    <div id="modalCliente" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nuevo Cliente 💗</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="formCliente">
+                <div class="form-group">
+                    <label>Nombre del Cliente</label>
+                    <input type="text" id="nombreCliente" required>
+                </div>
+                <div class="form-group">
+                    <label>Grupo</label>
+                    <input type="text" id="grupoCliente" required>
+                </div>
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select id="tipoCliente" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="Local">Local</option>
+                        <option value="Foráneo">Foráneo</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-kawaii btn-success">✨ Guardar</button>
+                    <button type="button" class="btn-kawaii btn-danger close-modal">❌ Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL AGREGAR RECOLECTOR -->
+    <div id="modalRecolector" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nuevo Recolector 🚚</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="formRecolector">
+                <div class="form-group">
+                    <label>Nombre del Recolector</label>
+                    <input type="text" id="nombreRecolector" required>
+                </div>
+                <div class="form-group">
+                    <label>Grupo</label>
+                    <input type="text" id="grupoRecolector" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-kawaii btn-success">✨ Guardar</button>
+                    <button type="button" class="btn-kawaii btn-danger close-modal">❌ Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL AGREGAR VENTA -->
+    <div id="modalVenta" class="modal">
+        <div class="modal-content modal-wide">
+            <div class="modal-header">
+                <h3>Nueva Venta 🛍️</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="formVenta">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Cliente</label>
+                        <select id="ventaCliente" required>
+                            <option value="">Seleccionar cliente...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Recolector</label>
+                        <select id="ventaRecolector" required>
+                            <option value="">Seleccionar recolector...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Grupo (automático)</label>
+                        <input type="text" id="ventaGrupo" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Producto</label>
+                        <input type="text" id="ventaProducto" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Estado de Pago</label>
+                        <select id="ventaPago" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="PENDIENTE">PENDIENTE</option>
+                            <option value="PAGADO">PAGADO</option>
+                            <option value="NO REALIZÓ EL PAGO">NO REALIZÓ EL PAGO</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Cantidad</label>
+                        <input type="number" id="ventaCantidad" min="1" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Precio Unitario</label>
+                        <input type="number" id="ventaPrecio" min="0" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Total (automático)</label>
+                        <input type="text" id="ventaTotal" readonly>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-kawaii btn-success">✨ Guardar</button>
+                    <button type="button" class="btn-kawaii btn-info" id="btnImprimirTicket">🧾 Ticket</button>
+                    <button type="button" class="btn-kawaii btn-danger close-modal">❌ Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ÁREA DE IMPRESIÓN TICKET -->
+    <div id="ticket" class="ticket-print">
+        <!-- Contenido del ticket generado dinámicamente -->
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
