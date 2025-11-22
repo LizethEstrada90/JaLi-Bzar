@@ -161,6 +161,7 @@ body::before {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .nav-btn {
@@ -276,6 +277,13 @@ body::before {
     margin-bottom: 30px;
 }
 
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
+
 .stat-card {
     background: linear-gradient(145deg, #ffffff, #fff5f9);
     border-radius: var(--radius-lg);
@@ -290,6 +298,7 @@ body::before {
     border: 2px solid transparent;
     position: relative;
     overflow: hidden;
+    min-height: 100px;
 }
 
 .stat-card::before {
@@ -1046,27 +1055,51 @@ body::before {
     .logo-section h1 {
         font-size: 1.5rem;
     }
-}
-
-/* Móviles grandes (481px - 768px) */
-@media (max-width: 768px) {
-    .header-content {
-        flex-direction: column;
-        align-items: stretch;
-    }
     
-    .logo-section {
+    .header-content {
         justify-content: center;
     }
     
     .main-nav {
         justify-content: center;
+        width: 100%;
+    }
+}
+
+/* Móviles grandes (481px - 768px) */
+@media (max-width: 768px) {
+    .header-kawaii {
+        padding: 15px 0;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .logo-section {
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .logo-personalizado {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .main-nav {
+        justify-content: center;
+        width: 100%;
     }
     
     .nav-btn {
         flex: 1;
         justify-content: center;
-        min-width: 120px;
+        min-width: 110px;
+        max-width: 150px;
+        padding: 10px 15px;
+        font-size: 0.9rem;
     }
     
     .section-title {
@@ -1076,19 +1109,27 @@ body::before {
     .section-header {
         flex-direction: column;
         align-items: stretch;
+        text-align: center;
     }
     
     .action-buttons {
         width: 100%;
+        justify-content: center;
     }
     
     .action-buttons .btn-kawaii {
         flex: 1;
         justify-content: center;
+        min-width: 140px;
     }
     
     .stats-grid {
         grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .stat-card {
+        padding: 20px;
     }
     
     .charts-grid {
@@ -1101,6 +1142,7 @@ body::before {
     
     .table-container {
         padding: 10px;
+        border-radius: var(--radius-md);
     }
     
     .kawaii-table {
@@ -1109,7 +1151,7 @@ body::before {
     
     .kawaii-table th,
     .kawaii-table td {
-        padding: 8px;
+        padding: 8px 5px;
     }
     
     .form-grid {
@@ -1124,16 +1166,26 @@ body::before {
 
 /* Móviles pequeños (hasta 480px) */
 @media (max-width: 480px) {
+    /* Ocultar decoraciones flotantes en móvil para mejor rendimiento */
+    .kawaii-decorations {
+        display: none;
+    }
+    
     .container {
         padding: 0 10px;
     }
     
     .header-kawaii {
-        padding: 15px 0;
+        padding: 12px 0;
     }
     
-    .logo-section h1 {
-        font-size: 1.2rem;
+    .logo-section {
+        width: 100%;
+    }
+    
+    .logo-personalizado {
+        width: 100px;
+        height: 100px;
     }
     
     .bolsi-mascot svg {
@@ -1145,6 +1197,7 @@ body::before {
         padding: 10px 12px;
         font-size: 0.85rem;
         min-width: 100px;
+        max-width: 140px;
     }
     
     .nav-btn span {
@@ -1157,12 +1210,19 @@ body::before {
     
     .stat-card {
         padding: 15px;
+        flex-direction: column;
+        text-align: center;
     }
     
     .stat-icon {
-        font-size: 2rem;
-        width: 50px;
-        height: 50px;
+        font-size: 2.5rem;
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 10px;
+    }
+    
+    .stat-info {
+        width: 100%;
     }
     
     .stat-value {
@@ -1172,10 +1232,12 @@ body::before {
     .btn-kawaii {
         padding: 10px 16px;
         font-size: 0.9rem;
+        width: 100%;
     }
     
     .table-container {
-        border-radius: var(--radius-md);
+        border-radius: var(--radius-sm);
+        padding: 5px;
     }
     
     .kawaii-table {
@@ -1184,7 +1246,7 @@ body::before {
     
     .kawaii-table th,
     .kawaii-table td {
-        padding: 6px;
+        padding: 6px 3px;
     }
     
     .item-card {
@@ -1204,6 +1266,7 @@ body::before {
     
     .form-actions {
         flex-direction: column;
+        gap: 10px;
     }
     
     .form-actions .btn-kawaii {
@@ -1350,5 +1413,4 @@ select:focus {
     to {
         transform: translate(-50%, -50%) rotate(360deg);
     }
-
 }
