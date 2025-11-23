@@ -408,14 +408,14 @@
         <div class="modal-content modal-carrito-mini">
             <div class="modal-header-mini">
                 <span style="font-weight: 600; color: #E91E8C;">🛒 <span id="nombreClienteCarrito"></span></span>
-                <button class="close-modal close-mini">&times;</button>
+                <button class="close-modal" onclick="cerrarModal('modalCarrito')">&times;</button>
             </div>
             
             <div class="modal-body-mini">
                 <!-- Formulario compacto -->
-                <input type="text" id="carritoProducto" placeholder="Producto" class="input-mini">
+                <input type="text" id="carritoProducto" placeholder="Producto" class="input-mini input-producto-largo">
                 <div class="row-mini">
-                    <input type="number" id="carritoCantidad" min="1" value="1" class="input-num-mini">
+                    <input type="number" id="carritoCantidad" min="1" placeholder="Cant" class="input-num-mini">
                     <input type="number" id="carritoPrecio" min="0" step="0.01" placeholder="$" class="input-num-mini">
                     <button type="button" class="btn-add-mini" id="btnAgregarAlCarrito">➕</button>
                 </div>
@@ -447,3 +447,4 @@
     <script src="app.js"></script>
 </body>
 </html>
+
