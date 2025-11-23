@@ -190,6 +190,7 @@ function inicializarEventos() {
     document.getElementById('btnAgregarClienteRapido').addEventListener('click', agregarClienteRapidoLive);
     document.getElementById('btnAgregarAlCarrito').addEventListener('click', agregarProductoAlCarrito);
     document.getElementById('btnImprimirCarrito').addEventListener('click', imprimirTicketCarrito);
+    document.getElementById('btnGenerarImagen').addEventListener('click', generarImagenCute);
     document.getElementById('btnFinalizarLive').addEventListener('click', finalizarLive);
     document.getElementById('btnLimpiarCarritos').addEventListener('click', limpiarTodosLosCarritos);
     
@@ -215,11 +216,16 @@ function inicializarEventos() {
     document.getElementById('formVenta').addEventListener('submit', guardarVenta);
 
     // Cálculos automáticos en formulario de venta
-    document.getElementById('ventaCliente').addEventListener('change', actualizarGrupoVenta);
+    // Event listener para actualizar grupo automáticamente desde RECOLECTOR
     document.getElementById('ventaRecolector').addEventListener('change', actualizarGrupoVenta);
+    
+    // Event listener para actualizar grupo del cliente desde recolector
+    document.getElementById('recolectorCliente').addEventListener('change', actualizarGrupoCliente);
 
     // Impresión de ticket
     document.getElementById('btnImprimirTicket').addEventListener('click', imprimirTicket);
+    // Generar imagen desde modal de ventas
+    document.getElementById('btnGenerarImagenVenta').addEventListener('click', generarImagenDesdeVenta);
 
     // Cerrar modal al hacer clic fuera
     document.querySelectorAll('.modal').forEach(modal => {
@@ -269,6 +275,11 @@ function abrirModal(modalId) {
             limpiarFormularioVenta();
         }
     }
+    
+    // Si es el modal de cliente, actualizar selector de recolectores
+    if (modalId === 'modalCliente') {
+        actualizarSelectRecolectoresCliente();
+    }
 }
 
 function cerrarModal(modalId) {
@@ -299,14 +310,44 @@ function cerrarModal(modalId) {
 }
 
 // ===== GESTIÓN DE CLIENTES =====
+
+// Actualizar select de recolectores en modal de cliente
+function actualizarSelectRecolectoresCliente() {
+    const select = document.getElementById('recolectorCliente');
+    select.innerHTML = '<option value="">Seleccionar recolector...</option>';
+    
+    state.recolectores.forEach(recolector => {
+        select.innerHTML += `<option value="${recolector.id}" data-grupo="${recolector.grupo || ''}">${recolector.nombre} - ${recolector.grupo || 'Sin grupo'}</option>`;
+    });
+}
+
+// Actualizar grupo del cliente cuando selecciona recolector
+function actualizarGrupoCliente() {
+    const select = document.getElementById('recolectorCliente');
+    const inputGrupo = document.getElementById('grupoCliente');
+    
+    const option = select.options[select.selectedIndex];
+    
+    if (option && option.dataset.grupo) {
+        inputGrupo.value = option.dataset.grupo;
+    } else {
+        inputGrupo.value = '';
+    }
+}
+
 function guardarCliente(e) {
     e.preventDefault();
+
+    const recolectorId = document.getElementById('recolectorCliente').value;
+    const recolector = state.recolectores.find(r => r.id == recolectorId);
 
     const cliente = {
         id: Date.now(),
         nombre: document.getElementById('nombreCliente').value.trim(),
-        grupo: document.getElementById('grupoCliente').value.trim(),
-        tipo: document.getElementById('tipoCliente').value
+        tipo: document.getElementById('tipoCliente').value,
+        recolectorId: recolectorId,
+        recolector: recolector ? recolector.nombre : '',
+        grupo: recolector ? recolector.grupo : ''
     };
 
     state.clientes.push(cliente);
@@ -337,7 +378,8 @@ function actualizarListaClientes() {
     container.innerHTML = state.clientes.map(cliente => `
         <div class="item-card">
             <h4>${cliente.nombre}</h4>
-            <p><strong>Grupo:</strong> ${cliente.grupo}</p>
+            <p><strong>Recolector:</strong> ${cliente.recolector || 'Sin asignar'}</p>
+            <p><strong>Grupo:</strong> ${cliente.grupo || 'Sin grupo'}</p>
             <span class="badge ${cliente.tipo === 'Local' ? 'badge-local' : 'badge-foraneo'}">
                 ${cliente.tipo}
             </span>
@@ -421,16 +463,16 @@ function actualizarSelectoresVenta() {
     const selectCliente = document.getElementById('ventaCliente');
     const selectRecolector = document.getElementById('ventaRecolector');
 
-    // Limpiar y llenar selector de clientes
+    // Limpiar y llenar selector de clientes (SIN grupo)
     selectCliente.innerHTML = '<option value="">Seleccionar cliente...</option>';
     state.clientes.forEach(cliente => {
-        selectCliente.innerHTML += `<option value="${cliente.id}" data-grupo="${cliente.grupo}">${cliente.nombre}</option>`;
+        selectCliente.innerHTML += `<option value="${cliente.id}">${cliente.nombre}</option>`;
     });
 
-    // Limpiar y llenar selector de recolectores
+    // Limpiar y llenar selector de recolectores (CON grupo)
     selectRecolector.innerHTML = '<option value="">Seleccionar recolector...</option>';
     state.recolectores.forEach(recolector => {
-        selectRecolector.innerHTML += `<option value="${recolector.id}" data-grupo="${recolector.grupo}">${recolector.nombre}</option>`;
+        selectRecolector.innerHTML += `<option value="${recolector.id}" data-grupo="${recolector.grupo || ''}">${recolector.nombre}</option>`;
     });
 }
 
@@ -556,17 +598,13 @@ function editarVenta(id) {
 }
 
 function actualizarGrupoVenta() {
-    const selectCliente = document.getElementById('ventaCliente');
     const selectRecolector = document.getElementById('ventaRecolector');
     const inputGrupo = document.getElementById('ventaGrupo');
 
-    const clienteOption = selectCliente.options[selectCliente.selectedIndex];
     const recolectorOption = selectRecolector.options[selectRecolector.selectedIndex];
 
-    // Priorizar el grupo del cliente si está seleccionado
-    if (clienteOption && clienteOption.dataset.grupo) {
-        inputGrupo.value = clienteOption.dataset.grupo;
-    } else if (recolectorOption && recolectorOption.dataset.grupo) {
+    // El grupo SIEMPRE viene del recolector seleccionado
+    if (recolectorOption && recolectorOption.dataset.grupo) {
         inputGrupo.value = recolectorOption.dataset.grupo;
     } else {
         inputGrupo.value = '';
@@ -1235,6 +1273,13 @@ function imprimirTicketVenta(venta) {
                     padding-bottom: 10px;
                 }
                 
+                .logo-img {
+                    max-width: 100px;
+                    max-height: 80px;
+                    margin: 0 auto 10px;
+                    display: block;
+                }
+                
                 .logo {
                     font-size: 28px;
                     font-weight: bold;
@@ -1309,6 +1354,7 @@ function imprimirTicketVenta(venta) {
         <body>
             <div class="ticket">
                 <div class="header">
+                    <img src="logo.png" alt="JaLi Bzar" class="logo-img" onerror="this.style.display='none'">
                     <div class="logo">JALI BZAR</div>
                     <div class="emoji">🛍️💗🌸</div>
                     <div class="fecha">${new Date().toLocaleString('es-MX', {
@@ -1373,6 +1419,341 @@ function imprimirTicketVenta(venta) {
 function generarTicketHTML(venta) {
     // Esta función ya no es necesaria pero la dejamos por compatibilidad
     return;
+}
+
+// ===== GENERAR IMAGEN CUTE DESDE MODAL DE VENTAS =====
+function generarImagenDesdeVenta() {
+    // Si estamos editando una venta, usar sus datos
+    if (state.ventaEnEdicion) {
+        const ventaExistente = state.ventasActuales.find(v => v.id === state.ventaEnEdicion);
+        if (ventaExistente) {
+            generarImagenCuteDesdeVenta(ventaExistente);
+            return;
+        }
+    }
+    
+    // Si es una venta nueva, verificar que haya productos
+    if (state.productosTemporal.length === 0) {
+        alert('⚠️ Agrega al menos un producto antes de generar la imagen');
+        return;
+    }
+    
+    // Obtener datos del formulario
+    const clienteId = parseInt(document.getElementById('ventaCliente').value);
+    const recolectorId = parseInt(document.getElementById('ventaRecolector').value);
+    
+    if (!clienteId || !recolectorId) {
+        alert('⚠️ Por favor selecciona un cliente y un recolector');
+        return;
+    }
+
+    const cliente = state.clientes.find(c => c.id === clienteId);
+    const recolector = state.recolectores.find(r => r.id === recolectorId);
+    const grupo = document.getElementById('ventaGrupo').value || '';
+
+    const ventaTemporal = {
+        cliente: cliente ? cliente.nombre : '',
+        recolector: recolector ? recolector.nombre : '',
+        grupo: grupo,
+        productos: state.productosTemporal,
+        total: state.productosTemporal.reduce((sum, p) => sum + p.subtotal, 0)
+    };
+
+    generarImagenCuteDesdeVenta(ventaTemporal);
+}
+
+function generarImagenCuteDesdeVenta(venta) {
+    const fecha = new Date().toLocaleDateString('es-MX', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    
+    // Crear tabla de productos (máximo 5 filas visibles)
+    const filasProductos = venta.productos.slice(0, 5).map(prod => `
+        <tr>
+            <td style="padding: 12px 8px; border: 1px solid #FFD1E8;">${prod.nombre}</td>
+            <td style="padding: 12px 8px; border: 1px solid #FFD1E8; text-align: center;">${prod.cantidad}</td>
+            <td style="padding: 12px 8px; border: 1px solid #FFD1E8; text-align: center;">$${prod.precioUnitario.toFixed(2)}</td>
+            <td style="padding: 12px 8px; border: 1px solid #FFD1E8; text-align: center; font-weight: 600;">$${prod.subtotal.toFixed(2)}</td>
+        </tr>
+    `).join('');
+    
+    // Abrir ventana nueva con la imagen
+    const ventana = window.open('', '', 'width=900,height=1200');
+    
+    ventana.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Nota de Venta - ${venta.cliente}</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+                    background: linear-gradient(135deg, #FFB6D9 0%, #FF8AB8 100%);
+                    padding: 20px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 100vh;
+                }
+                .nota {
+                    width: 800px;
+                    background: white;
+                    border-radius: 30px;
+                    padding: 40px;
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 30px;
+                    position: relative;
+                }
+                .decoracion-izq {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    font-size: 60px;
+                }
+                .decoracion-der {
+                    position: absolute;
+                    right: 0;
+                    top: 0;
+                    font-size: 60px;
+                }
+                .logo-img {
+                    max-width: 300px;
+                    margin: 0 auto 15px;
+                    display: block;
+                }
+                .titulo {
+                    font-size: 48px;
+                    color: #9B59B6;
+                    font-weight: bold;
+                    margin-bottom: 5px;
+                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+                }
+                .subtitulo {
+                    font-size: 20px;
+                    color: #FF69B4;
+                    font-style: italic;
+                }
+                .subtitulo-esp {
+                    font-size: 18px;
+                    color: #E8A547;
+                    font-family: 'Brush Script MT', cursive;
+                }
+                .info-box {
+                    background: linear-gradient(135deg, #FFF5F9, #FFE8F0);
+                    border-radius: 20px;
+                    padding: 25px;
+                    margin-bottom: 30px;
+                    border: 3px solid #FFB6D9;
+                }
+                .info-row {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 12px;
+                }
+                .info-label {
+                    color: #FF69B4;
+                    font-weight: bold;
+                    font-size: 18px;
+                }
+                .info-value {
+                    color: #333;
+                    font-size: 18px;
+                }
+                .productos-box {
+                    background: linear-gradient(135deg, #FFF5F9, #FFE8F0);
+                    border-radius: 20px;
+                    padding: 25px;
+                    margin-bottom: 25px;
+                    border: 3px solid #FFB6D9;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                th {
+                    background: linear-gradient(135deg, #FFB6D9, #FF8AB8);
+                    color: white;
+                    padding: 15px 8px;
+                    font-size: 18px;
+                    border: 1px solid #FF8AB8;
+                }
+                td {
+                    font-size: 16px;
+                }
+                .metodo-pago {
+                    display: flex;
+                    gap: 15px;
+                    align-items: center;
+                    margin-bottom: 20px;
+                    flex-wrap: wrap;
+                }
+                .metodo-label {
+                    color: #FF69B4;
+                    font-weight: bold;
+                    font-size: 18px;
+                }
+                .metodo-opcion {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 16px;
+                }
+                .circulo {
+                    width: 20px;
+                    height: 20px;
+                    border: 2px solid #FFB6D9;
+                    border-radius: 50%;
+                    display: inline-block;
+                }
+                .circulo-azul { border-color: #64B5F6; background: #64B5F6; }
+                .circulo-amarillo { border-color: #FFD54F; background: #FFD54F; }
+                .circulo-rosa { border-color: #FFB6D9; }
+                .total-box {
+                    background: linear-gradient(135deg, #FFF5F9, #FFE8F0);
+                    border: 3px solid #FFB6D9;
+                    border-radius: 15px;
+                    padding: 20px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 25px;
+                }
+                .total-label {
+                    font-size: 28px;
+                    color: #FF69B4;
+                    font-weight: bold;
+                }
+                .total-monto {
+                    font-size: 36px;
+                    color: #9B59B6;
+                    font-weight: bold;
+                }
+                .footer {
+                    text-align: center;
+                    padding: 15px;
+                    border-top: 2px dashed #FFB6D9;
+                    margin-top: 20px;
+                }
+                .footer-icono {
+                    font-size: 40px;
+                    margin-bottom: 10px;
+                }
+                .footer-text {
+                    color: #FF69B4;
+                    font-size: 24px;
+                    font-weight: bold;
+                }
+                @media print {
+                    body { background: white; padding: 0; }
+                    .nota { box-shadow: none; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="nota">
+                <div class="header">
+                    <div class="decoracion-izq">🌸🩷</div>
+                    <div class="decoracion-der">🌸🩷</div>
+                    <img src="logo.png" alt="JaLi Bzar" class="logo-img" onerror="this.style.display='none'">
+                    <div class="subtitulo">✨💜✨</div>
+                    <div class="subtitulo-esp">Gracias por su compra</div>
+                </div>
+                
+                <div class="info-box">
+                    <div class="info-row">
+                        <span class="info-label">Fecha:</span>
+                        <span class="info-value">${fecha}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Nombre:</span>
+                        <span class="info-value">${venta.cliente}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Recolector:</span>
+                        <span class="info-value">${venta.recolector}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Grupo:</span>
+                        <span class="info-value">${venta.grupo}</span>
+                    </div>
+                </div>
+                
+                <div class="productos-box">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filasProductos}
+                            ${venta.productos.length > 5 ? `
+                                <tr>
+                                    <td colspan="4" style="text-align: center; padding: 10px; color: #999; font-style: italic;">
+                                        + ${venta.productos.length - 5} productos más...
+                                    </td>
+                                </tr>
+                            ` : ''}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="info-box">
+                    <div class="metodo-pago">
+                        <span class="metodo-label">Método de pago</span>
+                        <div class="metodo-opcion">
+                            <span class="circulo"></span>
+                            <span>Efectivo</span>
+                        </div>
+                        <div class="metodo-opcion">
+                            <span class="circulo circulo-azul"></span>
+                            <span>Transferencia</span>
+                        </div>
+                        <div class="metodo-opcion">
+                            <span class="circulo circulo-rosa"></span>
+                            <span>Pagado</span>
+                        </div>
+                        <div class="metodo-opcion">
+                            <span class="circulo circulo-amarillo"></span>
+                            <span>Pendiente a pagar</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="total-box">
+                    <span class="total-label">Total</span>
+                    <span class="total-monto">$${venta.total.toFixed(2)}</span>
+                </div>
+                
+                <div class="footer">
+                    <div class="footer-icono">💌</div>
+                    <div class="footer-text">JaLi Bzar</div>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
+    
+    ventana.document.close();
+    
+    setTimeout(() => {
+        if (confirm('✅ Imagen generada!\n\n¿Quieres guardarla?\n\nOK = Guardar como imagen\nCancelar = Solo ver')) {
+            ventana.print();
+        }
+    }, 500);
+    
+    sonarExito();
+    mostrarNotificacion('📸 Imagen cute generada!', 'success');
 }
 
 // ===== LIVE DE VENTAS - SISTEMA DE CARRITOS =====
@@ -1654,6 +2035,7 @@ function imprimirTicketCarrito() {
                 body { font-family: 'Courier New', monospace; padding: 20px; background: white; }
                 .ticket { width: 80mm; margin: 0 auto; padding: 10mm; background: white; }
                 .header { text-align: center; margin-bottom: 15px; border-bottom: 2px dashed #000; padding-bottom: 10px; }
+                .logo-img { max-width: 100px; max-height: 80px; margin: 0 auto 10px; display: block; }
                 .logo { font-size: 28px; font-weight: bold; color: #E91E8C; margin-bottom: 8px; }
                 .fecha { font-size: 11px; color: #666; }
                 .emoji { font-size: 24px; margin: 8px 0; }
@@ -1673,6 +2055,7 @@ function imprimirTicketCarrito() {
         <body>
             <div class="ticket">
                 <div class="header">
+                    <img src="logo.png" alt="JaLi Bzar" class="logo-img" onerror="this.style.display='none'">
                     <div class="logo">JALI BZAR</div>
                     <div class="emoji">🛍️💗🌸</div>
                     <div class="fecha">${new Date().toLocaleString('es-MX', {
@@ -1725,6 +2108,316 @@ function imprimirTicketCarrito() {
     }, 250);
 }
 
+// Generar imagen cute para foráneos (estilo nota rosa)
+function generarImagenCute() {
+    const carrito = state.carritosLive.find(c => c.id === state.carritoActual);
+    if (!carrito) return;
+    
+    if (!carrito.productos || carrito.productos.length === 0) {
+        alert('⚠️ No hay productos en el carrito para generar imagen');
+        return;
+    }
+    
+    // Buscar datos del cliente
+    const cliente = state.clientes.find(c => c.nombre.toLowerCase() === carrito.nombre.toLowerCase());
+    const recolector = cliente && cliente.recolector ? cliente.recolector : 'Facebook Live';
+    const grupo = cliente && cliente.grupo ? cliente.grupo : 'LIVE';
+    
+    const fecha = new Date().toLocaleDateString('es-MX', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    
+    // Crear tabla de productos (máximo 5 filas visibles)
+    const filasProductos = carrito.productos.slice(0, 5).map(prod => `
+        <tr>
+            <td style="padding: 12px 8px; border: 1px solid #FFD1E8;">${prod.nombre}</td>
+            <td style="padding: 12px 8px; border: 1px solid #FFD1E8; text-align: center;">${prod.cantidad}</td>
+            <td style="padding: 12px 8px; border: 1px solid #FFD1E8; text-align: center;">$${prod.precioUnitario.toFixed(2)}</td>
+            <td style="padding: 12px 8px; border: 1px solid #FFD1E8; text-align: center; font-weight: 600;">$${prod.subtotal.toFixed(2)}</td>
+        </tr>
+    `).join('');
+    
+    // Abrir ventana nueva con la imagen
+    const ventana = window.open('', '', 'width=900,height=1200');
+    
+    ventana.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Nota de Venta - ${carrito.nombre}</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+                    background: linear-gradient(135deg, #FFB6D9 0%, #FF8AB8 100%);
+                    padding: 20px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 100vh;
+                }
+                .nota {
+                    width: 800px;
+                    background: white;
+                    border-radius: 30px;
+                    padding: 40px;
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 30px;
+                    position: relative;
+                }
+                .decoracion-izq {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    font-size: 60px;
+                }
+                .decoracion-der {
+                    position: absolute;
+                    right: 0;
+                    top: 0;
+                    font-size: 60px;
+                }
+                .logo-img {
+                    max-width: 300px;
+                    margin: 0 auto 15px;
+                    display: block;
+                }
+                .titulo {
+                    font-size: 48px;
+                    color: #9B59B6;
+                    font-weight: bold;
+                    margin-bottom: 5px;
+                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+                }
+                .subtitulo {
+                    font-size: 20px;
+                    color: #FF69B4;
+                    font-style: italic;
+                }
+                .subtitulo-esp {
+                    font-size: 18px;
+                    color: #E8A547;
+                    font-family: 'Brush Script MT', cursive;
+                }
+                .info-box {
+                    background: linear-gradient(135deg, #FFF5F9, #FFE8F0);
+                    border-radius: 20px;
+                    padding: 25px;
+                    margin-bottom: 30px;
+                    border: 3px solid #FFB6D9;
+                }
+                .info-row {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 12px;
+                }
+                .info-label {
+                    color: #FF69B4;
+                    font-weight: bold;
+                    font-size: 18px;
+                }
+                .info-value {
+                    color: #333;
+                    font-size: 18px;
+                }
+                .productos-box {
+                    background: linear-gradient(135deg, #FFF5F9, #FFE8F0);
+                    border-radius: 20px;
+                    padding: 25px;
+                    margin-bottom: 25px;
+                    border: 3px solid #FFB6D9;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                th {
+                    background: linear-gradient(135deg, #FFB6D9, #FF8AB8);
+                    color: white;
+                    padding: 15px 8px;
+                    font-size: 18px;
+                    border: 1px solid #FF8AB8;
+                }
+                td {
+                    font-size: 16px;
+                }
+                .metodo-pago {
+                    display: flex;
+                    gap: 15px;
+                    align-items: center;
+                    margin-bottom: 20px;
+                    flex-wrap: wrap;
+                }
+                .metodo-label {
+                    color: #FF69B4;
+                    font-weight: bold;
+                    font-size: 18px;
+                }
+                .metodo-opcion {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 16px;
+                }
+                .circulo {
+                    width: 20px;
+                    height: 20px;
+                    border: 2px solid #FFB6D9;
+                    border-radius: 50%;
+                    display: inline-block;
+                }
+                .circulo-azul { border-color: #64B5F6; background: #64B5F6; }
+                .circulo-amarillo { border-color: #FFD54F; background: #FFD54F; }
+                .circulo-rosa { border-color: #FFB6D9; }
+                .total-box {
+                    background: linear-gradient(135deg, #FFF5F9, #FFE8F0);
+                    border: 3px solid #FFB6D9;
+                    border-radius: 15px;
+                    padding: 20px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 25px;
+                }
+                .total-label {
+                    font-size: 28px;
+                    color: #FF69B4;
+                    font-weight: bold;
+                }
+                .total-monto {
+                    font-size: 36px;
+                    color: #9B59B6;
+                    font-weight: bold;
+                }
+                .footer {
+                    text-align: center;
+                    padding: 15px;
+                    border-top: 2px dashed #FFB6D9;
+                    margin-top: 20px;
+                }
+                .footer-icono {
+                    font-size: 40px;
+                    margin-bottom: 10px;
+                }
+                .footer-text {
+                    color: #FF69B4;
+                    font-size: 24px;
+                    font-weight: bold;
+                }
+                @media print {
+                    body { background: white; padding: 0; }
+                    .nota { box-shadow: none; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="nota">
+                <div class="header">
+                    <div class="decoracion-izq">🛍️💗</div>
+                    <div class="decoracion-der">📦🎀</div>
+                    <img src="logo.png" alt="JaLi Bzar" class="logo-img" onerror="this.style.display='none'">
+                    <div class="titulo">JaLi Bzar</div>
+                    <div class="subtitulo">💗</div>
+                    <div class="subtitulo-esp">Gracias por su compra</div>
+                </div>
+                
+                <div class="info-box">
+                    <div class="info-row">
+                        <span class="info-label">Fecha:</span>
+                        <span class="info-value">${fecha}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Nombre:</span>
+                        <span class="info-value">${carrito.nombre}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Recolector:</span>
+                        <span class="info-value">${recolector}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Grupo:</span>
+                        <span class="info-value">${grupo}</span>
+                    </div>
+                </div>
+                
+                <div class="productos-box">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filasProductos}
+                            ${carrito.productos.length > 5 ? `
+                                <tr>
+                                    <td colspan="4" style="text-align: center; padding: 10px; color: #999; font-style: italic;">
+                                        + ${carrito.productos.length - 5} productos más...
+                                    </td>
+                                </tr>
+                            ` : ''}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="info-box">
+                    <div class="metodo-pago">
+                        <span class="metodo-label">Método de pago</span>
+                        <div class="metodo-opcion">
+                            <span class="circulo"></span>
+                            <span>Efectivo</span>
+                        </div>
+                        <div class="metodo-opcion">
+                            <span class="circulo circulo-azul"></span>
+                            <span>Transferencia</span>
+                        </div>
+                        <div class="metodo-opcion">
+                            <span class="circulo circulo-amarillo"></span>
+                            <span>Pagado</span>
+                        </div>
+                        <div class="metodo-opcion">
+                            <span class="circulo circulo-rosa"></span>
+                            <span>Pendiente a pagar</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="total-box">
+                    <span class="total-label">Total</span>
+                    <span class="total-monto">$${(carrito.total || 0).toFixed(2)}</span>
+                </div>
+                
+                <div class="footer">
+                    <div class="footer-icono">👍</div>
+                    <div class="footer-text">JaLi Bzar</div>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
+    
+    ventana.document.close();
+    
+    // Dar tiempo para cargar y luego mostrar opciones
+    setTimeout(() => {
+        if (confirm('✅ Imagen generada!\n\n¿Quieres guardarla?\n\nOK = Guardar como imagen\nCancelar = Solo ver')) {
+            ventana.print();
+        }
+    }, 500);
+    
+    sonarExito();
+    mostrarNotificacion('📸 Imagen cute generada!', 'success');
+}
+
 // Finalizar live y convertir carritos en ventas
 function finalizarLive() {
     if (state.carritosLive.length === 0) {
@@ -1743,13 +2436,21 @@ function finalizarLive() {
             // Buscar si el cliente ya existe
             let cliente = state.clientes.find(c => c.nombre.toLowerCase() === carrito.nombre.toLowerCase());
             
-            // Si no existe, crear cliente
-            if (!cliente) {
+            let recolectorVenta = 'Facebook Live';
+            let grupoVenta = 'LIVE';
+            
+            if (cliente && cliente.recolector && cliente.grupo) {
+                // Cliente YA EXISTE y tiene recolector asignado
+                recolectorVenta = cliente.recolector;
+                grupoVenta = cliente.grupo;
+            } else if (!cliente) {
+                // Cliente NO EXISTE - crear nuevo con tipo Foráneo
                 cliente = {
                     id: Date.now() + Math.random(),
                     nombre: carrito.nombre,
-                    grupo: 'LIVE',
-                    tipo: 'Foráneo'
+                    tipo: 'Foráneo',
+                    recolector: 'Facebook Live',
+                    grupo: 'LIVE'
                 };
                 state.clientes.push(cliente);
             }
@@ -1759,8 +2460,8 @@ function finalizarLive() {
                 id: Date.now() + Math.random(),
                 fecha: new Date().toISOString(),
                 cliente: carrito.nombre,
-                recolector: 'Facebook Live',
-                grupo: 'LIVE',
+                recolector: recolectorVenta,
+                grupo: grupoVenta,
                 pago: 'PENDIENTE',
                 productos: [...carrito.productos],
                 total: carrito.total || 0,
