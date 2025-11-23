@@ -1065,6 +1065,153 @@ body::before {
 
 /* ===== RESPONSIVE DESIGN ===== */
 
+/* ===== LIVE DE VENTAS - CARRITOS ===== */
+.carritos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.carrito-card {
+    background: linear-gradient(145deg, #ffffff, #fff5f9);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: 0 8px 25px rgba(255, 138, 184, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 1);
+    border: 2px solid #FFB6D9;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+}
+
+.carrito-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 35px rgba(255, 138, 184, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 1),
+                inset 0 1px 0 rgba(255, 255, 255, 1);
+    border-color: #FF8AB8;
+}
+
+.carrito-agregar {
+    background: linear-gradient(145deg, #fff5f9, #FFE8F0);
+    border: 3px dashed #FFB6D9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carrito-agregar:hover {
+    background: linear-gradient(145deg, #FFE8F0, #FFB6D9);
+    border-color: #FF8AB8;
+}
+
+.carrito-add-content {
+    text-align: center;
+}
+
+.add-icon {
+    font-size: 4rem;
+    color: #FF8AB8;
+    margin-bottom: 10px;
+    transition: transform 0.3s ease;
+}
+
+.carrito-agregar:hover .add-icon {
+    transform: scale(1.2) rotate(90deg);
+}
+
+.carrito-add-content p {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #E91E8C;
+}
+
+.carrito-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #FFE8F0;
+}
+
+.carrito-nombre {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #E91E8C;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.carrito-eliminar {
+    background: var(--rojo-pastel);
+    color: #C62828;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.carrito-eliminar:hover {
+    background: #EF9A9A;
+    transform: scale(1.1);
+}
+
+.carrito-productos {
+    flex: 1;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.carrito-producto-item {
+    background: #fff;
+    padding: 8px;
+    margin-bottom: 6px;
+    border-radius: 8px;
+    border: 1px solid #FFE8F0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.carrito-total {
+    padding-top: 15px;
+    border-top: 2px solid #FFB6D9;
+    text-align: right;
+}
+
+.carrito-total-label {
+    font-size: 0.9rem;
+    color: #999;
+    margin-bottom: 5px;
+}
+
+.carrito-total-monto {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #E91E8C;
+}
+
+.carrito-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #FFB6D9, #FF8AB8);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
 /* Pantallas muy grandes (más de 1400px) - Logo puede ser más grande */
 @media (min-width: 1400px) {
     .logo-personalizado {
