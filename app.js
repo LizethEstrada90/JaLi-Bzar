@@ -187,20 +187,18 @@ function inicializarEventos() {
     document.getElementById('btnAgregarProducto').addEventListener('click', agregarProductoALista);
     
     // Live de Ventas - Carritos
-    document.getElementById('btnAgregarRapido').addEventListener('click', agregarProductoRapido);
+    document.getElementById('btnAgregarClienteRapido').addEventListener('click', agregarClienteRapidoLive);
     document.getElementById('btnAgregarAlCarrito').addEventListener('click', agregarProductoAlCarrito);
     document.getElementById('btnImprimirCarrito').addEventListener('click', imprimirTicketCarrito);
     document.getElementById('btnFinalizarLive').addEventListener('click', finalizarLive);
     document.getElementById('btnLimpiarCarritos').addEventListener('click', limpiarTodosLosCarritos);
     
-    // Enter en campos rápidos
-    ['quickCliente', 'quickProducto', 'quickCantidad', 'quickPrecio'].forEach(id => {
-        document.getElementById(id).addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                agregarProductoRapido();
-            }
-        });
+    // Enter en campo cliente
+    document.getElementById('quickCliente').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            agregarClienteRapidoLive();
+        }
     });
 
     // Cerrar modales
@@ -1379,12 +1377,9 @@ function generarTicketHTML(venta) {
 
 // ===== LIVE DE VENTAS - SISTEMA DE CARRITOS =====
 
-// Agregar producto de forma rápida
-function agregarProductoRapido() {
+// Agregar cliente rápido (solo nombre, sin productos)
+function agregarClienteRapidoLive() {
     const nombreCliente = document.getElementById('quickCliente').value.trim();
-    const nombreProducto = document.getElementById('quickProducto').value.trim();
-    const cantidad = parseFloat(document.getElementById('quickCantidad').value) || 0;
-    const precio = parseFloat(document.getElementById('quickPrecio').value) || 0;
     
     if (!nombreCliente) {
         alert('⚠️ Escribe el nombre del cliente');
@@ -1392,51 +1387,36 @@ function agregarProductoRapido() {
         return;
     }
     
-    if (!nombreProducto || cantidad <= 0 || precio <= 0) {
-        alert('⚠️ Completa los datos del producto');
-        return;
-    }
-    
     // Buscar si el cliente ya existe
-    let carrito = state.carritosLive.find(c => 
+    const existe = state.carritosLive.find(c => 
         c.nombre.toLowerCase() === nombreCliente.toLowerCase()
     );
     
-    // Si no existe, crear carrito nuevo
-    if (!carrito) {
-        carrito = {
-            id: Date.now(),
-            nombre: nombreCliente,
-            productos: [],
-            total: 0
-        };
-        state.carritosLive.push(carrito);
+    if (existe) {
+        alert('⚠️ Este cliente ya existe');
+        document.getElementById('quickCliente').value = '';
+        document.getElementById('quickCliente').focus();
+        return;
     }
     
-    // Agregar producto
-    const producto = {
-        id: Date.now() + Math.random(),
-        nombre: nombreProducto,
-        cantidad: cantidad,
-        precioUnitario: precio,
-        subtotal: cantidad * precio
+    // Crear carrito nuevo vacío
+    const carrito = {
+        id: Date.now(),
+        nombre: nombreCliente,
+        productos: [],
+        total: 0
     };
     
-    carrito.productos.push(producto);
-    carrito.total = carrito.productos.reduce((sum, p) => sum + p.subtotal, 0);
+    state.carritosLive.unshift(carrito); // unshift para agregar al inicio
     
-    // Limpiar campos excepto cliente
-    document.getElementById('quickProducto').value = '';
-    document.getElementById('quickCantidad').value = '1';
-    document.getElementById('quickPrecio').value = '';
-    
-    // Enfocar en producto para seguir agregando
-    document.getElementById('quickProducto').focus();
+    // Limpiar campo
+    document.getElementById('quickCliente').value = '';
+    document.getElementById('quickCliente').focus();
     
     guardarDatos();
     actualizarCarritosGrid();
-    sonarPop();
-    mostrarNotificacion(`✅ Agregado a ${nombreCliente}`, 'success');
+    sonarExito();
+    mostrarNotificacion(`✅ Cliente ${nombreCliente} agregado`, 'success');
 }
 
 // Actualizar grid de carritos (VISTA DUAL: Lista en móvil, Cuadros en PC)
@@ -1460,13 +1440,13 @@ function actualizarCarritosGrid() {
             <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #999;">
                 <p style="font-size: 2rem; margin-bottom: 10px;">📹</p>
                 <p style="font-size: 1.1rem;">No hay clientes en el live</p>
-                <p>Usa el formulario de arriba para agregar</p>
+                <p>Presiona el botón ➕ para agregar</p>
             </div>
         `;
         return;
     }
     
-    // Crear elementos para cada carrito
+    // Crear elementos para cada carrito (se agregan al FINAL pero por CSS se ven al inicio)
     state.carritosLive.forEach(carrito => {
         const cantidadProductos = carrito.productos ? carrito.productos.length : 0;
         const total = carrito.total || 0;
@@ -1572,10 +1552,13 @@ function agregarProductoAlCarrito() {
     carrito.productos.push(producto);
     carrito.total = carrito.productos.reduce((sum, p) => sum + p.subtotal, 0);
     
-    // Limpiar campos
+    // Limpiar campos (cantidad también)
     document.getElementById('carritoProducto').value = '';
-    document.getElementById('carritoCantidad').value = '1';
+    document.getElementById('carritoCantidad').value = '';
     document.getElementById('carritoPrecio').value = '';
+    
+    // Enfocar en producto
+    document.getElementById('carritoProducto').focus();
     
     guardarDatos();
     actualizarListaProductosCarrito();
@@ -1794,9 +1777,6 @@ function finalizarLive() {
     
     // Limpiar formulario rápido
     document.getElementById('quickCliente').value = '';
-    document.getElementById('quickProducto').value = '';
-    document.getElementById('quickCantidad').value = '1';
-    document.getElementById('quickPrecio').value = '';
     
     guardarDatos();
     actualizarCarritosGrid();
@@ -1826,9 +1806,6 @@ function limpiarTodosLosCarritos() {
     
     // Limpiar formulario rápido
     document.getElementById('quickCliente').value = '';
-    document.getElementById('quickProducto').value = '';
-    document.getElementById('quickCantidad').value = '1';
-    document.getElementById('quickPrecio').value = '';
     
     guardarDatos();
     actualizarCarritosGrid();
