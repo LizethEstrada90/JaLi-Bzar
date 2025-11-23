@@ -40,6 +40,9 @@
                     <button class="nav-btn active" data-section="dashboard">
                         <span>📊</span> Dashboard
                     </button>
+                    <button class="nav-btn" data-section="live">
+                        <span>📹</span> Live Ventas
+                    </button>
                     <button class="nav-btn" data-section="ventas">
                         <span>🛍️</span> Ventas
                     </button>
@@ -126,6 +129,31 @@
                     <div class="chart-card">
                         <h3>Productos Más Vendidos 🌟</h3>
                         <canvas id="chartProductos"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN LIVE DE VENTAS -->
+        <section id="live" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Live de Ventas 📹🛍️</h2>
+                    <div class="action-buttons">
+                        <button class="btn-kawaii btn-success" id="btnFinalizarLive">
+                            <span>✅</span> Finalizar Live
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grid de carritos de clientes -->
+                <div class="carritos-grid" id="carritosGrid">
+                    <!-- Botón para agregar nuevo cliente -->
+                    <div class="carrito-card carrito-agregar" id="btnAgregarCarrito">
+                        <div class="carrito-add-content">
+                            <div class="add-icon">➕</div>
+                            <p>Agregar Cliente</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -363,6 +391,63 @@
                     <button type="button" class="btn-kawaii btn-danger close-modal">❌ Cerrar</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- MODAL CARRITO DEL CLIENTE -->
+    <div id="modalCarrito" class="modal">
+        <div class="modal-content modal-wide">
+            <div class="modal-header">
+                <h3 id="tituloCarrito">🛒 Carrito - <span id="nombreClienteCarrito"></span></h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="carrito-body">
+                <!-- Formulario para agregar producto al carrito -->
+                <div style="background: linear-gradient(145deg, #fff5f9, #ffffff); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 2px solid #FFB6D9;">
+                    <h4 style="color: #E91E8C; margin-bottom: 15px;">➕ Agregar Producto</h4>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Producto</label>
+                            <input type="text" id="carritoProducto" placeholder="Ej: Blusa rosa">
+                        </div>
+                        <div class="form-group">
+                            <label>Cantidad</label>
+                            <input type="number" id="carritoCantidad" min="1" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Precio</label>
+                            <input type="number" id="carritoPrecio" min="0" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button type="button" class="btn-kawaii btn-success" id="btnAgregarAlCarrito" style="width: 100%;">
+                                ➕ Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de productos en el carrito -->
+                <div style="background: white; border-radius: 16px; padding: 20px; border: 2px solid #FFE8F0;">
+                    <h4 style="color: #E91E8C; margin-bottom: 15px;">📦 Productos en el carrito</h4>
+                    <div id="listaProductosCarrito" style="max-height: 300px; overflow-y: auto;">
+                        <p style="text-align: center; color: #999; padding: 20px;">
+                            No hay productos en el carrito
+                        </p>
+                    </div>
+                    
+                    <!-- Total del carrito -->
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 3px solid #FFB6D9; text-align: right;">
+                        <span style="font-size: 1.5rem; font-weight: bold; color: #E91E8C;">
+                            TOTAL: <span id="totalCarrito">$0.00</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-actions" style="margin-top: 20px;">
+                    <button type="button" class="btn-kawaii btn-info" id="btnImprimirCarrito">🧾 Imprimir</button>
+                    <button type="button" class="btn-kawaii btn-danger close-modal">❌ Cerrar</button>
+                </div>
+            </div>
         </div>
     </div>
 
