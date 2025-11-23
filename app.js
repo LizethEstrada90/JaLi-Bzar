@@ -257,6 +257,9 @@ function abrirModal(modalId) {
     const modal = document.getElementById(modalId);
     modal.classList.add('active');
     
+    // Prevenir scroll del body
+    document.body.classList.add('modal-open');
+    
     // Sonar campana kawaii al abrir modal
     sonarCampana();
 
@@ -274,6 +277,9 @@ function cerrarModal(modalId) {
     const modal = document.getElementById(modalId);
     modal.classList.remove('active');
     
+    // Restaurar scroll del body
+    document.body.classList.remove('modal-open');
+    
     // Sonido suave al cerrar
     sonarClick();
     
@@ -286,6 +292,11 @@ function cerrarModal(modalId) {
         state.ventaEnEdicion = null;
         state.productosTemporal = [];
         document.getElementById('tituloModalVenta').textContent = 'Nueva Venta 🛍️';
+    }
+    
+    // Si cerramos modal de carrito, limpiar estado
+    if (modalId === 'modalCarrito') {
+        state.carritoActual = null;
     }
 }
 
