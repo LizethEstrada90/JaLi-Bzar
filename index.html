@@ -149,15 +149,28 @@
                     </div>
                 </div>
 
-                <!-- Grid de carritos de clientes -->
-                <div class="carritos-grid" id="carritosGrid">
-                    <!-- Botón para agregar nuevo cliente -->
-                    <div class="carrito-card carrito-agregar" id="btnAgregarCarrito">
-                        <div class="carrito-add-content">
-                            <div class="add-icon">➕</div>
-                            <p>Agregar Cliente</p>
+                <!-- Panel de agregar rápido (siempre visible) -->
+                <div class="panel-rapido">
+                    <div class="form-rapido">
+                        <div class="form-rapido-row">
+                            <input type="text" id="quickCliente" placeholder="👤 Cliente" class="input-rapido input-cliente">
+                        </div>
+                        <div class="form-rapido-row">
+                            <input type="text" id="quickProducto" placeholder="📦 Producto" class="input-rapido input-producto">
+                            <input type="number" id="quickCantidad" value="1" min="1" class="input-rapido input-cant">
+                            <input type="number" id="quickPrecio" placeholder="💰 $" step="0.01" class="input-rapido input-precio">
+                        </div>
+                        <div class="form-rapido-row">
+                            <button class="btn-kawaii btn-success btn-rapido" id="btnAgregarRapido">
+                                ➕ AGREGAR
+                            </button>
                         </div>
                     </div>
+                </div>
+
+                <!-- Lista de carritos (vista lista en móvil, cuadros en PC) -->
+                <div class="carritos-container" id="carritosContainer">
+                    <!-- Los carritos se agregan aquí -->
                 </div>
             </div>
         </section>
@@ -399,56 +412,40 @@
 
     <!-- MODAL CARRITO DEL CLIENTE -->
     <div id="modalCarrito" class="modal">
-        <div class="modal-content modal-wide">
+        <div class="modal-content modal-carrito-small">
             <div class="modal-header">
-                <h3 id="tituloCarrito">🛒 Carrito - <span id="nombreClienteCarrito"></span></h3>
+                <h3 id="tituloCarrito">🛒 <span id="nombreClienteCarrito"></span></h3>
                 <button class="close-modal">&times;</button>
             </div>
-            <div class="carrito-body">
-                <!-- Formulario para agregar producto al carrito -->
-                <div style="background: linear-gradient(145deg, #fff5f9, #ffffff); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 2px solid #FFB6D9;">
-                    <h4 style="color: #E91E8C; margin-bottom: 15px;">➕ Agregar Producto</h4>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Producto</label>
-                            <input type="text" id="carritoProducto" placeholder="Ej: Blusa rosa">
-                        </div>
-                        <div class="form-group">
-                            <label>Cantidad</label>
-                            <input type="number" id="carritoCantidad" min="1" value="1">
-                        </div>
-                        <div class="form-group">
-                            <label>Precio</label>
-                            <input type="number" id="carritoPrecio" min="0" step="0.01" placeholder="0.00">
-                        </div>
-                        <div class="form-group" style="display: flex; align-items: flex-end;">
-                            <button type="button" class="btn-kawaii btn-success" id="btnAgregarAlCarrito" style="width: 100%;">
-                                ➕ Agregar
-                            </button>
-                        </div>
+            <div class="carrito-body-small">
+                <!-- Formulario compacto para agregar producto -->
+                <div class="form-carrito-compacto">
+                    <input type="text" id="carritoProducto" placeholder="📦 Producto" class="input-compacto">
+                    <div class="form-row-compacto">
+                        <input type="number" id="carritoCantidad" min="1" value="1" placeholder="Cant." class="input-compacto input-mini">
+                        <input type="number" id="carritoPrecio" min="0" step="0.01" placeholder="$ Precio" class="input-compacto input-mini">
+                        <button type="button" class="btn-kawaii btn-success btn-compacto" id="btnAgregarAlCarrito">
+                            ➕
+                        </button>
                     </div>
                 </div>
 
-                <!-- Lista de productos en el carrito -->
-                <div style="background: white; border-radius: 16px; padding: 20px; border: 2px solid #FFE8F0;">
-                    <h4 style="color: #E91E8C; margin-bottom: 15px;">📦 Productos en el carrito</h4>
-                    <div id="listaProductosCarrito" style="max-height: 300px; overflow-y: auto;">
-                        <p style="text-align: center; color: #999; padding: 20px;">
-                            No hay productos en el carrito
-                        </p>
-                    </div>
-                    
-                    <!-- Total del carrito -->
-                    <div style="margin-top: 20px; padding-top: 20px; border-top: 3px solid #FFB6D9; text-align: right;">
-                        <span style="font-size: 1.5rem; font-weight: bold; color: #E91E8C;">
-                            TOTAL: <span id="totalCarrito">$0.00</span>
-                        </span>
-                    </div>
+                <!-- Lista compacta de productos -->
+                <div class="lista-productos-compacta" id="listaProductosCarrito">
+                    <p style="text-align: center; color: #999; padding: 15px; font-size: 0.9rem;">
+                        No hay productos
+                    </p>
                 </div>
 
-                <div class="form-actions" style="margin-top: 20px;">
-                    <button type="button" class="btn-kawaii btn-info" id="btnImprimirCarrito">🧾 Imprimir</button>
-                    <button type="button" class="btn-kawaii btn-danger close-modal">❌ Cerrar</button>
+                <!-- Total y acciones -->
+                <div class="carrito-footer-compacto">
+                    <div class="total-compacto">
+                        TOTAL: <span id="totalCarrito" style="color: #E91E8C; font-weight: bold;">$0.00</span>
+                    </div>
+                    <div class="acciones-compactas">
+                        <button type="button" class="btn-kawaii btn-info btn-small" id="btnImprimirCarrito">🧾</button>
+                        <button type="button" class="btn-kawaii btn-danger btn-small close-modal">✖️</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -463,5 +460,6 @@
     <script src="app.js"></script>
 </body>
 </html>
+
 
 
