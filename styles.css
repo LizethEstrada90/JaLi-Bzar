@@ -1067,7 +1067,7 @@ body::before {
 
 /* ===== LIVE DE VENTAS - CARRITOS ===== */
 
-/* Panel de agregar rápido */
+/* Panel de agregar rápido - SOLO NOMBRE */
 .panel-rapido {
     background: linear-gradient(145deg, #fff5f9, #ffffff);
     border-radius: var(--radius-lg);
@@ -1081,57 +1081,39 @@ body::before {
     width: 100%;
 }
 
-.form-rapido-row {
+.form-rapido-row-full {
     display: flex;
-    gap: 8px;
-    margin-bottom: 8px;
-    width: 100%;
+    gap: 10px;
+    align-items: stretch;
 }
 
-.form-rapido-row:last-child {
-    margin-bottom: 0;
-}
-
-.input-rapido {
-    padding: 10px 12px;
+.input-full-largo {
+    flex: 1;
+    padding: 14px 15px;
     border: 2px solid #FFE8F0;
     border-radius: var(--radius-md);
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-family: var(--font-main);
     transition: all 0.3s ease;
     background: white;
     box-sizing: border-box;
 }
 
-.input-rapido:focus {
+.input-full-largo:focus {
     outline: none;
     border-color: #FF8AB8;
     box-shadow: 0 0 0 3px rgba(255, 138, 184, 0.1);
+    font-size: 16px;
 }
 
-.input-full {
-    width: 100%;
-    flex: none;
+.btn-add-cliente {
+    width: 60px;
+    padding: 14px !important;
+    font-size: 1.5rem !important;
+    font-weight: bold !important;
+    flex-shrink: 0;
 }
 
-.input-producto-mobile {
-    flex: 2;
-    min-width: 0;
-}
-
-.input-num {
-    width: 70px;
-    flex: none;
-    text-align: center;
-}
-
-.btn-rapido {
-    padding: 10px 15px !important;
-    font-size: 1rem !important;
-    font-weight: 600 !important;
-    width: 100%;
-    white-space: nowrap;
-}
 
 /* Modal del carrito MINI - POSICIÓN FIJA */
 .modal-carrito-mini {
@@ -2100,4 +2082,69 @@ select:focus {
     to {
         transform: translate(-50%, -50%) rotate(360deg);
     }
+}
+/* Fix específico para Chrome mobile */
+.modal-carrito-mini {
+    -webkit-transform: translate(-50%, -50%) !important;
+    -webkit-overflow-scrolling: touch;
+    will-change: transform;
+}
+
+.input-mini, .input-num-mini {
+    -webkit-appearance: none;
+    font-size: 16px !important; /* Prevenir zoom en Chrome */
+}
+
+.lista-productos-mini {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}
+
+.btn-add-mini, .btn-mini-action {
+    -webkit-tap-highlight-color: transparent;
+}
+
+body.modal-open {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+    height: 100vh !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
+}
+
+.modal.active {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+}
+
+/* Fix para Chrome mobile con teclado */
+@supports (-webkit-touch-callout: none) {
+    .modal-carrito-mini {
+        height: 450px !important;
+    }
+}
+
+/* ===== FIX PARA WARNINGS DE COMPATIBILIDAD ===== */
+
+/* Agregar prefijos faltantes para transform */
+.modal-carrito-mini {
+    -ms-transform: translate(-50%, -50%) !important;
+    -moz-transform: translate(-50%, -50%) !important;
+}
+
+/* Agregar prefijos faltantes para appearance */
+.input-mini, .input-num-mini {
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Panel abajo de la lista */
+.panel-rapido-abajo {
+    margin-top: 20px;
+    margin-bottom: 0;
 }
