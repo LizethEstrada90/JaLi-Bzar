@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>JaLi Bzar - Sistema Kawaii 🎀</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -152,25 +152,20 @@
                 <!-- Panel de agregar rápido (siempre visible) -->
                 <div class="panel-rapido">
                     <div class="form-rapido">
-                        <div class="form-rapido-row">
-                            <input type="text" id="quickCliente" placeholder="👤 Cliente" class="input-rapido input-full">
-                        </div>
-                        <div class="form-rapido-row">
-                            <input type="text" id="quickProducto" placeholder="📦 Producto" class="input-rapido input-producto-mobile">
-                            <input type="number" id="quickCantidad" value="1" min="1" class="input-rapido input-num">
-                            <input type="number" id="quickPrecio" placeholder="$" step="0.01" class="input-rapido input-num">
-                        </div>
-                        <div class="form-rapido-row">
-                            <button class="btn-kawaii btn-success btn-rapido" id="btnAgregarRapido">
-                                ➕ AGREGAR
+                        <div class="form-rapido-row-full">
+                            <input type="text" id="quickCliente" placeholder="👤 Nombre del Cliente" class="input-rapido input-full-largo">
+                            <button class="btn-kawaii btn-success btn-add-cliente" id="btnAgregarClienteRapido">
+                                ➕
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Lista de carritos (vista lista en móvil, cuadros en PC) -->
-                <div class="carritos-container" id="carritosContainer">
-                    <!-- Los carritos se agregan aquí -->
+                <!-- Lista de carritos (crece hacia arriba, botón abajo) -->
+                <div class="carritos-wrapper">
+                    <div class="carritos-container" id="carritosContainer">
+                        <!-- Los carritos se agregan aquí -->
+                    </div>
                 </div>
             </div>
         </section>
