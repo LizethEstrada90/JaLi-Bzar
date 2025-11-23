@@ -134,7 +134,8 @@ async function sincronizarTodo() {
             guardarEnFirebase('recolectores', state.recolectores),
             guardarEnFirebase('ventasActuales', state.ventasActuales),
             guardarEnFirebase('historialSemanas', state.historialSemanas),
-            guardarEnFirebase('semanaActual', state.semanaActual)
+            guardarEnFirebase('semanaActual', state.semanaActual),
+            guardarEnFirebase('carritosLive', state.carritosLive)
         ]);
         
         console.log('✅ Todos los datos sincronizados con Firebase');
@@ -153,12 +154,13 @@ async function cargarTodoDesdeFirebase() {
     }
     
     try {
-        const [clientes, recolectores, ventasActuales, historialSemanas, semanaActual] = await Promise.all([
+        const [clientes, recolectores, ventasActuales, historialSemanas, semanaActual, carritosLive] = await Promise.all([
             cargarDeFirebase('clientes'),
             cargarDeFirebase('recolectores'),
             cargarDeFirebase('ventasActuales'),
             cargarDeFirebase('historialSemanas'),
-            cargarDeFirebase('semanaActual')
+            cargarDeFirebase('semanaActual'),
+            cargarDeFirebase('carritosLive')
         ]);
         
         // Actualizar estado si hay datos
@@ -167,6 +169,7 @@ async function cargarTodoDesdeFirebase() {
         if (ventasActuales) state.ventasActuales = ventasActuales;
         if (historialSemanas) state.historialSemanas = historialSemanas;
         if (semanaActual) state.semanaActual = semanaActual;
+        if (carritosLive) state.carritosLive = carritosLive;
         
         console.log('✅ Todos los datos cargados desde Firebase');
         mostrarNotificacion('☁️ Datos cargados desde la nube', 'success');
