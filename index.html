@@ -412,40 +412,34 @@
 
     <!-- MODAL CARRITO DEL CLIENTE -->
     <div id="modalCarrito" class="modal">
-        <div class="modal-content modal-carrito-small">
-            <div class="modal-header">
-                <h3 id="tituloCarrito">🛒 <span id="nombreClienteCarrito"></span></h3>
-                <button class="close-modal">&times;</button>
+        <div class="modal-content modal-carrito-mini">
+            <div class="modal-header-mini">
+                <span style="font-weight: 600; color: #E91E8C;">🛒 <span id="nombreClienteCarrito"></span></span>
+                <button class="close-modal close-mini">&times;</button>
             </div>
-            <div class="carrito-body-small">
-                <!-- Formulario compacto para agregar producto -->
-                <div class="form-carrito-compacto">
-                    <input type="text" id="carritoProducto" placeholder="📦 Producto" class="input-compacto">
-                    <div class="form-row-compacto">
-                        <input type="number" id="carritoCantidad" min="1" value="1" placeholder="Cant." class="input-compacto input-mini">
-                        <input type="number" id="carritoPrecio" min="0" step="0.01" placeholder="$ Precio" class="input-compacto input-mini">
-                        <button type="button" class="btn-kawaii btn-success btn-compacto" id="btnAgregarAlCarrito">
-                            ➕
-                        </button>
-                    </div>
+            
+            <div class="modal-body-mini">
+                <!-- Formulario compacto -->
+                <input type="text" id="carritoProducto" placeholder="Producto" class="input-mini">
+                <div class="row-mini">
+                    <input type="number" id="carritoCantidad" min="1" value="1" class="input-num-mini">
+                    <input type="number" id="carritoPrecio" min="0" step="0.01" placeholder="$" class="input-num-mini">
+                    <button type="button" class="btn-add-mini" id="btnAgregarAlCarrito">➕</button>
                 </div>
-
-                <!-- Lista compacta de productos -->
-                <div class="lista-productos-compacta" id="listaProductosCarrito">
-                    <p style="text-align: center; color: #999; padding: 15px; font-size: 0.9rem;">
-                        No hay productos
-                    </p>
+                
+                <!-- Lista con scroll fijo -->
+                <div class="lista-productos-mini" id="listaProductosCarrito">
+                    <p style="text-align: center; color: #999; padding: 10px; font-size: 0.85rem;">Sin productos</p>
                 </div>
-
-                <!-- Total y acciones -->
-                <div class="carrito-footer-compacto">
-                    <div class="total-compacto">
-                        TOTAL: <span id="totalCarrito" style="color: #E91E8C; font-weight: bold;">$0.00</span>
-                    </div>
-                    <div class="acciones-compactas">
-                        <button type="button" class="btn-kawaii btn-info btn-small" id="btnImprimirCarrito">🧾</button>
-                        <button type="button" class="btn-kawaii btn-danger btn-small close-modal">✖️</button>
-                    </div>
+            </div>
+            
+            <div class="modal-footer-mini">
+                <div style="font-weight: 600; color: #E91E8C; margin-bottom: 8px;">
+                    TOTAL: <span id="totalCarrito">$0.00</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="btn-mini-action" id="btnImprimirCarrito">🧾</button>
+                    <button type="button" class="btn-mini-action close-modal">✖️</button>
                 </div>
             </div>
         </div>
