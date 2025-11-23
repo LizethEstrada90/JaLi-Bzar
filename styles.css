@@ -1077,10 +1077,15 @@ body::before {
     border: 2px solid #FFB6D9;
 }
 
+.form-rapido {
+    width: 100%;
+}
+
 .form-rapido-row {
     display: flex;
     gap: 8px;
     margin-bottom: 8px;
+    width: 100%;
 }
 
 .form-rapido-row:last-child {
@@ -1095,7 +1100,7 @@ body::before {
     font-family: var(--font-main);
     transition: all 0.3s ease;
     background: white;
-    flex: 1;
+    box-sizing: border-box;
 }
 
 .input-rapido:focus {
@@ -1104,22 +1109,20 @@ body::before {
     box-shadow: 0 0 0 3px rgba(255, 138, 184, 0.1);
 }
 
-.input-cliente {
+.input-full {
     width: 100%;
-}
-
-.input-producto {
-    flex: 2;
-}
-
-.input-cant {
-    width: 60px;
     flex: none;
 }
 
-.input-precio {
-    flex: 1;
-    min-width: 80px;
+.input-producto-mobile {
+    flex: 2;
+    min-width: 0;
+}
+
+.input-num {
+    width: 70px;
+    flex: none;
+    text-align: center;
 }
 
 .btn-rapido {
@@ -1133,16 +1136,17 @@ body::before {
 /* Modal del carrito COMPACTO */
 .modal-carrito-small {
     max-width: 90vw;
-    width: 400px;
-    max-height: 85vh;
+    width: 420px;
+    max-height: 80vh;
     padding: 15px;
+    margin: auto;
 }
 
 .carrito-body-small {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    max-height: 70vh;
+    max-height: 65vh;
     overflow-y: auto;
 }
 
@@ -1161,6 +1165,7 @@ body::before {
     font-size: 0.9rem;
     margin-bottom: 8px;
     background: white;
+    box-sizing: border-box;
 }
 
 .input-compacto:focus {
@@ -1171,17 +1176,21 @@ body::before {
 .form-row-compacto {
     display: flex;
     gap: 6px;
+    width: 100%;
 }
 
 .input-mini {
-    width: 65px;
+    width: 60px;
+    flex: none;
     margin-bottom: 0;
+    text-align: center;
 }
 
 .btn-compacto {
     padding: 8px 12px !important;
     font-size: 1.2rem !important;
     flex: 1;
+    min-width: 0;
 }
 
 .lista-productos-compacta {
@@ -1207,6 +1216,8 @@ body::before {
 
 .producto-item-info {
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .producto-item-nombre {
@@ -1214,11 +1225,15 @@ body::before {
     color: #E91E8C;
     display: block;
     margin-bottom: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .producto-item-detalle {
     font-size: 0.8rem;
     color: #666;
+    display: block;
 }
 
 .carrito-footer-compacto {
@@ -1279,12 +1294,16 @@ body::before {
     align-items: center;
     gap: 10px;
     flex: 1;
+    min-width: 0;
 }
 
 .carrito-item-nombre {
     font-size: 1rem;
     font-weight: 600;
     color: #E91E8C;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .carrito-item-badge {
@@ -1294,6 +1313,7 @@ body::before {
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 600;
+    flex-shrink: 0;
 }
 
 .carrito-item-total {
@@ -1301,6 +1321,7 @@ body::before {
     font-weight: bold;
     color: #E91E8C;
     margin-right: 8px;
+    flex-shrink: 0;
 }
 
 .carrito-item-eliminar {
@@ -1312,6 +1333,7 @@ body::before {
     cursor: pointer;
     font-size: 1rem;
     transition: all 0.3s ease;
+    flex-shrink: 0;
 }
 
 .carrito-item-eliminar:hover {
@@ -1438,12 +1460,9 @@ body::before {
         font-size: 0.9rem;
     }
     
-    .input-cant {
-        width: 55px;
-    }
-    
-    .input-precio {
-        min-width: 70px;
+    .input-num {
+        width: 60px;
+        font-size: 0.9rem;
     }
     
     .btn-rapido {
@@ -1453,13 +1472,18 @@ body::before {
     
     /* Modal carrito más pequeño en móvil */
     .modal-carrito-small {
-        width: 95vw;
-        max-height: 90vh;
+        width: 92vw;
+        max-width: 380px;
+        max-height: 85vh;
         padding: 12px;
     }
     
     .carrito-body-small {
-        max-height: 75vh;
+        max-height: 70vh;
+    }
+    
+    .input-mini {
+        width: 55px;
     }
     
     /* En móvil: Vista LISTA */
