@@ -191,6 +191,7 @@ function inicializarEventos() {
     document.getElementById('btnAgregarAlCarrito').addEventListener('click', agregarProductoAlCarrito);
     document.getElementById('btnImprimirCarrito').addEventListener('click', imprimirTicketCarrito);
     document.getElementById('btnFinalizarLive').addEventListener('click', finalizarLive);
+    document.getElementById('btnLimpiarCarritos').addEventListener('click', limpiarTodosLosCarritos);
 
     // Cerrar modales
     document.querySelectorAll('.close-modal').forEach(btn => {
@@ -1379,9 +1380,17 @@ function agregarNuevoCarrito() {
 // Actualizar grid de carritos
 function actualizarCarritosGrid() {
     const grid = document.getElementById('carritosGrid');
-    const btnAgregar = document.getElementById('btnAgregarCarrito');
+    if (!grid) {
+        console.warn('Grid de carritos no encontrado');
+        return;
+    }
     
-    // Limpiar grid pero mantener botón de agregar
+    // Asegurar que carritosLive existe
+    if (!state.carritosLive) {
+        state.carritosLive = [];
+    }
+    
+    // Limpiar grid
     grid.innerHTML = '';
     
     // Agregar carritos existentes
@@ -1390,7 +1399,7 @@ function actualizarCarritosGrid() {
         card.className = 'carrito-card';
         card.onclick = () => abrirCarrito(carrito.id);
         
-        const cantidadProductos = carrito.productos.length;
+        const cantidadProductos = carrito.productos ? carrito.productos.length : 0;
         const productosTexto = cantidadProductos === 1 ? 'producto' : 'productos';
         
         card.innerHTML = `
@@ -1406,7 +1415,7 @@ function actualizarCarritosGrid() {
                 <div class="carrito-badge">
                     📦 ${cantidadProductos} ${productosTexto}
                 </div>
-                ${carrito.productos.length > 0 ? `
+                ${carrito.productos && carrito.productos.length > 0 ? `
                     <div style="margin-top: 10px; max-height: 60px; overflow-y: auto;">
                         ${carrito.productos.map(p => `
                             <div class="carrito-producto-item">
@@ -1419,15 +1428,28 @@ function actualizarCarritosGrid() {
             </div>
             <div class="carrito-total">
                 <div class="carrito-total-label">Total</div>
-                <div class="carrito-total-monto">$${carrito.total.toFixed(2)}</div>
+                <div class="carrito-total-monto">$${(carrito.total || 0).toFixed(2)}</div>
             </div>
         `;
         
         grid.appendChild(card);
     });
     
-    // Agregar botón de nuevo carrito al final
+    // SIEMPRE agregar botón de nuevo carrito al final
+    const btnAgregar = document.createElement('div');
+    btnAgregar.className = 'carrito-card carrito-agregar';
+    btnAgregar.id = 'btnAgregarCarrito';
+    btnAgregar.onclick = agregarNuevoCarrito;
+    btnAgregar.innerHTML = `
+        <div class="carrito-add-content">
+            <div class="add-icon">➕</div>
+            <p>Agregar Cliente</p>
+        </div>
+    `;
+    
     grid.appendChild(btnAgregar);
+    
+    console.log(`✅ Grid actualizado con ${state.carritosLive.length} carritos`);
 }
 
 // Abrir carrito para agregar productos
@@ -1658,7 +1680,7 @@ function finalizarLive() {
     let ventasCreadas = 0;
     
     state.carritosLive.forEach(carrito => {
-        if (carrito.productos.length > 0) {
+        if (carrito.productos && carrito.productos.length > 0) {
             // Buscar si el cliente ya existe
             let cliente = state.clientes.find(c => c.nombre.toLowerCase() === carrito.nombre.toLowerCase());
             
@@ -1682,7 +1704,7 @@ function finalizarLive() {
                 grupo: 'LIVE',
                 pago: 'PENDIENTE',
                 productos: [...carrito.productos],
-                total: carrito.total,
+                total: carrito.total || 0,
                 cantidad: carrito.productos.reduce((sum, p) => sum + p.cantidad, 0)
             };
             
@@ -1707,14 +1729,40 @@ function finalizarLive() {
     cambiarSeccion('ventas');
 }
 
+// Limpiar todos los carritos (botón de emergencia)
+function limpiarTodosLosCarritos() {
+    if (state.carritosLive.length === 0) {
+        alert('⚠️ No hay carritos para limpiar');
+        return;
+    }
+    
+    if (!confirm(`¿Eliminar TODOS los ${state.carritosLive.length} carritos?\n\n⚠️ ADVERTENCIA: Esto NO creará ventas, solo borrará los carritos.`)) {
+        return;
+    }
+    
+    state.carritosLive = [];
+    guardarDatos();
+    actualizarCarritosGrid();
+    sonarClick();
+    mostrarNotificacion('🗑️ Todos los carritos eliminados', 'info');
+}
+
 // ===== PERSISTENCIA DE DATOS (LocalStorage + Firebase) =====
+
+let timeoutGuardar = null;
+
 function guardarDatos() {
-    // Siempre guardar en localStorage como backup
+    // Siempre guardar en localStorage inmediatamente
     localStorage.setItem('jali_bzar_data', JSON.stringify(state));
     
-    // Sincronizar con Firebase si está disponible
+    // Debounce para Firebase (esperar 1 segundo antes de sincronizar)
     if (typeof firebaseInitialized !== 'undefined' && firebaseInitialized) {
-        sincronizarTodo();
+        if (timeoutGuardar) {
+            clearTimeout(timeoutGuardar);
+        }
+        timeoutGuardar = setTimeout(() => {
+            sincronizarTodo();
+        }, 1000);
     }
 }
 
@@ -1724,21 +1772,18 @@ function cargarDatos() {
     if (datosLocales) {
         const datosParseados = JSON.parse(datosLocales);
         Object.assign(state, datosParseados);
+        
+        // Asegurar que carritosLive existe
+        if (!state.carritosLive) {
+            state.carritosLive = [];
+        }
+        
         console.log('✅ Datos cargados desde localStorage');
     }
     
     // Luego intentar sincronizar con Firebase
     if (typeof firebaseInitialized !== 'undefined' && firebaseInitialized) {
-        cargarTodoDesdeFirebase().then((cargado) => {
-            if (cargado) {
-                // Actualizar interfaz después de cargar desde Firebase
-                actualizarDashboard();
-                actualizarTablaVentas();
-                actualizarListaClientes();
-                actualizarListaRecolectores();
-                actualizarHistorial();
-            }
-        });
+        cargarTodoDesdeFirebase();
     }
 }
 
@@ -1794,3 +1839,4 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
