@@ -1580,15 +1580,15 @@ function actualizarListaProductosCarrito() {
     const container = document.getElementById('listaProductosCarrito');
     
     if (!carrito.productos || carrito.productos.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #999; padding: 15px; font-size: 0.9rem;">No hay productos</p>';
+        container.innerHTML = '<p style="text-align: center; color: #999; padding: 10px; font-size: 0.85rem;">Sin productos</p>';
     } else {
         container.innerHTML = carrito.productos.map(prod => `
-            <div class="producto-item-compacto">
-                <div class="producto-item-info">
-                    <span class="producto-item-nombre">${prod.nombre}</span>
-                    <span class="producto-item-detalle">${prod.cantidad} × $${prod.precioUnitario.toFixed(2)} = $${prod.subtotal.toFixed(2)}</span>
+            <div class="producto-mini-item">
+                <div class="producto-mini-info">
+                    <span class="producto-mini-nombre">${prod.nombre}</span>
+                    <span class="producto-mini-detalle">${prod.cantidad} × $${prod.precioUnitario.toFixed(2)} = $${prod.subtotal.toFixed(2)}</span>
                 </div>
-                <button type="button" onclick="eliminarProductoCarrito(${prod.id})" class="btn-delete" style="padding: 6px 10px; font-size: 0.9rem;">
+                <button type="button" onclick="eliminarProductoCarrito(${prod.id})" style="background: var(--rojo-pastel); color: #C62828; border: none; padding: 5px 8px; border-radius: 6px; cursor: pointer; font-size: 0.9rem;">
                     🗑️
                 </button>
             </div>
