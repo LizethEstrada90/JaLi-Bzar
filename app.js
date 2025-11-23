@@ -133,7 +133,9 @@ const state = {
     historialSemanas: [],
     semanaActual: 1,
     ventaEnEdicion: null,
-    productosTemporal: [] // Array temporal para múltiples productos
+    productosTemporal: [], // Array temporal para múltiples productos
+    carritosLive: [], // Carritos para el live de ventas
+    carritoActual: null // ID del carrito que se está editando
 };
 
 // ===== INICIALIZACIÓN =====
@@ -162,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     actualizarListaClientes();
     actualizarListaRecolectores();
     actualizarHistorial();
+    actualizarCarritosGrid();
     
     // Activar sonidos en botones después de que todo cargue
     setTimeout(() => {
@@ -182,6 +185,12 @@ function inicializarEventos() {
     document.getElementById('btnAgregarVenta').addEventListener('click', () => abrirModal('modalVenta'));
     document.getElementById('btnNuevaSemana').addEventListener('click', crearNuevaSemana);
     document.getElementById('btnAgregarProducto').addEventListener('click', agregarProductoALista);
+    
+    // Live de Ventas - Carritos
+    document.getElementById('btnAgregarCarrito').addEventListener('click', agregarNuevoCarrito);
+    document.getElementById('btnAgregarAlCarrito').addEventListener('click', agregarProductoAlCarrito);
+    document.getElementById('btnImprimirCarrito').addEventListener('click', imprimirTicketCarrito);
+    document.getElementById('btnFinalizarLive').addEventListener('click', finalizarLive);
 
     // Cerrar modales
     document.querySelectorAll('.close-modal').forEach(btn => {
@@ -1344,6 +1353,358 @@ function imprimirTicketVenta(venta) {
 function generarTicketHTML(venta) {
     // Esta función ya no es necesaria pero la dejamos por compatibilidad
     return;
+}
+
+// ===== LIVE DE VENTAS - SISTEMA DE CARRITOS =====
+
+// Agregar nuevo carrito (cliente)
+function agregarNuevoCarrito() {
+    const nombre = prompt('¿Nombre del cliente?');
+    if (!nombre || nombre.trim() === '') return;
+    
+    const nuevoCarrito = {
+        id: Date.now(),
+        nombre: nombre.trim(),
+        productos: [],
+        total: 0
+    };
+    
+    state.carritosLive.push(nuevoCarrito);
+    guardarDatos();
+    actualizarCarritosGrid();
+    sonarExito();
+    mostrarNotificacion(`Carrito creado para ${nombre} 🛒`, 'success');
+}
+
+// Actualizar grid de carritos
+function actualizarCarritosGrid() {
+    const grid = document.getElementById('carritosGrid');
+    const btnAgregar = document.getElementById('btnAgregarCarrito');
+    
+    // Limpiar grid pero mantener botón de agregar
+    grid.innerHTML = '';
+    
+    // Agregar carritos existentes
+    state.carritosLive.forEach(carrito => {
+        const card = document.createElement('div');
+        card.className = 'carrito-card';
+        card.onclick = () => abrirCarrito(carrito.id);
+        
+        const cantidadProductos = carrito.productos.length;
+        const productosTexto = cantidadProductos === 1 ? 'producto' : 'productos';
+        
+        card.innerHTML = `
+            <div class="carrito-header">
+                <div class="carrito-nombre">
+                    👤 ${carrito.nombre}
+                </div>
+                <button class="carrito-eliminar" onclick="event.stopPropagation(); eliminarCarrito(${carrito.id})" title="Eliminar">
+                    🗑️
+                </button>
+            </div>
+            <div class="carrito-productos">
+                <div class="carrito-badge">
+                    📦 ${cantidadProductos} ${productosTexto}
+                </div>
+                ${carrito.productos.length > 0 ? `
+                    <div style="margin-top: 10px; max-height: 60px; overflow-y: auto;">
+                        ${carrito.productos.map(p => `
+                            <div class="carrito-producto-item">
+                                <span>${p.nombre}</span>
+                                <span style="color: #E91E8C; font-weight: 600;">$${p.subtotal.toFixed(2)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : '<p style="color: #999; font-size: 0.85rem; margin-top: 10px;">Sin productos aún</p>'}
+            </div>
+            <div class="carrito-total">
+                <div class="carrito-total-label">Total</div>
+                <div class="carrito-total-monto">$${carrito.total.toFixed(2)}</div>
+            </div>
+        `;
+        
+        grid.appendChild(card);
+    });
+    
+    // Agregar botón de nuevo carrito al final
+    grid.appendChild(btnAgregar);
+}
+
+// Abrir carrito para agregar productos
+function abrirCarrito(carritoId) {
+    const carrito = state.carritosLive.find(c => c.id === carritoId);
+    if (!carrito) return;
+    
+    state.carritoActual = carritoId;
+    
+    // Actualizar título
+    document.getElementById('nombreClienteCarrito').textContent = carrito.nombre;
+    
+    // Mostrar productos
+    actualizarListaProductosCarrito();
+    
+    // Abrir modal
+    abrirModal('modalCarrito');
+}
+
+// Agregar producto al carrito actual
+function agregarProductoAlCarrito() {
+    if (!state.carritoActual) return;
+    
+    const nombre = document.getElementById('carritoProducto').value.trim();
+    const cantidad = parseFloat(document.getElementById('carritoCantidad').value) || 0;
+    const precio = parseFloat(document.getElementById('carritoPrecio').value) || 0;
+    
+    if (!nombre || cantidad <= 0 || precio <= 0) {
+        alert('⚠️ Por favor llena todos los campos del producto');
+        return;
+    }
+    
+    const carrito = state.carritosLive.find(c => c.id === state.carritoActual);
+    if (!carrito) return;
+    
+    const producto = {
+        id: Date.now(),
+        nombre: nombre,
+        cantidad: cantidad,
+        precioUnitario: precio,
+        subtotal: cantidad * precio
+    };
+    
+    carrito.productos.push(producto);
+    carrito.total = carrito.productos.reduce((sum, p) => sum + p.subtotal, 0);
+    
+    // Limpiar campos
+    document.getElementById('carritoProducto').value = '';
+    document.getElementById('carritoCantidad').value = '1';
+    document.getElementById('carritoPrecio').value = '';
+    
+    guardarDatos();
+    actualizarListaProductosCarrito();
+    actualizarCarritosGrid();
+    sonarPop();
+}
+
+// Actualizar lista de productos en el modal del carrito
+function actualizarListaProductosCarrito() {
+    const carrito = state.carritosLive.find(c => c.id === state.carritoActual);
+    if (!carrito) return;
+    
+    const container = document.getElementById('listaProductosCarrito');
+    
+    if (carrito.productos.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No hay productos en el carrito</p>';
+    } else {
+        container.innerHTML = carrito.productos.map(prod => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #fff5f9; border-radius: 12px; margin-bottom: 10px; border: 2px solid #FFE8F0;">
+                <div style="flex: 1;">
+                    <strong style="color: #E91E8C; font-size: 1.1rem;">${prod.nombre}</strong><br>
+                    <span style="font-size: 0.9rem; color: #666;">${prod.cantidad} × $${prod.precioUnitario.toFixed(2)} = $${prod.subtotal.toFixed(2)}</span>
+                </div>
+                <button type="button" onclick="eliminarProductoCarrito(${prod.id})" class="btn-delete" style="padding: 8px 12px;">
+                    🗑️
+                </button>
+            </div>
+        `).join('');
+    }
+    
+    document.getElementById('totalCarrito').textContent = `$${carrito.total.toFixed(2)}`;
+}
+
+// Eliminar producto del carrito
+function eliminarProductoCarrito(productoId) {
+    const carrito = state.carritosLive.find(c => c.id === state.carritoActual);
+    if (!carrito) return;
+    
+    carrito.productos = carrito.productos.filter(p => p.id !== productoId);
+    carrito.total = carrito.productos.reduce((sum, p) => sum + p.subtotal, 0);
+    
+    guardarDatos();
+    actualizarListaProductosCarrito();
+    actualizarCarritosGrid();
+    sonarClick();
+}
+
+// Eliminar carrito completo
+function eliminarCarrito(carritoId) {
+    const carrito = state.carritosLive.find(c => c.id === carritoId);
+    if (!carrito) return;
+    
+    if (!confirm(`¿Eliminar el carrito de ${carrito.nombre}?`)) return;
+    
+    state.carritosLive = state.carritosLive.filter(c => c.id !== carritoId);
+    guardarDatos();
+    actualizarCarritosGrid();
+    sonarClick();
+    mostrarNotificacion(`Carrito de ${carrito.nombre} eliminado`, 'info');
+}
+
+// Imprimir ticket del carrito
+function imprimirTicketCarrito() {
+    const carrito = state.carritosLive.find(c => c.id === state.carritoActual);
+    if (!carrito) return;
+    
+    if (carrito.productos.length === 0) {
+        alert('⚠️ No hay productos en el carrito para imprimir');
+        return;
+    }
+    
+    const ventanaImpresion = window.open('', '', 'width=800,height=600');
+    
+    const filasProductos = carrito.productos.map(prod => `
+        <div class="fila">
+            <span>${prod.nombre}</span>
+            <span>${prod.cantidad} × $${prod.precioUnitario.toFixed(2)}</span>
+        </div>
+        <div class="fila" style="padding-left: 20px; font-size: 11px; color: #666;">
+            <span>Subtotal:</span>
+            <span>$${prod.subtotal.toFixed(2)}</span>
+        </div>
+    `).join('');
+    
+    ventanaImpresion.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Ticket - ${carrito.nombre}</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { font-family: 'Courier New', monospace; padding: 20px; background: white; }
+                .ticket { width: 80mm; margin: 0 auto; padding: 10mm; background: white; }
+                .header { text-align: center; margin-bottom: 15px; border-bottom: 2px dashed #000; padding-bottom: 10px; }
+                .logo { font-size: 28px; font-weight: bold; color: #E91E8C; margin-bottom: 8px; }
+                .fecha { font-size: 11px; color: #666; }
+                .emoji { font-size: 24px; margin: 8px 0; }
+                .seccion { margin: 15px 0; font-size: 12px; }
+                .fila { display: flex; justify-content: space-between; padding: 4px 0; }
+                .label { font-weight: bold; }
+                .separador { border-top: 1px dashed #000; margin: 10px 0; }
+                .total { border-top: 2px solid #000; margin-top: 15px; padding-top: 10px; text-align: right; font-size: 16px; font-weight: bold; }
+                .footer { text-align: center; margin-top: 20px; padding-top: 10px; border-top: 2px dashed #000; font-size: 11px; }
+                .gracias { font-weight: bold; margin-bottom: 5px; }
+                @media print {
+                    body { padding: 0; }
+                    .ticket { width: 80mm; padding: 5mm; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="ticket">
+                <div class="header">
+                    <div class="logo">JALI BZAR</div>
+                    <div class="emoji">🛍️💗🌸</div>
+                    <div class="fecha">${new Date().toLocaleString('es-MX', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })}</div>
+                </div>
+                
+                <div class="seccion">
+                    <div class="fila">
+                        <span class="label">Cliente:</span>
+                        <span>${carrito.nombre}</span>
+                    </div>
+                    <div class="fila">
+                        <span class="label">Tipo:</span>
+                        <span>LIVE FACEBOOK 📹</span>
+                    </div>
+                </div>
+                
+                <div class="separador"></div>
+                
+                <div class="seccion">
+                    <div style="font-weight: bold; margin-bottom: 10px; text-align: center;">PRODUCTOS</div>
+                    ${filasProductos}
+                </div>
+                
+                <div class="total">
+                    TOTAL: $${carrito.total.toFixed(2)}
+                </div>
+                
+                <div class="footer">
+                    <div class="gracias">¡GRACIAS POR TU COMPRA!</div>
+                    <div class="emoji">✨💗🌸</div>
+                    <div style="color: #E91E8C; font-weight: bold; margin-top: 5px;">JaLi Bzar</div>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
+    
+    ventanaImpresion.document.close();
+    
+    setTimeout(() => {
+        ventanaImpresion.focus();
+        ventanaImpresion.print();
+        ventanaImpresion.close();
+    }, 250);
+}
+
+// Finalizar live y convertir carritos en ventas
+function finalizarLive() {
+    if (state.carritosLive.length === 0) {
+        alert('⚠️ No hay carritos para finalizar');
+        return;
+    }
+    
+    const mensaje = `¿Finalizar Live y convertir ${state.carritosLive.length} carritos en ventas?\n\nEsto:\n- Convertirá cada carrito en una venta\n- Limpiará todos los carritos\n- Agregará las ventas a la semana actual`;
+    
+    if (!confirm(mensaje)) return;
+    
+    let ventasCreadas = 0;
+    
+    state.carritosLive.forEach(carrito => {
+        if (carrito.productos.length > 0) {
+            // Buscar si el cliente ya existe
+            let cliente = state.clientes.find(c => c.nombre.toLowerCase() === carrito.nombre.toLowerCase());
+            
+            // Si no existe, crear cliente
+            if (!cliente) {
+                cliente = {
+                    id: Date.now() + Math.random(),
+                    nombre: carrito.nombre,
+                    grupo: 'LIVE',
+                    tipo: 'Foráneo'
+                };
+                state.clientes.push(cliente);
+            }
+            
+            // Crear venta
+            const venta = {
+                id: Date.now() + Math.random(),
+                fecha: new Date().toISOString(),
+                cliente: carrito.nombre,
+                recolector: 'Facebook Live',
+                grupo: 'LIVE',
+                pago: 'PENDIENTE',
+                productos: [...carrito.productos],
+                total: carrito.total,
+                cantidad: carrito.productos.reduce((sum, p) => sum + p.cantidad, 0)
+            };
+            
+            state.ventasActuales.push(venta);
+            ventasCreadas++;
+        }
+    });
+    
+    // Limpiar carritos
+    state.carritosLive = [];
+    
+    guardarDatos();
+    actualizarCarritosGrid();
+    actualizarTablaVentas();
+    actualizarListaClientes();
+    actualizarDashboard();
+    
+    sonarExito();
+    mostrarNotificacion(`✅ Live finalizado! ${ventasCreadas} ventas creadas`, 'success');
+    
+    // Cambiar a la vista de ventas
+    cambiarSeccion('ventas');
 }
 
 // ===== PERSISTENCIA DE DATOS (LocalStorage + Firebase) =====
