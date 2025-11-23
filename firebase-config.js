@@ -169,14 +169,23 @@ async function cargarTodoDesdeFirebase() {
         if (ventasActuales) state.ventasActuales = ventasActuales;
         if (historialSemanas) state.historialSemanas = historialSemanas;
         if (semanaActual) state.semanaActual = semanaActual;
-        if (carritosLive) state.carritosLive = carritosLive;
+        if (carritosLive) state.carritosLive = carritosLive || [];
         
         console.log('✅ Todos los datos cargados desde Firebase');
-        mostrarNotificacion('☁️ Datos cargados desde la nube', 'success');
+        
+        // IMPORTANTE: Actualizar la interfaz después de cargar
+        setTimeout(() => {
+            actualizarDashboard();
+            actualizarTablaVentas();
+            actualizarListaClientes();
+            actualizarListaRecolectores();
+            actualizarHistorial();
+            actualizarCarritosGrid();
+        }, 100);
+        
         return true;
     } catch (error) {
         console.error('❌ Error al cargar desde Firebase:', error);
-        mostrarNotificacion('⚠️ Error al cargar desde la nube', 'error');
         return false;
     }
 }
