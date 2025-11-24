@@ -2191,82 +2191,178 @@ body.modal-open {
     }
 }
 
-/* ===== FIX PARA TABLETS Y MÓVILES ===== */
+/* ===== FIX DEFINITIVO PARA TABLETS Y MÓVILES ===== */
 
-/* Desactivar animaciones en dispositivos táctiles */
+/* Detectar dispositivos táctiles y desactivar TODAS las animaciones */
 @media (hover: none) and (pointer: coarse) {
-    /* Botones sin animaciones extrañas */
+    /* FORZAR: Sin animaciones en NINGÚN elemento */
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+    
+    /* EXCEPCIÓN: Solo permitir transiciones muy básicas */
     .btn-kawaii,
     .nav-btn,
+    button,
     .btn-edit,
     .btn-delete,
     .btn-add-mini,
     .btn-mini-action,
-    button {
+    .carrito-eliminar,
+    .carrito-item-eliminar,
+    .close-modal,
+    .close-mini {
+        transition: background-color 0.15s ease, opacity 0.15s ease !important;
         transform: none !important;
-        transition: background 0.2s ease !important;
+        animation: none !important;
     }
     
+    /* Efecto de tap (presionar) - MUY SUTIL */
     .btn-kawaii:active,
     .nav-btn:active,
     button:active {
-        transform: scale(0.98) !important;
-        transition: transform 0.1s ease !important;
-    }
-    
-    /* Desactivar hover en botones */
-    .btn-kawaii:hover,
-    .nav-btn:hover,
-    button:hover {
+        opacity: 0.7 !important;
         transform: none !important;
     }
     
-    /* Quitar efectos de las tarjetas */
+    /* Desactivar TODOS los hovers */
+    .btn-kawaii:hover,
+    .nav-btn:hover,
+    button:hover,
     .stat-card:hover,
     .chart-card:hover,
     .item-card:hover,
-    .carrito-card:hover {
+    .carrito-card:hover,
+    .carrito-item-lista:hover,
+    .btn-edit:hover,
+    .btn-delete:hover,
+    .close-modal:hover {
         transform: none !important;
-        box-shadow: 0 4px 20px rgba(255, 138, 184, 0.2) !important;
+        animation: none !important;
+        box-shadow: inherit !important;
     }
     
-    /* Deshabilitar zoom en inputs */
+    /* Iconos sin animaciones */
+    .stat-icon,
+    .stat-icon::after {
+        animation: none !important;
+    }
+    
+    /* Tarjetas sin efectos */
+    .stat-card::before,
+    .chart-card::before,
+    .modal-content::before {
+        animation: none !important;
+        transition: none !important;
+        opacity: 0 !important;
+    }
+    
+    /* Header sin animaciones */
+    .header-kawaii,
+    .header-kawaii::before {
+        animation: none !important;
+    }
+    
+    /* Modal sin efectos de glow */
+    .modal-content {
+        animation: slideUp 0.2s ease !important;
+    }
+    
+    /* Decoraciones flotantes - OCULTAR */
+    .kawaii-decorations,
+    .float-decoration {
+        display: none !important;
+    }
+    
+    /* Forzar font-size 16px para prevenir zoom */
     input,
     select,
-    textarea {
+    textarea,
+    .input-mini,
+    .input-num-mini,
+    .input-compacto,
+    .input-full-largo {
         font-size: 16px !important;
+    }
+    
+    /* Prevenir bounce/rubber band */
+    body,
+    html {
+        overscroll-behavior: none;
+        -webkit-overflow-scrolling: touch;
     }
 }
 
-/* Tablets específicamente */
+/* Tablets específicamente (768px - 1024px) */
 @media (min-width: 768px) and (max-width: 1024px) and (hover: none) {
-    /* Ajustar tamaño de botones para tablets */
+    /* Botones más grandes para tap fácil */
     .btn-kawaii {
+        min-height: 44px !important;
+        min-width: 100px !important;
         padding: 12px 24px !important;
         font-size: 15px !important;
     }
     
     .nav-btn {
+        min-height: 44px !important;
         padding: 12px 20px !important;
         font-size: 14px !important;
     }
     
-    /* Hacer tap más fácil */
-    button {
+    /* Todos los botones interactivos */
+    button,
+    .btn-edit,
+    .btn-delete,
+    .carrito-eliminar {
         min-height: 44px !important;
         min-width: 44px !important;
     }
 }
 
-/* Desactivar tap-highlight molesto de webkit */
+/* Desactivar tap-highlight molesto */
 * {
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Permitir selección de texto SOLO en inputs */
+input,
+textarea,
+.kawaii-table td,
+.stat-value,
+.carrito-total-monto {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
 }
 
 /* Mejorar scroll en tablets */
 .modal-body-mini,
 .lista-productos-mini,
-.table-container {
-    -webkit-overflow-scrolling: touch;
+.table-container,
+.carrito-body-small,
+.modal-content {
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+}
+
+/* CRÍTICO: Prevenir zoom cuando abres el teclado */
+@media screen and (max-width: 1024px) {
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="tel"],
+    select,
+    textarea {
+        font-size: 16px !important;
+        -webkit-text-size-adjust: 100%;
+    }
 }
