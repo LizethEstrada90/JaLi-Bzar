@@ -2190,3 +2190,83 @@ body.modal-open {
         font-size: 1.1rem !important;
     }
 }
+
+/* ===== FIX PARA TABLETS Y MÓVILES ===== */
+
+/* Desactivar animaciones en dispositivos táctiles */
+@media (hover: none) and (pointer: coarse) {
+    /* Botones sin animaciones extrañas */
+    .btn-kawaii,
+    .nav-btn,
+    .btn-edit,
+    .btn-delete,
+    .btn-add-mini,
+    .btn-mini-action,
+    button {
+        transform: none !important;
+        transition: background 0.2s ease !important;
+    }
+    
+    .btn-kawaii:active,
+    .nav-btn:active,
+    button:active {
+        transform: scale(0.98) !important;
+        transition: transform 0.1s ease !important;
+    }
+    
+    /* Desactivar hover en botones */
+    .btn-kawaii:hover,
+    .nav-btn:hover,
+    button:hover {
+        transform: none !important;
+    }
+    
+    /* Quitar efectos de las tarjetas */
+    .stat-card:hover,
+    .chart-card:hover,
+    .item-card:hover,
+    .carrito-card:hover {
+        transform: none !important;
+        box-shadow: 0 4px 20px rgba(255, 138, 184, 0.2) !important;
+    }
+    
+    /* Deshabilitar zoom en inputs */
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+}
+
+/* Tablets específicamente */
+@media (min-width: 768px) and (max-width: 1024px) and (hover: none) {
+    /* Ajustar tamaño de botones para tablets */
+    .btn-kawaii {
+        padding: 12px 24px !important;
+        font-size: 15px !important;
+    }
+    
+    .nav-btn {
+        padding: 12px 20px !important;
+        font-size: 14px !important;
+    }
+    
+    /* Hacer tap más fácil */
+    button {
+        min-height: 44px !important;
+        min-width: 44px !important;
+    }
+}
+
+/* Desactivar tap-highlight molesto de webkit */
+* {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+/* Mejorar scroll en tablets */
+.modal-body-mini,
+.lista-productos-mini,
+.table-container {
+    -webkit-overflow-scrolling: touch;
+}
