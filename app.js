@@ -1474,12 +1474,12 @@ function generarImagenCuteDesdeVenta(venta) {
     });
     
     // Crear tabla de productos (máximo 5 filas visibles)
-    const filasProductos = venta.productos.slice(0, 5).map(prod => `
+    const filasProductos = venta.productos.map(prod => `
         <tr>
-            <td style="padding: 12px 8px; border: 1px solid #FFD1E8;">${prod.nombre}</td>
-            <td style="padding: 12px 8px; border: 1px solid #FFD1E8; text-align: center;">${prod.cantidad}</td>
-            <td style="padding: 12px 8px; border: 1px solid #FFD1E8; text-align: center;">$${prod.precioUnitario.toFixed(2)}</td>
-            <td style="padding: 12px 8px; border: 1px solid #FFD1E8; text-align: center; font-weight: 600;">$${prod.subtotal.toFixed(2)}</td>
+            <td style="padding: 8px 6px; border: 1px solid #FFD1E8; font-size: 14px;">${prod.nombre}</td>
+            <td style="padding: 8px 6px; border: 1px solid #FFD1E8; text-align: center; font-size: 14px;">${prod.cantidad}</td>
+            <td style="padding: 8px 6px; border: 1px solid #FFD1E8; text-align: center; font-size: 14px;">$${prod.precioUnitario.toFixed(2)}</td>
+            <td style="padding: 8px 6px; border: 1px solid #FFD1E8; text-align: center; font-weight: 600; font-size: 14px;">$${prod.subtotal.toFixed(2)}</td>
         </tr>
     `).join('');
     
@@ -2178,12 +2178,12 @@ function generarImagenCute() {
         day: 'numeric'
     });
     
-    const filasProductos = carrito.productos.slice(0, 5).map(prod => `
+    const filasProductos = carrito.productos.map(prod => `
         <tr>
-            <td style="padding: 12px 8px; border: 1px solid #FFD1E8;">${prod.nombre}</td>
-            <td style="padding: 12px 8px; border: 1px solid #FFD1E8; text-align: center;">${prod.cantidad}</td>
-            <td style="padding: 12px 8px; border: 1px solid #FFD1E8; text-align: center;">$${prod.precioUnitario.toFixed(2)}</td>
-            <td style="padding: 12px 8px; border: 1px solid #FFD1E8; text-align: center; font-weight: 600;">$${prod.subtotal.toFixed(2)}</td>
+            <td style="padding: 8px 6px; border: 1px solid #FFD1E8; font-size: 14px;">${prod.nombre}</td>
+            <td style="padding: 8px 6px; border: 1px solid #FFD1E8; text-align: center; font-size: 14px;">${prod.cantidad}</td>
+            <td style="padding: 8px 6px; border: 1px solid #FFD1E8; text-align: center; font-size: 14px;">$${prod.precioUnitario.toFixed(2)}</td>
+            <td style="padding: 8px 6px; border: 1px solid #FFD1E8; text-align: center; font-weight: 600; font-size: 14px;">$${prod.subtotal.toFixed(2)}</td>
         </tr>
     `).join('');
     
@@ -2427,13 +2427,6 @@ function generarImagenCute() {
                             </thead>
                             <tbody>
                                 ${filasProductos}
-                                ${carrito.productos.length > 5 ? `
-                                    <tr>
-                                        <td colspan="4" style="text-align: center; padding: 10px; color: #999; font-style: italic;">
-                                            + ${carrito.productos.length - 5} productos más...
-                                        </td>
-                                    </tr>
-                                ` : ''}
                             </tbody>
                         </table>
                     </div>
@@ -3095,5 +3088,6 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
 
 
