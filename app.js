@@ -184,6 +184,7 @@ function inicializarEventos() {
     document.getElementById('btnAgregarRecolector').addEventListener('click', () => abrirModal('modalRecolector'));
     document.getElementById('btnAgregarVenta').addEventListener('click', () => abrirModal('modalVenta'));
     document.getElementById('btnNuevaSemana').addEventListener('click', crearNuevaSemana);
+    document.getElementById('btnGenerarHojasPagados').addEventListener('click', generarHojasEntregaPorGrupo); // ← NUEVA LÍNEA
     document.getElementById('btnAgregarProducto').addEventListener('click', agregarProductoALista);
     
     // Live de Ventas - Carritos
@@ -543,10 +544,12 @@ function eliminarProductoTemporal(id) {
 }
 
 // Limpiar formulario de venta
+
 function limpiarFormularioVenta() {
     document.getElementById('formVenta').reset();
+    document.getElementById('ventaPaquetes').value = '';
     state.productosTemporal = [];
-    state.ventaEnEdicion = null; // IMPORTANTE: Resetear estado de edición
+    state.ventaEnEdicion = null;
     document.getElementById('tituloModalVenta').textContent = 'Nueva Venta 🛍️';
     actualizarListaProductosModal();
 }
@@ -571,6 +574,7 @@ function editarVenta(id) {
     document.getElementById('ventaCliente').value = clienteId;
     document.getElementById('ventaRecolector').value = recolectorId;
     document.getElementById('ventaGrupo').value = venta.grupo;
+    document.getElementById('ventaPaquetes').value = venta.paquetes || 0;
     document.getElementById('ventaPago').value = venta.pago;
     
     // MANTENER productos existentes y permitir agregar más
@@ -631,16 +635,17 @@ function guardarVenta(e) {
     const recolector = state.recolectores.find(r => r.id === recolectorId);
 
     const venta = {
-        id: state.ventaEnEdicion || Date.now(),
-        fecha: new Date().toISOString(),
-        cliente: cliente ? cliente.nombre : '',
-        recolector: recolector ? recolector.nombre : '',
-        grupo: document.getElementById('ventaGrupo').value,
-        pago: document.getElementById('ventaPago').value,
-        productos: [...state.productosTemporal],
-        total: state.productosTemporal.reduce((sum, p) => sum + p.subtotal, 0),
-        cantidad: state.productosTemporal.reduce((sum, p) => sum + p.cantidad, 0)
-    };
+    id: state.ventaEnEdicion || Date.now(),
+    fecha: new Date().toISOString(),
+    cliente: cliente ? cliente.nombre : '',
+    recolector: recolector ? recolector.nombre : '',
+    grupo: document.getElementById('ventaGrupo').value,
+    pago: document.getElementById('ventaPago').value,
+    paquetes: parseInt(document.getElementById('ventaPaquetes').value) || 0,
+    productos: [...state.productosTemporal],
+    total: state.productosTemporal.reduce((sum, p) => sum + p.subtotal, 0),
+    cantidad: state.productosTemporal.reduce((sum, p) => sum + p.cantidad, 0)
+};
 
     if (state.ventaEnEdicion) {
         // ACTUALIZAR venta existente (no duplicar)
@@ -673,8 +678,8 @@ function actualizarTablaVentas() {
     
     if (state.ventasActuales.length === 0) {
         tbody.innerHTML = `
-            <tr>
-                <td colspan="9" style="text-align: center; padding: 40px; color: #999;">
+           <tr>
+        <td colspan="8" style="text-align: center; padding: 40px; color: #999;">
                     <p style="font-size: 2rem; margin-bottom: 10px;">🛍️</p>
                     <p>No hay ventas registradas en esta semana</p>
                     <p>¡Agrega tu primera venta!</p>
@@ -701,25 +706,24 @@ function actualizarTablaVentas() {
         }
         
         return `
-            <tr>
-                <td>${venta.cliente}</td>
-                <td>${venta.recolector}</td>
-                <td>${venta.grupo}</td>
-                <td style="white-space: normal;">${productoDisplay}</td>
-                <td class="${pagoClass}">${venta.pago}</td>
-                <td>${venta.productos ? venta.productos.reduce((sum, p) => sum + p.cantidad, 0) : venta.cantidad}</td>
-                <td>-</td>
-                <td style="font-weight: bold; color: #E91E8C;">$${venta.total.toFixed(2)}</td>
-                <td>
-                    <button class="btn-edit" onclick="editarVenta(${venta.id})" title="Editar">
-                        ✏️
-                    </button>
-                    <button class="btn-delete" onclick="eliminarVenta(${venta.id})" title="Eliminar">
-                        🗑️
-                    </button>
-                </td>
-            </tr>
-        `;
+    <tr>
+        <td>${venta.cliente}</td>
+        <td>${venta.recolector}</td>
+        <td>${venta.grupo}</td>
+        <td style="white-space: normal;">${productoDisplay}</td>
+        <td class="${pagoClass}">${venta.pago}</td>
+        <td>${venta.paquetes || 0}</td>
+        <td style="font-weight: bold; color: #E91E8C;">$${venta.total.toFixed(2)}</td>
+        <td>
+            <button class="btn-edit" onclick="editarVenta(${venta.id})" title="Editar">
+                ✏️
+            </button>
+            <button class="btn-delete" onclick="eliminarVenta(${venta.id})" title="Eliminar">
+                🗑️
+            </button>
+        </td>
+    </tr>
+`;
     }).join('');
 
     // Calcular total
@@ -1422,6 +1426,8 @@ function generarTicketHTML(venta) {
 }
 
 // ===== GENERAR IMAGEN CUTE DESDE MODAL DE VENTAS =====
+
+// ===== GENERAR IMAGEN CUTE DESDE MODAL DE VENTAS =====
 function generarImagenDesdeVenta() {
     // Si estamos editando una venta, usar sus datos
     if (state.ventaEnEdicion) {
@@ -1461,7 +1467,6 @@ function generarImagenDesdeVenta() {
 
     generarImagenCuteDesdeVenta(ventaTemporal);
 }
-
 function generarImagenCuteDesdeVenta(venta) {
     const fecha = new Date().toLocaleDateString('es-MX', {
         year: 'numeric',
@@ -1479,7 +1484,7 @@ function generarImagenCuteDesdeVenta(venta) {
         </tr>
     `).join('');
     
-    // Abrir ventana nueva con la imagen
+    // Abrir ventana con la vista previa
     const ventana = window.open('', '', 'width=900,height=1200');
     
     ventana.document.write(`
@@ -1488,6 +1493,7 @@ function generarImagenCuteDesdeVenta(venta) {
         <head>
             <meta charset="UTF-8">
             <title>Nota de Venta - ${venta.cliente}</title>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -1650,112 +1656,158 @@ function generarImagenCuteDesdeVenta(venta) {
                     font-size: 24px;
                     font-weight: bold;
                 }
-                @media print {
-                    body { background: white; padding: 0; }
-                    .nota { box-shadow: none; }
+                .botonera {
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    display: flex;
+                    gap: 10px;
+                    z-index: 10000;
+                }
+                .btn-accion {
+                    background: linear-gradient(135deg, #FF8AB8, #FFB6D9);
+                    color: white;
+                    border: none;
+                    padding: 15px 25px;
+                    border-radius: 50px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    box-shadow: 0 4px 15px rgba(255, 138, 184, 0.4);
+                    font-family: 'Comic Sans MS', sans-serif;
+                }
+                .btn-cerrar {
+                    background: linear-gradient(135deg, #E0E0E0, #BDBDBD);
+                    color: #333;
                 }
             </style>
         </head>
         <body>
-            <div class="nota">
-                <div class="header">
-                    <div class="decoracion-izq">🌸🩷</div>
-                    <div class="decoracion-der">🌸🩷</div>
-                    <img src="logo.png" alt="JaLi Bzar" class="logo-img" onerror="this.style.display='none'">
-                    <div class="subtitulo">✨💜✨</div>
-                    <div class="subtitulo-esp">Gracias por su compra</div>
-                </div>
-                
-                <div class="info-box">
-                    <div class="info-row">
-                        <span class="info-label">Fecha:</span>
-                        <span class="info-value">${fecha}</span>
+            <div id="notaCaptura">
+                <div class="nota">
+                    <div class="header">
+                        <div class="decoracion-izq">🛍️💗</div>
+                        <div class="decoracion-der">📦🎀</div>
+                        <img src="${window.location.origin}/logo.png" alt="JaLi Bzar" class="logo-img" crossorigin="anonymous">
+                        <div class="titulo">JaLi Bzar</div>
+                        <div class="subtitulo">💗</div>
+                        <div class="subtitulo-esp">Gracias por su compra</div>
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">Nombre:</span>
-                        <span class="info-value">${venta.cliente}</span>
+                    
+                    <div class="info-box">
+                        <div class="info-row">
+                            <span class="info-label">Fecha:</span>
+                            <span class="info-value">${fecha}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Nombre:</span>
+                            <span class="info-value">${venta.cliente}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Recolector:</span>
+                            <span class="info-value">${venta.recolector}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Grupo:</span>
+                            <span class="info-value">${venta.grupo}</span>
+                        </div>
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">Recolector:</span>
-                        <span class="info-value">${venta.recolector}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Grupo:</span>
-                        <span class="info-value">${venta.grupo}</span>
-                    </div>
-                </div>
-                
-                <div class="productos-box">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Cantidad</th>
-                                <th>Precio</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${filasProductos}
-                            ${venta.productos.length > 5 ? `
+                    
+                    <div class="productos-box">
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td colspan="4" style="text-align: center; padding: 10px; color: #999; font-style: italic;">
-                                        + ${venta.productos.length - 5} productos más...
-                                    </td>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio</th>
+                                    <th>Total</th>
                                 </tr>
-                            ` : ''}
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="info-box">
-                    <div class="metodo-pago">
-                        <span class="metodo-label">Método de pago</span>
-                        <div class="metodo-opcion">
-                            <span class="circulo"></span>
-                            <span>Efectivo</span>
-                        </div>
-                        <div class="metodo-opcion">
-                            <span class="circulo circulo-azul"></span>
-                            <span>Transferencia</span>
-                        </div>
-                        <div class="metodo-opcion">
-                            <span class="circulo circulo-rosa"></span>
-                            <span>Pagado</span>
-                        </div>
-                        <div class="metodo-opcion">
-                            <span class="circulo circulo-amarillo"></span>
-                            <span>Pendiente a pagar</span>
+                            </thead>
+                            <tbody>
+                                ${filasProductos}
+                                ${venta.productos.length > 5 ? `
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; padding: 10px; color: #999; font-style: italic;">
+                                            + ${venta.productos.length - 5} productos más...
+                                        </td>
+                                    </tr>
+                                ` : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="info-box">
+                        <div class="metodo-pago">
+                            <span class="metodo-label">Método de pago</span>
+                            <div class="metodo-opcion">
+                                <span class="circulo"></span>
+                                <span>Efectivo</span>
+                            </div>
+                            <div class="metodo-opcion">
+                                <span class="circulo circulo-azul"></span>
+                                <span>Transferencia</span>
+                            </div>
+                            <div class="metodo-opcion">
+                                <span class="circulo circulo-rosa"></span>
+                                <span>Pagado</span>
+                            </div>
+                            <div class="metodo-opcion">
+                                <span class="circulo circulo-amarillo"></span>
+                                <span>Pendiente a pagar</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="total-box">
-                    <span class="total-label">Total</span>
-                    <span class="total-monto">$${venta.total.toFixed(2)}</span>
-                </div>
-                
-                <div class="footer">
-                    <div class="footer-icono">💌</div>
-                    <div class="footer-text">JaLi Bzar</div>
+                    
+                    <div class="total-box">
+                        <span class="total-label">Total</span>
+                        <span class="total-monto">$${venta.total.toFixed(2)}</span>
+                    </div>
+                    
+                    <div class="footer">
+                        <div class="footer-icono">👍</div>
+                        <div class="footer-text">JaLi Bzar</div>
+                    </div>
                 </div>
             </div>
+            
+            <div class="botonera">
+                <button class="btn-accion" onclick="descargarImagen()">📥 Descargar PNG</button>
+                <button class="btn-accion btn-cerrar" onclick="window.close()">❌ Cerrar</button>
+            </div>
+            
+            <script>
+                function descargarImagen() {
+                    const elemento = document.getElementById('notaCaptura');
+                    html2canvas(elemento, {
+                        scale: 2,
+                        backgroundColor: null,
+                        logging: false,
+                        useCORS: true,
+                        allowTaint: true
+                    }).then(canvas => {
+                        canvas.toBlob(blob => {
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'JaLi_Bzar_${venta.cliente}_' + new Date().getTime() + '.png';
+                            a.click();
+                            URL.revokeObjectURL(url);
+                            alert('✅ Imagen descargada exitosamente!');
+                        }, 'image/png');
+                    }).catch(error => {
+                        console.error('Error:', error);
+                        alert('⚠️ Error al generar la imagen. Intenta de nuevo.');
+                    });
+                }
+            </script>
         </body>
         </html>
     `);
     
     ventana.document.close();
-    
-    setTimeout(() => {
-        if (confirm('✅ Imagen generada!\n\n¿Quieres guardarla?\n\nOK = Guardar como imagen\nCancelar = Solo ver')) {
-            ventana.print();
-        }
-    }, 500);
-    
     sonarExito();
-    mostrarNotificacion('📸 Imagen cute generada!', 'success');
+    mostrarNotificacion('📸 Vista previa lista! Descarga cuando quieras', 'success');
 }
-
 // ===== LIVE DE VENTAS - SISTEMA DE CARRITOS =====
 
 // Agregar cliente rápido (solo nombre, sin productos)
@@ -2118,7 +2170,6 @@ function generarImagenCute() {
         return;
     }
     
-    // Buscar datos del cliente
     const cliente = state.clientes.find(c => c.nombre.toLowerCase() === carrito.nombre.toLowerCase());
     const recolector = cliente && cliente.recolector ? cliente.recolector : 'Facebook Live';
     const grupo = cliente && cliente.grupo ? cliente.grupo : 'LIVE';
@@ -2129,7 +2180,6 @@ function generarImagenCute() {
         day: 'numeric'
     });
     
-    // Crear tabla de productos (máximo 5 filas visibles)
     const filasProductos = carrito.productos.slice(0, 5).map(prod => `
         <tr>
             <td style="padding: 12px 8px; border: 1px solid #FFD1E8;">${prod.nombre}</td>
@@ -2139,7 +2189,6 @@ function generarImagenCute() {
         </tr>
     `).join('');
     
-    // Abrir ventana nueva con la imagen
     const ventana = window.open('', '', 'width=900,height=1200');
     
     ventana.document.write(`
@@ -2148,6 +2197,7 @@ function generarImagenCute() {
         <head>
             <meta charset="UTF-8">
             <title>Nota de Venta - ${carrito.nombre}</title>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -2310,112 +2360,157 @@ function generarImagenCute() {
                     font-size: 24px;
                     font-weight: bold;
                 }
-                @media print {
-                    body { background: white; padding: 0; }
-                    .nota { box-shadow: none; }
+                .botonera {
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    display: flex;
+                    gap: 10px;
+                    z-index: 10000;
+                }
+                .btn-accion {
+                    background: linear-gradient(135deg, #FF8AB8, #FFB6D9);
+                    color: white;
+                    border: none;
+                    padding: 15px 25px;
+                    border-radius: 50px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    box-shadow: 0 4px 15px rgba(255, 138, 184, 0.4);
+                    font-family: 'Comic Sans MS', sans-serif;
+                }
+                .btn-cerrar {
+                    background: linear-gradient(135deg, #E0E0E0, #BDBDBD);
+                    color: #333;
                 }
             </style>
         </head>
         <body>
-            <div class="nota">
-                <div class="header">
-                    <div class="decoracion-izq">🛍️💗</div>
-                    <div class="decoracion-der">📦🎀</div>
-                    <img src="logo.png" alt="JaLi Bzar" class="logo-img" onerror="this.style.display='none'">
-                    <div class="titulo">JaLi Bzar</div>
-                    <div class="subtitulo">💗</div>
-                    <div class="subtitulo-esp">Gracias por su compra</div>
-                </div>
-                
-                <div class="info-box">
-                    <div class="info-row">
-                        <span class="info-label">Fecha:</span>
-                        <span class="info-value">${fecha}</span>
+            <div id="notaCaptura">
+                <div class="nota">
+                    <div class="header">
+                        <div class="decoracion-izq">🛍️💗</div>
+                        <div class="decoracion-der">📦🎀</div>
+                        <img src="${window.location.origin}/logo.png" alt="JaLi Bzar" class="logo-img" crossorigin="anonymous">
+                        <div class="titulo">JaLi Bzar</div>
+                        <div class="subtitulo">💗</div>
+                        <div class="subtitulo-esp">Gracias por su compra</div>
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">Nombre:</span>
-                        <span class="info-value">${carrito.nombre}</span>
+                    
+                    <div class="info-box">
+                        <div class="info-row">
+                            <span class="info-label">Fecha:</span>
+                            <span class="info-value">${fecha}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Nombre:</span>
+                            <span class="info-value">${carrito.nombre}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Recolector:</span>
+                            <span class="info-value">${recolector}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Grupo:</span>
+                            <span class="info-value">${grupo}</span>
+                        </div>
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">Recolector:</span>
-                        <span class="info-value">${recolector}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Grupo:</span>
-                        <span class="info-value">${grupo}</span>
-                    </div>
-                </div>
-                
-                <div class="productos-box">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Cantidad</th>
-                                <th>Precio</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${filasProductos}
-                            ${carrito.productos.length > 5 ? `
+                    
+                    <div class="productos-box">
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td colspan="4" style="text-align: center; padding: 10px; color: #999; font-style: italic;">
-                                        + ${carrito.productos.length - 5} productos más...
-                                    </td>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio</th>
+                                    <th>Total</th>
                                 </tr>
-                            ` : ''}
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="info-box">
-                    <div class="metodo-pago">
-                        <span class="metodo-label">Método de pago</span>
-                        <div class="metodo-opcion">
-                            <span class="circulo"></span>
-                            <span>Efectivo</span>
-                        </div>
-                        <div class="metodo-opcion">
-                            <span class="circulo circulo-azul"></span>
-                            <span>Transferencia</span>
-                        </div>
-                        <div class="metodo-opcion">
-                            <span class="circulo circulo-amarillo"></span>
-                            <span>Pagado</span>
-                        </div>
-                        <div class="metodo-opcion">
-                            <span class="circulo circulo-rosa"></span>
-                            <span>Pendiente a pagar</span>
+                            </thead>
+                            <tbody>
+                                ${filasProductos}
+                                ${carrito.productos.length > 5 ? `
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; padding: 10px; color: #999; font-style: italic;">
+                                            + ${carrito.productos.length - 5} productos más...
+                                        </td>
+                                    </tr>
+                                ` : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="info-box">
+                        <div class="metodo-pago">
+                            <span class="metodo-label">Método de pago</span>
+                            <div class="metodo-opcion">
+                                <span class="circulo"></span>
+                                <span>Efectivo</span>
+                            </div>
+                            <div class="metodo-opcion">
+                                <span class="circulo circulo-azul"></span>
+                                <span>Transferencia</span>
+                            </div>
+                            <div class="metodo-opcion">
+                                <span class="circulo circulo-rosa"></span>
+                                <span>Pagado</span>
+                            </div>
+                            <div class="metodo-opcion">
+                                <span class="circulo circulo-amarillo"></span>
+                                <span>Pendiente a pagar</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="total-box">
-                    <span class="total-label">Total</span>
-                    <span class="total-monto">$${(carrito.total || 0).toFixed(2)}</span>
-                </div>
-                
-                <div class="footer">
-                    <div class="footer-icono">👍</div>
-                    <div class="footer-text">JaLi Bzar</div>
+                    
+                    <div class="total-box">
+                        <span class="total-label">Total</span>
+                        <span class="total-monto">$${(carrito.total || 0).toFixed(2)}</span>
+                    </div>
+                    
+                    <div class="footer">
+                        <div class="footer-icono">👍</div>
+                        <div class="footer-text">JaLi Bzar</div>
+                    </div>
                 </div>
             </div>
+            
+            <div class="botonera">
+                <button class="btn-accion" onclick="descargarImagen()">📥 Descargar PNG</button>
+                <button class="btn-accion btn-cerrar" onclick="window.close()">❌ Cerrar</button>
+            </div>
+            
+            <script>
+                function descargarImagen() {
+                    const elemento = document.getElementById('notaCaptura');
+                    html2canvas(elemento, {
+                        scale: 2,
+                        backgroundColor: null,
+                        logging: false,
+                        useCORS: true,
+                        allowTaint: true
+                    }).then(canvas => {
+                        canvas.toBlob(blob => {
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'JaLi_Bzar_${carrito.nombre}_' + new Date().getTime() + '.png';
+                            a.click();
+                            URL.revokeObjectURL(url);
+                            alert('✅ Imagen descargada exitosamente!');
+                        }, 'image/png');
+                    }).catch(error => {
+                        console.error('Error:', error);
+                        alert('⚠️ Error al generar la imagen. Intenta de nuevo.');
+                    });
+                }
+            </script>
         </body>
         </html>
     `);
     
     ventana.document.close();
-    
-    // Dar tiempo para cargar y luego mostrar opciones
-    setTimeout(() => {
-        if (confirm('✅ Imagen generada!\n\n¿Quieres guardarla?\n\nOK = Guardar como imagen\nCancelar = Solo ver')) {
-            ventana.print();
-        }
-    }, 500);
-    
     sonarExito();
-    mostrarNotificacion('📸 Imagen cute generada!', 'success');
+    mostrarNotificacion('📸 Vista previa lista! Descarga cuando quieras', 'success');
 }
 
 // Finalizar live y convertir carritos en ventas
@@ -2579,6 +2674,402 @@ function mostrarNotificacion(mensaje, tipo = 'info') {
         notif.style.animation = 'slideOutRight 0.3s ease';
         setTimeout(() => notif.remove(), 300);
     }, 3000);
+}
+
+// ===== GENERAR HOJAS DE ENTREGA POR GRUPO =====
+function generarHojasEntregaPorGrupo() {
+    // Filtrar solo ventas PAGADAS
+    const ventasPagadas = state.ventasActuales.filter(v => v.pago === 'PAGADO');
+    
+    if (ventasPagadas.length === 0) {
+        alert('⚠️ No hay ventas con estado PAGADO para generar hojas');
+        return;
+    }
+    
+    // Agrupar por GRUPO
+    const ventasPorGrupo = {};
+    ventasPagadas.forEach(venta => {
+        const grupo = venta.grupo || 'SIN GRUPO';
+        if (!ventasPorGrupo[grupo]) {
+            ventasPorGrupo[grupo] = [];
+        }
+        ventasPorGrupo[grupo].push(venta);
+    });
+    
+    const grupos = Object.keys(ventasPorGrupo);
+    
+    if (grupos.length === 0) {
+        alert('⚠️ No hay grupos para generar hojas');
+        return;
+    }
+    
+    // Si hay un solo grupo, generarlo directamente
+    if (grupos.length === 1) {
+        generarPDFGrupo(grupos[0], ventasPorGrupo[grupos[0]]);
+        sonarExito();
+        return;
+    }
+    
+    // Si hay múltiples grupos, mostrar selector
+    mostrarSelectorGrupos(grupos, ventasPorGrupo);
+}
+
+function mostrarSelectorGrupos(grupos, ventasPorGrupo) {
+    // Crear modal personalizado para seleccionar grupo
+    const modalHTML = `
+        <div id="modalSelectorGrupos" class="modal active" style="z-index: 10000;">
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h3>📄 Selecciona el Grupo</h3>
+                    <button class="close-modal" onclick="cerrarSelectorGrupos()">&times;</button>
+                </div>
+                <div style="padding: 20px;">
+                    <p style="margin-bottom: 20px; color: #666;">¿Qué grupo quieres generar?</p>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        ${grupos.map(grupo => `
+                            <button 
+                                class="btn-kawaii btn-info" 
+                                style="width: 100%; padding: 15px; font-size: 16px;"
+                                onclick="seleccionarGrupoYGenerar('${grupo}')">
+                                📋 ${grupo.toUpperCase()} (${ventasPorGrupo[grupo].length} ventas)
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 2px dashed #FFB6D9;">
+                        <button 
+                            class="btn-kawaii btn-success" 
+                            style="width: 100%; padding: 15px;"
+                            onclick="generarTodosLosGrupos()">
+                            ✨ Generar TODOS los Grupos
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Insertar modal en el DOM
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    document.body.classList.add('modal-open');
+    
+    // Guardar datos en variable global temporal
+    window.ventasPorGrupoTemp = ventasPorGrupo;
+    
+    sonarCampana();
+}
+
+function cerrarSelectorGrupos() {
+    const modal = document.getElementById('modalSelectorGrupos');
+    if (modal) {
+        modal.remove();
+        document.body.classList.remove('modal-open');
+        delete window.ventasPorGrupoTemp;
+    }
+}
+
+function seleccionarGrupoYGenerar(nombreGrupo) {
+    if (window.ventasPorGrupoTemp && window.ventasPorGrupoTemp[nombreGrupo]) {
+        generarPDFGrupo(nombreGrupo, window.ventasPorGrupoTemp[nombreGrupo]);
+        cerrarSelectorGrupos();
+        sonarExito();
+        mostrarNotificacion(`✅ Hoja de ${nombreGrupo} generada`, 'success');
+    }
+}
+
+function generarTodosLosGrupos() {
+    if (window.ventasPorGrupoTemp) {
+        Object.keys(window.ventasPorGrupoTemp).forEach(grupo => {
+            generarPDFGrupo(grupo, window.ventasPorGrupoTemp[grupo]);
+        });
+        cerrarSelectorGrupos();
+        sonarExito();
+        mostrarNotificacion(`✅ Se generaron ${Object.keys(window.ventasPorGrupoTemp).length} hojas`, 'success');
+    }
+}
+    
+function generarPDFGrupo(nombreGrupo, ventas) {
+    const fecha = new Date().toLocaleDateString('es-MX', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+    
+    // Calcular totales generales
+    let totalPiezas = 0;
+    let totalPaquetes = 0;
+    
+    // Generar filas de TODAS las ventas del grupo
+    const filasHTML = ventas.map(venta => {
+        const piezas = venta.productos ? venta.productos.reduce((sum, p) => sum + p.cantidad, 0) : venta.cantidad;
+        const paquetes = venta.paquetes || 0;
+        
+        totalPiezas += piezas;
+        totalPaquetes += paquetes;
+        
+        return `
+            <tr>
+                <td style="padding: 10px 8px; border: 1px solid #FFB6D9; font-size: 13px;">${venta.cliente}</td>
+                <td style="padding: 10px 8px; border: 1px solid #FFB6D9; font-size: 13px; text-align: center;">${venta.recolector}</td>
+                <td style="padding: 10px 8px; border: 1px solid #FFB6D9; font-size: 13px; text-align: center; font-weight: 600;">${piezas}</td>
+                <td style="padding: 10px 8px; border: 1px solid #FFB6D9; font-size: 13px; text-align: center; font-weight: 600;">${paquetes}</td>
+                <td style="padding: 10px 8px; border: 1px solid #FFB6D9; background: white; min-width: 120px;"></td>
+            </tr>
+        `;
+    }).join('');
+    
+    // Abrir ventana para vista previa y descarga
+    const ventana = window.open('', '', 'width=1000,height=1200');
+    
+    ventana.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Hoja de Entrega - ${nombreGrupo}</title>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+                    padding: 20px;
+                    background: linear-gradient(135deg, #FFF5F9 0%, #FFE8F0 100%);
+                }
+                .documento {
+                    max-width: 900px;
+                    margin: 0 auto;
+                    background: white;
+                    padding: 35px;
+                    box-shadow: 0 10px 40px rgba(255, 105, 180, 0.2);
+                    border-radius: 20px;
+                    border: 3px solid #FFB6D9;
+                }
+                .header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 25px;
+                    padding: 20px;
+                    background: linear-gradient(135deg, #FFF5F9, #FFE8F0);
+                    border-radius: 15px;
+                    border: 2px solid #FFB6D9;
+                }
+                .logo-section {
+                    display: flex;
+                    align-items: center;
+                    gap: 20px;
+                }
+                .logo-img {
+                    max-width: 150px;
+                    max-height: 150px;
+                    filter: drop-shadow(0 4px 8px rgba(255, 105, 180, 0.3));
+                }
+                .info-header {
+                    text-align: right;
+                }
+                .grupo-nombre {
+                    font-size: 32px;
+                    font-weight: bold;
+                    color: #E91E8C;
+                    margin-bottom: 8px;
+                    text-shadow: 2px 2px 4px rgba(233, 30, 140, 0.1);
+                }
+                .fecha-box {
+                    background: white;
+                    padding: 10px 20px;
+                    border-radius: 50px;
+                    border: 2px solid #FFB6D9;
+                    display: inline-block;
+                }
+                .fecha-icon {
+                    font-size: 18px;
+                    margin-right: 5px;
+                }
+                .fecha-text {
+                    font-size: 16px;
+                    color: #E91E8C;
+                    font-weight: bold;
+                }
+                .estado-badge {
+                    display: inline-block;
+                    background: linear-gradient(135deg, #b871faff, #dab7fcff);
+                    color: #720bf8ff;
+                    padding: 10px 25px;
+                    border-radius: 50px;
+                    font-weight: bold;
+                    font-size: 16px;
+                    margin: 15px 0 25px 0;
+                    box-shadow: 0 4px 12px rgba(129, 199, 132, 0.3);
+                }
+                .decoracion-top {
+                    text-align: center;
+                    font-size: 28px;
+                    margin-bottom: 15px;
+                    letter-spacing: 10px;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 20px;
+                    box-shadow: 0 4px 15px rgba(255, 182, 217, 0.2);
+                    border-radius: 10px;
+                    overflow: hidden;
+                }
+                th {
+                    background: linear-gradient(135deg, #FFB6D9, #FF8AB8);
+                    color: white;
+                    padding: 14px 10px;
+                    border: none;
+                    font-weight: bold;
+                    font-size: 14px;
+                    text-align: center;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+                td {
+                    border: 1px solid #FFB6D9;
+                }
+                tr:nth-child(even) {
+                    background: #FFF5F9;
+                }
+                tr:hover {
+                    background: #FFE8F0;
+                }
+                .total-row {
+                    background: linear-gradient(135deg, #FFE8F0, #FFB6D9) !important;
+                    font-weight: bold;
+                    font-size: 15px;
+                }
+                .total-row td {
+                    padding: 12px 10px !important;
+                    color: #E91E8C;
+                    border: 2px solid #FF8AB8;
+                }
+                .decoracion-bottom {
+                    text-align: center;
+                    font-size: 24px;
+                    margin-top: 20px;
+                    padding-top: 15px;
+                    border-top: 2px dashed #FFB6D9;
+                    color: #FFB6D9;
+                }
+                .botonera {
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    display: flex;
+                    gap: 10px;
+                    z-index: 10000;
+                }
+                .btn-accion {
+                    background: linear-gradient(135deg, #FF8AB8, #FFB6D9);
+                    color: white;
+                    border: none;
+                    padding: 15px 25px;
+                    border-radius: 50px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    box-shadow: 0 6px 20px rgba(255, 138, 184, 0.4);
+                    transition: transform 0.2s;
+                    font-family: 'Comic Sans MS', sans-serif;
+                }
+                .btn-accion:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 8px 25px rgba(255, 138, 184, 0.5);
+                }
+                .btn-cerrar {
+                    background: linear-gradient(135deg, #E0E0E0, #BDBDBD);
+                    color: #333;
+                }
+                @media print {
+                    .botonera { display: none; }
+                    body { 
+                        background: white; 
+                        padding: 0; 
+                    }
+                    .documento { 
+                        box-shadow: none;
+                        border: none;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div id="contenidoPDF">
+                <div class="documento">
+                    <div class="decoracion-top">🌸 ✨ 💗 ✨ 🌸</div>
+                    
+                    <div class="header">
+                        <div class="logo-section">
+                            <img src="${window.location.origin}/logo.png" alt="JaLi Bzar" class="logo-img" crossorigin="anonymous">
+                        </div>
+                        <div class="info-header">
+                            <div class="grupo-nombre">${nombreGrupo.toUpperCase()}</div>
+                            <div class="fecha-box">
+                                <span class="fecha-icon">📅</span>
+                                <span class="fecha-text">${fecha}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="estado-badge">♥JaLi Bzar♥</div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;">👤 Nombre del Cliente</th>
+                                <th style="width: 20%;">🚚 Recolector</th>
+                                <th style="width: 10%;">📦 Piezas</th>
+                                <th style="width: 10%;">📋 Paquetes</th>
+                                <th style="width: 30%;">✍️ Firma</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filasHTML}
+                            <tr class="total-row">
+                                <td colspan="2" style="text-align: right; font-size: 15px;">💰 TOTAL:</td>
+                                <td style="text-align: center; font-size: 15px;">${totalPiezas}</td>
+                                <td style="text-align: center; font-size: 15px;">${totalPaquetes}</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="decoracion-bottom">💝 ✨ 🎀 ✨ 💝</div>
+                </div>
+            </div>
+            
+            <div class="botonera">
+                <button class="btn-accion" onclick="descargarPDF()">📥 Descargar PDF</button>
+                <button class="btn-accion" onclick="imprimirHoja()">🖨️ Imprimir</button>
+                <button class="btn-accion btn-cerrar" onclick="window.close()">❌ Cerrar</button>
+            </div>
+            
+            <script>
+                function descargarPDF() {
+                    const elemento = document.getElementById('contenidoPDF');
+                    const opciones = {
+                        margin: 10,
+                        filename: 'JaLi_Bzar_${nombreGrupo}_${fecha.replace(/\//g, '-')}.pdf',
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2, useCORS: true },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    };
+                    
+                    html2pdf().set(opciones).from(elemento).save().then(() => {
+                        alert('✅ PDF descargado exitosamente!');
+                    });
+                }
+                
+                function imprimirHoja() {
+                    window.print();
+                }
+            </script>
+        </body>
+        </html>
+    `);
+    
+    ventana.document.close();
 }
 
 // Agregar estilos de animación
