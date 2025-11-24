@@ -2366,3 +2366,52 @@ textarea,
         -webkit-text-size-adjust: 100%;
     }
 }
+
+/* ===== MODO SIN ANIMACIONES (TABLETS) ===== */
+/* Este código se activa con una clase en el body */
+
+body.no-animations *,
+body.no-animations *::before,
+body.no-animations *::after {
+    animation: none !important;
+    transition: none !important;
+}
+
+body.no-animations .btn-kawaii,
+body.no-animations .nav-btn,
+body.no-animations button {
+    transition: opacity 0.1s ease !important;
+}
+
+body.no-animations .btn-kawaii:active,
+body.no-animations button:active {
+    opacity: 0.7;
+}
+
+body.no-animations .kawaii-decorations {
+    display: none !important;
+}
+
+body.no-animations .stat-card:hover,
+body.no-animations .chart-card:hover,
+body.no-animations .carrito-card:hover {
+    transform: none !important;
+    box-shadow: 0 4px 20px rgba(255, 138, 184, 0.2) !important;
+}
+
+body.no-animations .header-kawaii::before {
+    display: none !important;
+}
+
+body.no-animations .stat-icon {
+    background: #FF8AB8 !important;
+}
+
+body.no-animations body::before {
+    display: none !important;
+}
+
+body.no-animations body {
+    background: #FFE5F1 !important;
+    animation: none !important;
+}
