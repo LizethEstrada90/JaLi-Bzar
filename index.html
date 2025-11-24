@@ -6,6 +6,7 @@
     <title>JaLi Bzar - Sistema Kawaii 🎀</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -177,6 +178,9 @@
                         <button class="btn-kawaii btn-primary" id="btnNuevaSemana">
                             <span>✨</span> Crear Hoja Nueva
                         </button>
+                        <button class="btn-kawaii btn-info" id="btnGenerarHojasPagados">
+                            <span>📄</span> Hojas de Entrega
+                        </button>
                         <button class="btn-kawaii btn-success" id="btnAgregarVenta">
                             <span>➕</span> Nueva Venta
                         </button>
@@ -187,27 +191,26 @@
                 <div class="table-container">
                     <table class="kawaii-table" id="tablaVentas">
                         <thead>
-                            <tr>
-                                <th>Cliente</th>
-                                <th>Recolector</th>
-                                <th>Grupo</th>
-                                <th>Producto</th>
-                                <th>Pago</th>
-                                <th>Cantidad</th>
-                                <th>Precio Unit.</th>
-                                <th>Total</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
+                         <tr>
+                         <th>Cliente</th>
+                         <th>Recolector</th>
+                         <th>Grupo</th>
+                         <th>Producto</th>
+                         <th>Pago</th>
+                         <th>Paquetes</th>
+                         <th>Total</th>
+                         <th>Acciones</th>
+                         </tr>
+                         </thead>
                         <tbody id="ventasBody">
                             <!-- Las ventas se agregan dinámicamente -->
                         </tbody>
                         <tfoot>
-                            <tr>
-                                <td colspan="7" style="text-align: right; font-weight: bold;">TOTAL:</td>
-                                <td colspan="2" style="font-weight: bold; color: #FF8AB8;" id="totalVentas">$0.00</td>
-                            </tr>
-                        </tfoot>
+    <tr>
+        <td colspan="6" style="text-align: right; font-weight: bold;">TOTAL:</td>
+        <td colspan="2" style="font-weight: bold; color: #FF8AB8;" id="totalVentas">$0.00</td>
+    </tr>
+</tfoot>
                     </table>
                 </div>
             </div>
@@ -332,31 +335,35 @@
             <form id="formVenta">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>Cliente</label>
-                        <select id="ventaCliente" required>
-                            <option value="">Seleccionar cliente...</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Recolector</label>
-                        <select id="ventaRecolector" required>
-                            <option value="">Seleccionar recolector...</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Grupo (automático)</label>
-                        <input type="text" id="ventaGrupo" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Estado de Pago</label>
-                        <select id="ventaPago" required>
-                            <option value="">Seleccionar...</option>
-                            <option value="PENDIENTE">PENDIENTE</option>
-                            <option value="PAGADO">PAGADO</option>
-                            <option value="NO REALIZÓ EL PAGO">NO REALIZÓ EL PAGO</option>
-                        </select>
-                    </div>
-                </div>
+                         <label>Cliente</label>
+                            <select id="ventaCliente" required>
+                               <option value="">Seleccionar cliente...</option>
+                   </select>
+                 </div>
+                  <div class="form-group">
+                  <label>Recolector</label>
+                  <select id="ventaRecolector" required>
+                    <option value="">Seleccionar recolector...</option>
+             </select>
+            </div>
+    <div class="form-group">
+        <label>Grupo (automático)</label>
+        <input type="text" id="ventaGrupo" readonly>
+    </div>
+    <div class="form-group">
+        <label>Paquetes</label>
+        <input type="number" id="ventaPaquetes" min="0" placeholder="Ej: 3">
+    </div>
+    <div class="form-group">
+        <label>Estado de Pago</label>
+        <select id="ventaPago" required>
+            <option value="">Seleccionar...</option>
+            <option value="PENDIENTE">PENDIENTE</option>
+            <option value="PAGADO">PAGADO</option>
+            <option value="NO REALIZÓ EL PAGO">NO REALIZÓ EL PAGO</option>
+        </select>
+    </div>
+</div>
 
                 <!-- SECCIÓN DE PRODUCTOS -->
                 <div style="margin: 25px 0; padding: 20px; background: linear-gradient(145deg, #fff5f9, #ffffff); border-radius: 16px; border: 2px solid #FFB6D9;">
@@ -450,9 +457,7 @@
     <div id="ticket" class="ticket-print">
         <!-- Contenido del ticket generado dinámicamente -->
     </div>
-
     <script src="firebase-config.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
-
