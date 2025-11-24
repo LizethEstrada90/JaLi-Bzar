@@ -1359,7 +1359,6 @@ function imprimirTicketVenta(venta) {
             <div class="ticket">
                 <div class="header">
                     <img src="./logo.png" alt="JaLi Bzar" class="logo-img" onerror="this.style.display='none'">
-                    <div class="logo">JALI BZAR</div>
                     <div class="emoji">🛍️💗🌸</div>
                     <div class="fecha">${new Date().toLocaleString('es-MX', {
                         year: 'numeric',
@@ -1686,11 +1685,10 @@ function generarImagenCuteDesdeVenta(venta) {
             <div id="notaCaptura">
                 <div class="nota">
                     <div class="header">
-                        <div class="decoracion-izq">🛍️💗</div>
-                        <div class="decoracion-der">📦🎀</div>
+                        <div class="decoracion-izq">🌸🩷</div>
+                        <div class="decoracion-der">🌸🩷</div>
                         <img src="./logo.png" alt="JaLi Bzar" class="logo-img">
-                        <div class="titulo">JaLi Bzar</div>
-                        <div class="subtitulo">💗</div>
+                        <div class="subtitulo">✨💜✨</div>
                         <div class="subtitulo-esp">Gracias por su compra</div>
                     </div>
                     
@@ -1764,7 +1762,7 @@ function generarImagenCuteDesdeVenta(venta) {
                     </div>
                     
                     <div class="footer">
-                        <div class="footer-icono">👍</div>
+                        <div class="footer-icono">🌷</div>
                         <div class="footer-text">JaLi Bzar</div>
                     </div>
                 </div>
@@ -3097,4 +3095,5 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
 
