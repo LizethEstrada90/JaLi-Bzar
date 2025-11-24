@@ -1358,7 +1358,7 @@ function imprimirTicketVenta(venta) {
         <body>
             <div class="ticket">
                 <div class="header">
-                    <img src="logo.png" alt="JaLi Bzar" class="logo-img" onerror="this.style.display='none'">
+                    <img src="./logo.png" alt="JaLi Bzar" class="logo-img" onerror="this.style.display='none'">
                     <div class="logo">JALI BZAR</div>
                     <div class="emoji">🛍️💗🌸</div>
                     <div class="fecha">${new Date().toLocaleString('es-MX', {
@@ -1688,7 +1688,7 @@ function generarImagenCuteDesdeVenta(venta) {
                     <div class="header">
                         <div class="decoracion-izq">🛍️💗</div>
                         <div class="decoracion-der">📦🎀</div>
-                        <img src="${window.location.origin}/logo.png" alt="JaLi Bzar" class="logo-img" crossorigin="anonymous">
+                        <img src="./logo.png" alt="JaLi Bzar" class="logo-img">
                         <div class="titulo">JaLi Bzar</div>
                         <div class="subtitulo">💗</div>
                         <div class="subtitulo-esp">Gracias por su compra</div>
@@ -2392,7 +2392,7 @@ function generarImagenCute() {
                     <div class="header">
                         <div class="decoracion-izq">🛍️💗</div>
                         <div class="decoracion-der">📦🎀</div>
-                        <img src="${window.location.origin}/logo.png" alt="JaLi Bzar" class="logo-img" crossorigin="anonymous">
+                        <img src="./logo.png" alt="JaLi Bzar" class="logo-img">
                         <div class="titulo">JaLi Bzar</div>
                         <div class="subtitulo">💗</div>
                         <div class="subtitulo-esp">Gracias por su compra</div>
@@ -3001,7 +3001,7 @@ function generarPDFGrupo(nombreGrupo, ventas) {
                     
                     <div class="header">
                         <div class="logo-section">
-                            <img src="${window.location.origin}/logo.png" alt="JaLi Bzar" class="logo-img" crossorigin="anonymous">
+                            <img src="./logo.png" alt="JaLi Bzar" class="logo-img">
                         </div>
                         <div class="info-header">
                             <div class="grupo-nombre">${nombreGrupo.toUpperCase()}</div>
@@ -3097,3 +3097,4 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
