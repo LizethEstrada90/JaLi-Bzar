@@ -1723,13 +1723,6 @@ function generarImagenCuteDesdeVenta(venta) {
                             </thead>
                             <tbody>
                                 ${filasProductos}
-                                ${venta.productos.length > 5 ? `
-                                    <tr>
-                                        <td colspan="4" style="text-align: center; padding: 10px; color: #999; font-style: italic;">
-                                            + ${venta.productos.length - 5} productos más...
-                                        </td>
-                                    </tr>
-                                ` : ''}
                             </tbody>
                         </table>
                     </div>
@@ -3088,6 +3081,7 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
 
 
 
