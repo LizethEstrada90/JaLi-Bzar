@@ -185,6 +185,7 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
     margin-bottom: 30px;
+    justify-items: center;
 }
 
 .stat-card {
@@ -199,6 +200,8 @@ body {
     border: 2px solid transparent;
     min-height: 100px;
     cursor: pointer; /* ✅ Indica que es clicable */
+    width: 100%;
+    max-width: 400px;
 }
 
 .stat-card:hover {
@@ -251,6 +254,14 @@ body {
     box-shadow: 0 15px 50px rgba(255, 138, 184, 0.2);
     border: 2px solid rgba(255, 182, 217, 0.3);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.chart-card canvas {
+    max-width: 100%;
+    margin: 0 auto;
 }
 
 .chart-card:hover {
@@ -322,8 +333,18 @@ body {
 
 .action-buttons {
     display: flex;
-    gap: 10px;
+    gap: 15px;
     flex-wrap: wrap;
+    justify-content: center;
+}
+
+.action-buttons .btn-kawaii {
+    flex: 1;
+    min-width: 180px;
+    max-width: 250px;
+    justify-content: center;
+    padding: 15px 20px;
+    font-size: 1rem;
 }
 
 /* ===== TABLA KAWAII - OPTIMIZADA PARA TABLET ===== */
@@ -1162,19 +1183,29 @@ body.modal-open {
     
     .main-nav {
         width: 100%;
-        gap: 6px;
+        gap: 8px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
     }
     
     .nav-btn {
-        flex: 1 1 calc(33.333% - 6px);
         justify-content: center;
-        min-width: 100px;
-        padding: 10px 8px;
-        font-size: 0.85rem;
+        padding: 12px 8px;
+        font-size: 0.8rem;
+        min-height: 60px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        width: 100%;
     }
     
     .nav-btn span {
-        font-size: 1rem;
+        font-size: 1.3rem;
+    }
+    
+    /* ✅ Dashboard centrado */
+    .stats-grid {
+        padding: 0 10px;
     }
     
     /* ✅ En móvil: Vista LISTA */
@@ -1188,12 +1219,21 @@ body.modal-open {
     
     /* ✅ Tabla responsive */
     .kawaii-table {
-        font-size: 0.85rem;
+        font-size: 0.75rem;
     }
     
     .kawaii-table th,
     .kawaii-table td {
-        padding: 8px 5px;
+        padding: 6px 4px;
+        font-size: 0.75rem;
+    }
+    
+    /* ✅ Tabla scroll horizontal suave */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -20px;
+        padding: 0 20px;
     }
 }
 
@@ -1224,16 +1264,32 @@ body.modal-open {
         width: 48px !important;
     }
     
-    /* ✅ Botones más pequeños en móvil */
+    /* ✅ Botones grid en móvil */
+    .main-nav {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+    }
+    
     .nav-btn {
-        font-size: 0.75rem;
-        padding: 8px 6px;
-        min-width: 85px;
-        gap: 4px;
+        font-size: 0.7rem;
+        padding: 10px 4px;
+        min-height: 65px;
+        gap: 2px;
     }
     
     .nav-btn span {
-        font-size: 0.9rem;
+        font-size: 1.2rem;
+    }
+    
+    /* ✅ Tabla más compacta */
+    .kawaii-table {
+        font-size: 0.7rem;
+    }
+    
+    .kawaii-table th,
+    .kawaii-table td {
+        padding: 5px 3px;
+        font-size: 0.7rem;
     }
 }
 
@@ -1521,5 +1577,70 @@ html {
     
     .calc-buttons {
         gap: 8px;
+    }
+}
+
+/* ===== MEJORAS RESPONSIVE PARA GRÁFICAS ===== */
+@media (max-width: 768px) {
+    .chart-card {
+        padding: 15px;
+    }
+    
+    .chart-card h3 {
+        font-size: 1.1rem;
+    }
+    
+    .chart-card canvas {
+        max-height: 250px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .chart-card {
+        padding: 12px;
+    }
+    
+    .chart-card h3 {
+        font-size: 1rem;
+    }
+    
+    .chart-card canvas {
+        max-height: 220px !important;
+    }
+}
+
+/* ===== ARREGLOS FINALES RESPONSIVE ===== */
+
+/* Botones de acción en móvil */
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    
+    .action-buttons .btn-kawaii {
+        width: 100%;
+        max-width: none;
+        min-width: auto;
+        justify-content: center;
+    }
+    
+    /* Gráficas mejor centradas */
+    .charts-grid {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+    
+    .chart-card {
+        width: 100%;
+        max-width: 500px;
+    }
+}
+
+@media (max-width: 480px) {
+    .action-buttons .btn-kawaii {
+        font-size: 0.95rem;
+        padding: 14px 18px;
     }
 }
