@@ -1081,7 +1081,20 @@ function crearGraficaTopClientes() {
                         display: false
                     },
                     ticks: {
-                        color: '#E91E8C'
+                        color: '#E91E8C',
+                        font: {
+                            size: window.innerWidth < 768 ? 9 : 12
+                        },
+                        maxRotation: window.innerWidth < 768 ? 45 : 0,
+                        minRotation: window.innerWidth < 768 ? 45 : 0,
+                        callback: function(value, index) {
+                            const label = this.getLabelForValue(value);
+                            // Acortar nombres en móvil
+                            if (window.innerWidth < 768 && label.length > 12) {
+                                return label.substring(0, 10) + '...';
+                            }
+                            return label;
+                        }
                     }
                 }
             }
@@ -1141,10 +1154,41 @@ function crearGraficaRecolectores() {
             plugins: {
                 legend: {
                     position: 'bottom',
+                    align: 'center',
                     labels: {
                         color: '#E91E8C',
-                        font: { size: 11, weight: 'bold' },
-                        padding: 15
+                        font: { 
+                            size: window.innerWidth < 768 ? 10 : 11,
+                            weight: 'bold' 
+                        },
+                        padding: window.innerWidth < 768 ? 10 : 12,
+                        boxWidth: window.innerWidth < 768 ? 15 : 18,
+                        boxHeight: window.innerWidth < 768 ? 15 : 18,
+                        usePointStyle: false,
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map((label, i) => {
+                                    const meta = chart.getDatasetMeta(0);
+                                    const style = meta.controller.getStyle(i);
+                                    // Acortar nombres largos
+                                    let displayLabel = label;
+                                    const maxLength = window.innerWidth < 768 ? 13 : 15;
+                                    if (label.length > maxLength) {
+                                        displayLabel = label.substring(0, maxLength - 2) + '..';
+                                    }
+                                    return {
+                                        text: displayLabel,
+                                        fillStyle: style.backgroundColor,
+                                        strokeStyle: style.borderColor,
+                                        lineWidth: 2,
+                                        hidden: !chart.getDataVisibility(i),
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
                     }
                 }
             }
