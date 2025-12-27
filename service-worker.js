@@ -3,13 +3,13 @@
 
 const CACHE_NAME = 'jali-bzar-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/app.js',
-  '/firebase-config.js',
-  '/bolsi-logo.png',
-  '/manifest.json'
+  '/JaLi-Bzar/',
+  '/JaLi-Bzar/index.html',
+  '/JaLi-Bzar/styles.css',
+  '/JaLi-Bzar/app.js',
+  '/JaLi-Bzar/firebase-config.js',
+  '/JaLi-Bzar/bolsi-logo.png',
+  '/JaLi-Bzar/manifest.json'
 ];
 
 // Instalación del service worker
@@ -93,7 +93,7 @@ self.addEventListener('fetch', event => {
           })
           .catch(() => {
             // Si falla la red y no está en caché, mostrar página offline
-            return caches.match('/index.html');
+            return caches.match('/JaLi-Bzar/index.html');
           });
       })
   );
