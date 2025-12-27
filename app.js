@@ -184,7 +184,7 @@ function inicializarEventos() {
     document.getElementById('btnAgregarRecolector').addEventListener('click', () => abrirModal('modalRecolector'));
     document.getElementById('btnAgregarVenta').addEventListener('click', () => abrirModal('modalVenta'));
     document.getElementById('btnNuevaSemana').addEventListener('click', crearNuevaSemana);
-    document.getElementById('btnGenerarHojasPagados').addEventListener('click', generarHojasEntregaPorGrupo); // ← NUEVA LÍNEA
+    document.getElementById('btnGenerarHojasPagados').addEventListener('click', generarHojasEntregaPorGrupo);
     document.getElementById('btnAgregarProducto').addEventListener('click', agregarProductoALista);
     
     // Live de Ventas - Carritos
@@ -216,6 +216,9 @@ function inicializarEventos() {
     document.getElementById('formRecolector').addEventListener('submit', guardarRecolector);
     document.getElementById('formVenta').addEventListener('submit', guardarVenta);
 
+    // ✨ CAMBIO 3: Auto-completar recolector y grupo al seleccionar CLIENTE
+    document.getElementById('ventaCliente').addEventListener('change', autoCompletarDesdeCliente);
+    
     // Cálculos automáticos en formulario de venta
     // Event listener para actualizar grupo automáticamente desde RECOLECTOR
     document.getElementById('ventaRecolector').addEventListener('change', actualizarGrupoVenta);
@@ -234,6 +237,29 @@ function inicializarEventos() {
             if (e.target === modal) cerrarModal(modal.id);
         });
     });
+}
+
+// ✨ CAMBIO 3: Función para auto-completar recolector y grupo desde el cliente seleccionado
+function autoCompletarDesdeCliente() {
+    const clienteId = parseInt(document.getElementById('ventaCliente').value);
+    
+    if (!clienteId) {
+        // Si no hay cliente, limpiar campos
+        document.getElementById('ventaRecolector').value = '';
+        document.getElementById('ventaGrupo').value = '';
+        return;
+    }
+    
+    // Buscar el cliente seleccionado
+    const cliente = state.clientes.find(c => c.id === clienteId);
+    
+    if (cliente && cliente.recolectorId) {
+        // Auto-seleccionar el recolector del cliente
+        document.getElementById('ventaRecolector').value = cliente.recolectorId;
+        
+        // Actualizar el grupo automáticamente
+        actualizarGrupoVenta();
+    }
 }
 
 function cambiarSeccion(seccion) {
@@ -544,7 +570,6 @@ function eliminarProductoTemporal(id) {
 }
 
 // Limpiar formulario de venta
-
 function limpiarFormularioVenta() {
     document.getElementById('formVenta').reset();
     document.getElementById('ventaPaquetes').value = '';
@@ -634,18 +659,25 @@ function guardarVenta(e) {
     const cliente = state.clientes.find(c => c.id === clienteId);
     const recolector = state.recolectores.find(r => r.id === recolectorId);
 
+    // ✨ CAMBIO 1: Agregar fechaCreacion (solo para nuevas) y fechaModificacion (siempre)
+    const ahora = new Date().toISOString();
+    
     const venta = {
-    id: state.ventaEnEdicion || Date.now(),
-    fecha: new Date().toISOString(),
-    cliente: cliente ? cliente.nombre : '',
-    recolector: recolector ? recolector.nombre : '',
-    grupo: document.getElementById('ventaGrupo').value,
-    pago: document.getElementById('ventaPago').value,
-    paquetes: parseInt(document.getElementById('ventaPaquetes').value) || 0,
-    productos: [...state.productosTemporal],
-    total: state.productosTemporal.reduce((sum, p) => sum + p.subtotal, 0),
-    cantidad: state.productosTemporal.reduce((sum, p) => sum + p.cantidad, 0)
-};
+        id: state.ventaEnEdicion || Date.now(),
+        fechaCreacion: state.ventaEnEdicion 
+            ? state.ventasActuales.find(v => v.id === state.ventaEnEdicion)?.fechaCreacion || ahora
+            : ahora, // Solo se establece al crear, NO al editar
+        fechaModificacion: ahora, // SIEMPRE se actualiza
+        fecha: ahora, // Mantener para compatibilidad
+        cliente: cliente ? cliente.nombre : '',
+        recolector: recolector ? recolector.nombre : '',
+        grupo: document.getElementById('ventaGrupo').value,
+        pago: document.getElementById('ventaPago').value,
+        paquetes: parseInt(document.getElementById('ventaPaquetes').value) || 0,
+        productos: [...state.productosTemporal],
+        total: state.productosTemporal.reduce((sum, p) => sum + p.subtotal, 0),
+        cantidad: state.productosTemporal.reduce((sum, p) => sum + p.cantidad, 0)
+    };
 
     if (state.ventaEnEdicion) {
         // ACTUALIZAR venta existente (no duplicar)
@@ -673,10 +705,13 @@ function guardarVenta(e) {
     limpiarFormularioVenta();
 }
 
-function actualizarTablaVentas() {
+function actualizarTablaVentas(ventasAMostrar = null) {
     const tbody = document.getElementById('ventasBody');
     
-    if (state.ventasActuales.length === 0) {
+    // Si no se pasa un array, usar todas las ventas actuales
+    const ventas = ventasAMostrar || state.ventasActuales;
+    
+    if (ventas.length === 0) {
         tbody.innerHTML = `
            <tr>
         <td colspan="8" style="text-align: center; padding: 40px; color: #999;">
@@ -690,7 +725,7 @@ function actualizarTablaVentas() {
         return;
     }
 
-    tbody.innerHTML = state.ventasActuales.map(venta => {
+    tbody.innerHTML = ventas.map(venta => {
         const pagoClass = venta.pago === 'PENDIENTE' ? 'pago-pendiente' :
                          venta.pago === 'PAGADO' ? 'pago-pagado' : 'pago-no-realizo';
         
@@ -727,7 +762,7 @@ function actualizarTablaVentas() {
     }).join('');
 
     // Calcular total
-    const total = state.ventasActuales.reduce((sum, v) => sum + v.total, 0);
+    const total = ventas.reduce((sum, v) => sum + v.total, 0);
     document.getElementById('totalVentas').textContent = `$${total.toFixed(2)}`;
 }
 
@@ -870,10 +905,13 @@ function actualizarDashboard() {
 }
 
 function actualizarEstadisticas() {
+    // ✨ CAMBIO 1: Usar fechaCreacion en lugar de fecha para "Ventas del Día"
     const hoy = new Date().toDateString();
-    const ventasHoy = state.ventasActuales.filter(v => 
-        new Date(v.fecha).toDateString() === hoy
-    );
+    const ventasHoy = state.ventasActuales.filter(v => {
+        // Si tiene fechaCreacion, usarla; si no, usar fecha (compatibilidad)
+        const fechaVenta = v.fechaCreacion || v.fecha;
+        return new Date(fechaVenta).toDateString() === hoy;
+    });
     
     const totalVentasHoy = ventasHoy.reduce((sum, v) => sum + v.total, 0);
     const totalVentasSemana = state.ventasActuales.reduce((sum, v) => sum + v.total, 0);
@@ -891,7 +929,7 @@ function actualizarGraficas() {
     crearGraficaVentasDia();
     crearGraficaTopClientes();
     crearGraficaRecolectores();
-    crearGraficaProductos();
+    // ✨ CAMBIO 2: NO llamar a crearGraficaProductos (eliminada)
 }
 
 function crearGraficaVentasDia() {
@@ -1114,69 +1152,7 @@ function crearGraficaRecolectores() {
     });
 }
 
-function crearGraficaProductos() {
-    const ctx = document.getElementById('chartProductos');
-    if (!ctx) return;
-
-    // Destruir gráfica anterior si existe
-    if (window.chartProductos instanceof Chart) {
-        window.chartProductos.destroy();
-    }
-
-    const productosCantidad = {};
-    state.ventasActuales.forEach(venta => {
-        productosCantidad[venta.producto] = (productosCantidad[venta.producto] || 0) + venta.cantidad;
-    });
-
-    const top5 = Object.entries(productosCantidad)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5);
-
-    // Si no hay datos, mostrar ejemplo
-    const labels = top5.length > 0 ? top5.map(p => p[0]) : ['Producto 1', 'Producto 2', 'Producto 3'];
-    const data = top5.length > 0 ? top5.map(p => p[1]) : [0, 0, 0];
-
-    window.chartProductos = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Cantidad Vendida',
-                data: data,
-                backgroundColor: 'rgba(184, 230, 255, 0.8)',
-                borderColor: '#64B5F6',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            indexAxis: 'y',
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                x: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(255, 182, 217, 0.2)'
-                    },
-                    ticks: {
-                        color: '#E91E8C'
-                    }
-                },
-                y: {
-                    grid: {
-                        display: false
-                    },
-                    ticks: {
-                        color: '#E91E8C'
-                    }
-                }
-            }
-        }
-    });
-}
+// ✨ CAMBIO 2: Función crearGraficaProductos ELIMINADA (ya no se llama)
 
 // ===== IMPRESIÓN DE TICKET =====
 function imprimirTicket() {
@@ -1425,8 +1401,6 @@ function generarTicketHTML(venta) {
 }
 
 // ===== GENERAR IMAGEN CUTE DESDE MODAL DE VENTAS =====
-
-// ===== GENERAR IMAGEN CUTE DESDE MODAL DE VENTAS =====
 function generarImagenDesdeVenta() {
     // Si estamos editando una venta, usar sus datos
     if (state.ventaEnEdicion) {
@@ -1466,6 +1440,7 @@ function generarImagenDesdeVenta() {
 
     generarImagenCuteDesdeVenta(ventaTemporal);
 }
+
 function generarImagenCuteDesdeVenta(venta) {
     const fecha = new Date().toLocaleDateString('es-MX', {
         year: 'numeric',
@@ -1799,6 +1774,7 @@ function generarImagenCuteDesdeVenta(venta) {
     sonarExito();
     mostrarNotificacion('📸 Vista previa lista! Descarga cuando quieras', 'success');
 }
+
 // ===== LIVE DE VENTAS - SISTEMA DE CARRITOS =====
 
 // Agregar cliente rápido (solo nombre, sin productos)
@@ -2534,10 +2510,13 @@ function finalizarLive() {
                 state.clientes.push(cliente);
             }
             
-            // Crear venta
+            // Crear venta con fechaCreacion
+            const ahora = new Date().toISOString();
             const venta = {
                 id: Date.now() + Math.random(),
-                fecha: new Date().toISOString(),
+                fechaCreacion: ahora, // ✨ NUEVA: fecha de creación
+                fechaModificacion: ahora,
+                fecha: ahora,
                 cliente: carrito.nombre,
                 recolector: recolectorVenta,
                 grupo: grupoVenta,
@@ -2771,6 +2750,7 @@ function generarTodosLosGrupos() {
     }
 }
     
+// ✨ CAMBIO 4: Ordenar ventas por recolector antes de generar PDF
 function generarPDFGrupo(nombreGrupo, ventas) {
     const fecha = new Date().toLocaleDateString('es-MX', {
         day: '2-digit',
@@ -2778,12 +2758,19 @@ function generarPDFGrupo(nombreGrupo, ventas) {
         year: 'numeric'
     });
     
+    // ✨ CAMBIO 4: ORDENAR POR RECOLECTOR alfabéticamente
+    const ventasOrdenadas = [...ventas].sort((a, b) => {
+        const recolectorA = (a.recolector || '').toLowerCase();
+        const recolectorB = (b.recolector || '').toLowerCase();
+        return recolectorA.localeCompare(recolectorB);
+    });
+    
     // Calcular totales generales
     let totalPiezas = 0;
     let totalPaquetes = 0;
     
-    // Generar filas de TODAS las ventas del grupo
-    const filasHTML = ventas.map(venta => {
+    // Generar filas de TODAS las ventas del grupo (ya ordenadas)
+    const filasHTML = ventasOrdenadas.map(venta => {
         const piezas = venta.productos ? venta.productos.reduce((sum, p) => sum + p.cantidad, 0) : venta.cantidad;
         const paquetes = venta.paquetes || 0;
         
@@ -3082,6 +3069,366 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
+// ===== 🎯 FUNCIONES DE NAVEGACIÓN DESDE TARJETAS DEL DASHBOARD =====
 
+/**
+ * Ver ventas creadas hoy (basado en fechaCreacion)
+ */
+function verVentasDelDia() {
+    const hoy = new Date().toDateString();
+    const ventasHoy = state.ventasActuales.filter(v => {
+        const fechaVenta = v.fechaCreacion || v.fecha; // Usar fechaCreacion
+        return new Date(fechaVenta).toDateString() === hoy;
+    });
+    
+    // Cambiar a sección ventas
+    cambiarSeccion('ventas');
+    
+    // Actualizar tabla con ventas filtradas
+    actualizarTablaVentas(ventasHoy);
+    
+    // Mostrar notificación
+    mostrarNotificacion(`Mostrando ${ventasHoy.length} venta(s) de hoy 📅`, 'info');
+}
 
+/**
+ * Ver ventas de esta semana
+ */
+function verVentasDeLaSemana() {
+    const ahora = new Date();
+    const inicioSemana = new Date(ahora);
+    inicioSemana.setDate(ahora.getDate() - ahora.getDay()); // Domingo de esta semana
+    inicioSemana.setHours(0, 0, 0, 0);
+    
+    const ventasSemana = state.ventasActuales.filter(v => {
+        const fechaVenta = new Date(v.fechaCreacion || v.fecha);
+        return fechaVenta >= inicioSemana;
+    });
+    
+    // Cambiar a sección ventas
+    cambiarSeccion('ventas');
+    
+    // Actualizar tabla con ventas filtradas
+    actualizarTablaVentas(ventasSemana);
+    
+    // Mostrar notificación
+    mostrarNotificacion(`Mostrando ${ventasSemana.length} venta(s) de esta semana 📊`, 'info');
+}
 
+/**
+ * Ver solo pedidos con estado PENDIENTE
+ */
+function verPedidosPendientes() {
+    const ventasPendientes = state.ventasActuales.filter(v => v.pago === 'PENDIENTE');
+    
+    // Cambiar a sección ventas
+    cambiarSeccion('ventas');
+    
+    // Actualizar tabla con ventas filtradas
+    actualizarTablaVentas(ventasPendientes);
+    
+    // Mostrar notificación
+    mostrarNotificacion(`Mostrando ${ventasPendientes.length} pedido(s) pendiente(s) ⏳`, 'info');
+}
+
+/**
+ * Ver solo pedidos con estado PAGADO
+ */
+function verPedidosPagados() {
+    const ventasPagadas = state.ventasActuales.filter(v => v.pago === 'PAGADO');
+    
+    // Cambiar a sección ventas
+    cambiarSeccion('ventas');
+    
+    // Actualizar tabla con ventas filtradas
+    actualizarTablaVentas(ventasPagadas);
+    
+    // Mostrar notificación
+    mostrarNotificacion(`Mostrando ${ventasPagadas.length} pedido(s) pagado(s) ✅`, 'info');
+}
+
+/**
+ * Ver todos los clientes
+ */
+function verTodosLosClientes() {
+    // Cambiar a sección clientes
+    cambiarSeccion('clientes');
+    
+    // La lista ya se actualiza automáticamente al cambiar de sección
+    actualizarListaClientes();
+    
+    // Mostrar notificación
+    mostrarNotificacion(`Mostrando ${state.clientes.length} cliente(s) 👥`, 'info');
+}
+
+// ===== 🔢 CALCULADORA KAWAII =====
+
+// Estado de la calculadora
+const calcState = {
+    currentValue: '0',
+    previousValue: '',
+    operator: null,
+    shouldResetDisplay: false,
+    history: []
+};
+
+/**
+ * Agregar número a la pantalla
+ */
+function calcNumber(num) {
+    sonarClick();
+    
+    if (calcState.shouldResetDisplay) {
+        calcState.currentValue = num;
+        calcState.shouldResetDisplay = false;
+    } else {
+        if (calcState.currentValue === '0' && num !== '.') {
+            calcState.currentValue = num;
+        } else if (num === '.' && calcState.currentValue.includes('.')) {
+            return; // No agregar punto si ya existe
+        } else {
+            calcState.currentValue += num;
+        }
+    }
+    
+    updateCalcDisplay();
+}
+
+/**
+ * Seleccionar operador (+, -, ×, ÷)
+ */
+function calcOperator(op) {
+    sonarClick();
+    
+    if (calcState.operator && !calcState.shouldResetDisplay) {
+        calcEquals();
+    }
+    
+    calcState.previousValue = calcState.currentValue;
+    calcState.operator = op;
+    calcState.shouldResetDisplay = true;
+    
+    updateCalcDisplay();
+}
+
+/**
+ * Calcular resultado
+ */
+function calcEquals() {
+    sonarExito();
+    
+    if (!calcState.operator || calcState.shouldResetDisplay) return;
+    
+    const prev = parseFloat(calcState.previousValue);
+    const current = parseFloat(calcState.currentValue);
+    
+    if (isNaN(prev) || isNaN(current)) return;
+    
+    let result = 0;
+    const operation = `${prev} ${calcState.operator} ${current}`;
+    
+    switch (calcState.operator) {
+        case '+':
+            result = prev + current;
+            break;
+        case '-':
+            result = prev - current;
+            break;
+        case '×':
+            result = prev * current;
+            break;
+        case '÷':
+            if (current === 0) {
+                alert('🙊 ¡No se puede dividir entre cero, mana!');
+                calcClear();
+                return;
+            }
+            result = prev / current;
+            break;
+    }
+    
+    // Redondear a 2 decimales si es necesario
+    result = Math.round(result * 100) / 100;
+    
+    // Agregar al historial
+    addToCalcHistory(operation, result);
+    
+    // Actualizar estado
+    calcState.currentValue = result.toString();
+    calcState.operator = null;
+    calcState.previousValue = '';
+    calcState.shouldResetDisplay = true;
+    
+    updateCalcDisplay();
+}
+
+/**
+ * Calcular porcentaje
+ */
+function calcPercent() {
+    sonarClick();
+    
+    const current = parseFloat(calcState.currentValue);
+    if (isNaN(current)) return;
+    
+    calcState.currentValue = (current / 100).toString();
+    updateCalcDisplay();
+}
+
+/**
+ * Borrar pantalla (Clear)
+ */
+function calcClear() {
+    sonarClick();
+    
+    calcState.currentValue = '0';
+    calcState.previousValue = '';
+    calcState.operator = null;
+    calcState.shouldResetDisplay = false;
+    
+    updateCalcDisplay();
+}
+
+/**
+ * Borrar último dígito (Delete/Backspace)
+ */
+function calcDelete() {
+    sonarClick();
+    
+    if (calcState.currentValue.length > 1) {
+        calcState.currentValue = calcState.currentValue.slice(0, -1);
+    } else {
+        calcState.currentValue = '0';
+    }
+    
+    updateCalcDisplay();
+}
+
+/**
+ * Actualizar pantalla de la calculadora
+ */
+function updateCalcDisplay() {
+    const resultElement = document.getElementById('calcResult');
+    const operationElement = document.getElementById('calcOperation');
+    
+    if (!resultElement || !operationElement) return;
+    
+    resultElement.textContent = calcState.currentValue;
+    
+    if (calcState.operator && calcState.previousValue) {
+        operationElement.textContent = `${calcState.previousValue} ${calcState.operator}`;
+    } else {
+        operationElement.textContent = '';
+    }
+}
+
+/**
+ * Agregar cálculo al historial
+ */
+function addToCalcHistory(operation, result) {
+    calcState.history.unshift({
+        operation: operation,
+        result: result,
+        timestamp: new Date().toLocaleTimeString()
+    });
+    
+    // Mantener solo los últimos 10
+    if (calcState.history.length > 10) {
+        calcState.history = calcState.history.slice(0, 10);
+    }
+    
+    // Guardar en localStorage
+    localStorage.setItem('calcHistory', JSON.stringify(calcState.history));
+    
+    updateCalcHistory();
+}
+
+/**
+ * Actualizar vista del historial
+ */
+function updateCalcHistory() {
+    const historyElement = document.getElementById('calcHistory');
+    if (!historyElement) return;
+    
+    if (calcState.history.length === 0) {
+        historyElement.innerHTML = `
+            <p style="color: #999; text-align: center; padding: 20px;">
+                No hay cálculos aún
+            </p>
+        `;
+        return;
+    }
+    
+    historyElement.innerHTML = calcState.history.map(item => `
+        <div class="calc-history-item">
+            <div class="calc-history-operation">${item.operation}</div>
+            <div class="calc-history-result">= ${item.result}</div>
+        </div>
+    `).join('');
+}
+
+/**
+ * Limpiar historial
+ */
+function calcClearHistory() {
+    if (confirm('¿Borrar todo el historial de cálculos?')) {
+        calcState.history = [];
+        localStorage.removeItem('calcHistory');
+        updateCalcHistory();
+        mostrarNotificacion('Historial limpiado ✨', 'info');
+    }
+}
+
+/**
+ * Cargar historial al iniciar
+ */
+function loadCalcHistory() {
+    const saved = localStorage.getItem('calcHistory');
+    if (saved) {
+        try {
+            calcState.history = JSON.parse(saved);
+            updateCalcHistory();
+        } catch (e) {
+            console.error('Error cargando historial de calculadora:', e);
+        }
+    }
+}
+
+// Cargar historial al inicio
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        loadCalcHistory();
+    }, 500);
+});
+
+// Soporte de teclado para la calculadora
+document.addEventListener('keydown', (e) => {
+    // Solo funcionar si la sección de calculadora está activa
+    const calcSection = document.getElementById('calculadora');
+    if (!calcSection || !calcSection.classList.contains('active')) return;
+    
+    if (e.key >= '0' && e.key <= '9') {
+        calcNumber(e.key);
+    } else if (e.key === '.') {
+        calcNumber('.');
+    } else if (e.key === '+') {
+        calcOperator('+');
+    } else if (e.key === '-') {
+        calcOperator('-');
+    } else if (e.key === '*') {
+        calcOperator('×');
+    } else if (e.key === '/') {
+        e.preventDefault();
+        calcOperator('÷');
+    } else if (e.key === 'Enter' || e.key === '=') {
+        e.preventDefault();
+        calcEquals();
+    } else if (e.key === 'Escape') {
+        calcClear();
+    } else if (e.key === 'Backspace') {
+        e.preventDefault();
+        calcDelete();
+    } else if (e.key === '%') {
+        calcPercent();
+    }
+});
