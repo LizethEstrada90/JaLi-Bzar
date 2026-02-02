@@ -1,0 +1,80 @@
+/* ===== 🔥 ARREGLAR INPUT + BOTÓN EN LA MISMA LÍNEA ===== */
+
+/* 📦 CONTENEDOR DEL INPUT Y BOTÓN */
+.form-rapido-row-full {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 15px !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    margin-bottom: 20px !important;
+}
+
+/* 📝 INPUT DE NOMBRE DEL CLIENTE */
+#quickCliente,
+.input-rapido.input-full-largo {
+    flex: 1 !important;
+    min-width: 0 !important;
+    padding: 18px 20px 18px 45px !important;
+    font-size: 1.1rem !important;
+    border: 3px solid rgba(139, 127, 217, 0.3) !important;
+    border-radius: 20px !important;
+    background: white !important;
+    color: #333 !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(139, 127, 217, 0.1) !important;
+    margin: 0 !important;
+}
+
+#quickCliente:focus,
+.input-rapido.input-full-largo:focus {
+    outline: none !important;
+    border-color: #B5ABEC !important;
+    box-shadow: 0 6px 20px rgba(139, 127, 217, 0.2) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* ➕ BOTÓN VERDE DE AGREGAR */
+#btnAgregarClienteRapido,
+.btn-add-cliente {
+    flex-shrink: 0 !important;
+    background: linear-gradient(135deg, #81C784, #66BB6A) !important;
+    color: white !important;
+    border: none !important;
+    padding: 18px 25px !important;
+    border-radius: 20px !important;
+    font-size: 1.5rem !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 6px 20px rgba(129, 199, 132, 0.3) !important;
+    min-width: 60px !important;
+    height: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+}
+
+#btnAgregarClienteRapido:hover,
+.btn-add-cliente:hover {
+    background: linear-gradient(135deg, #66BB6A, #4CAF50) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 25px rgba(129, 199, 132, 0.4) !important;
+}
+
+/* 📱 RESPONSIVE */
+@media (max-width: 768px) {
+    #quickCliente,
+    .input-rapido.input-full-largo {
+        font-size: 1rem !important;
+        padding: 16px 18px 16px 45px !important;
+    }
+    
+    #btnAgregarClienteRapido,
+    .btn-add-cliente {
+        padding: 16px 22px !important;
+        font-size: 1.3rem !important;
+        min-width: 55px !important;
+    }
+}

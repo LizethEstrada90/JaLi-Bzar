@@ -1,0 +1,76 @@
+/* ===== 💰 ESTILOS PARA CAMPO DE ANTICIPO ===== */
+
+/* 💵 Campo de Anticipo */
+#anticipo,
+input[name="anticipo"] {
+    width: 100% !important;
+    padding: 14px 16px !important;
+    border: 2px solid rgba(129, 199, 132, 0.4) !important;
+    border-radius: 15px !important;
+    font-size: 1rem !important;
+    transition: all 0.3s ease !important;
+    background: #F1F8F4 !important;
+    color: #2E7D32 !important;
+    font-weight: 600 !important;
+}
+
+#anticipo:focus,
+input[name="anticipo"]:focus {
+    outline: none !important;
+    border-color: #81C784 !important;
+    box-shadow: 0 4px 15px rgba(129, 199, 132, 0.3) !important;
+}
+
+/* 📝 Label del Anticipo */
+label[for="anticipo"] {
+    color: #81C784 !important;
+    font-weight: 700 !important;
+    margin-bottom: 8px !important;
+    display: block !important;
+    font-size: 1rem !important;
+}
+
+/* 🎫 TICKET - Mostrar desglose del anticipo */
+.ticket-anticipo-section {
+    margin: 15px 0 !important;
+    padding: 15px !important;
+    background: rgba(129, 199, 132, 0.1) !important;
+    border-radius: 12px !important;
+    border: 2px dashed #81C784 !important;
+}
+
+.ticket-subtotal {
+    font-size: 1.1rem !important;
+    color: #666 !important;
+    margin-bottom: 8px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+}
+
+.ticket-anticipo {
+    font-size: 1.1rem !important;
+    color: #81C784 !important;
+    margin-bottom: 8px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    font-weight: 600 !important;
+}
+
+.ticket-total-final {
+    font-size: 1.5rem !important;
+    color: #EF5350 !important;
+    font-weight: bold !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    padding-top: 10px !important;
+    border-top: 2px solid #EF5350 !important;
+    margin-top: 10px !important;
+}
+
+/* 💡 Mensaje de ayuda */
+.anticipo-help {
+    font-size: 0.85rem !important;
+    color: #81C784 !important;
+    margin-top: 5px !important;
+    font-style: italic !important;
+}

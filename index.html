@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JaLi Bzar - Sistema Kawaii 🎀</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Sistema completo de gestión de ventas con estilo kawaii para tu negocio">
+    <meta name="theme-color" content="#FFB6D9">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="JaLi Bzar">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Iconos -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="PARCHE-FINAL-CORRECTO.css">
+    <link rel="stylesheet" href="ARREGLO-MENU-RESPONSIVE.css">
+    <link rel="stylesheet" href="FORZAR-GRID-HORIZONTAL.css">
+    <link rel="stylesheet" href="CSS-ULTRA-AGRESIVO.css">
+    <link rel="stylesheet" href="FIX-INPUT-HORIZONTAL.css">
+    <link rel="stylesheet" href="ARREGLAR-MODAL-NUEVA-VENTA.css">
+    <link rel="stylesheet" href="OCULTAR-BOTON-CERRAR-FINAL.css">
+    <link rel="stylesheet" href="ESTILOS-ANTICIPO.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+</head>
+<body class="no-animations">
+    <!-- HEADER MODERNO -->
+    <header class="header-kawaii" id="headerPrincipal">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+    <h1 class="logo-text">JaLi Bzar</h1>
+</div>
+                
+                <!-- NAVEGACIÓN DESKTOP -->
+                <nav class="main-nav">
+                    <button class="nav-btn active" data-section="dashboard">
+                        <i class="fas fa-chart-line"></i> Dashboard
+                    </button>
+                    <button class="nav-btn" data-section="live">
+                        <i class="fas fa-shopping-cart"></i> Live Ventas
+                    </button>
+                    <button class="nav-btn" data-section="ventas">
+                        <i class="fas fa-receipt"></i> Ventas
+                    </button>
+                    <button class="nav-btn" data-section="clientes">
+                        <i class="fas fa-users"></i> Clientes
+                    </button>
+                    <button class="nav-btn" data-section="recolectores">
+                        <i class="fas fa-truck"></i> Recolectores
+                    </button>
+                    <button class="nav-btn" data-section="calculadora">
+                        <i class="fas fa-calculator"></i> Calculadora
+                    </button>
+                    <button class="nav-btn" data-section="historial">
+                        <i class="fas fa-history"></i> Historial
+                    </button>
+                </nav>
+                
+                <!-- BOTÓN HAMBURGUESA (MÓVIL) -->
+                <div class="hamburger" id="hamburgerBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- MENÚ MÓVIL -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <span class="mobile-menu-title">Menú</span>
+            <button class="btn-cerrar-menu" id="btnCerrarMenu">✕</button>
+        </div>
+        <nav class="mobile-nav">
+            <button class="nav-btn active" data-section="dashboard">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </button>
+            <button class="nav-btn" data-section="live">
+                <i class="fas fa-shopping-cart"></i> Live Ventas
+            </button>
+            <button class="nav-btn" data-section="ventas">
+                <i class="fas fa-receipt"></i> Ventas
+            </button>
+            <button class="nav-btn" data-section="clientes">
+                <i class="fas fa-users"></i> Clientes
+            </button>
+            <button class="nav-btn" data-section="recolectores">
+                <i class="fas fa-truck"></i> Recolectores
+            </button>
+            <button class="nav-btn" data-section="calculadora">
+                <i class="fas fa-calculator"></i> Calculadora
+            </button>
+            <button class="nav-btn" data-section="historial">
+                <i class="fas fa-history"></i> Historial
+            </button>
+        </nav>
+    </div>
+    
+    <!-- OVERLAY PARA CERRAR MENÚ MÓVIL -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <!-- INDICADOR DE ESTADO FIREBASE -->
+    <div id="firebaseStatus" style="position: fixed; top: 15px; right: 15px; z-index: 9999; padding: 10px 18px; border-radius: 25px; font-size: 0.85rem; font-weight: 600; background: #E0E0E0; color: #666; box-shadow: 0 4px 15px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 8px; cursor: pointer;" title="Click para más información">
+        <span id="firebaseIcon">⚠️</span>
+        <span id="firebaseText">Verificando...</span>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="main-container">
+        <!-- SECCIÓN DASHBOARD -->
+        <section id="dashboard" class="section active">
+            <div class="container">
+                <h2 class="section-title">Dashboard Kawaii 💗</h2>
+                
+                <!-- Tarjetas de estadísticas -->
+                <div class="stats-grid">
+                    <div class="stat-card" onclick="verVentasDelDia()" title="Click para ver ventas de hoy">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <h3>Ventas del Día</h3>
+                            <p class="stat-value" id="ventasHoy">$0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" onclick="verVentasDeLaSemana()" title="Click para ver ventas de la semana">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <h3>Ventas de la Semana</h3>
+                            <p class="stat-value" id="ventasSemana">$0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" onclick="verTodosLosClientes()" title="Click para ver todos los clientes">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <h3>Total Clientes</h3>
+                            <p class="stat-value" id="totalClientes">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" onclick="verPedidosPendientes()" title="Click para ver pedidos pendientes">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-info">
+                            <h3>Pedidos Pendientes</h3>
+                            <p class="stat-value" id="pedidosPendientes">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" onclick="verPedidosPagados()" title="Click para ver pedidos pagados">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <h3>Pedidos Pagados</h3>
+                            <p class="stat-value" id="pedidosPagados">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>Ventas por Día 📈</h3>
+                        <canvas id="chartVentasDia"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Top Clientes 👑</h3>
+                        <canvas id="chartTopClientes"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Ventas por Recolector 🚚</h3>
+                        <canvas id="chartRecolectores"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN LIVE DE VENTAS -->
+        <section id="live" class="section">
+            <div class="container">
+                <button class="btn-inicio-movil" onclick="cambiarSeccion('dashboard')">
+                    <i class="fas fa-arrow-left"></i> Inicio
+                </button>
+                <div class="section-header">
+                    <h2 class="section-title">Live de Ventas 📹🛍️</h2>
+                    <div class="action-buttons">
+                        <button class="btn-kawaii btn-danger" id="btnLimpiarCarritos" title="Limpiar todos los carritos">
+                            <span>🗑️</span> Limpiar Todo
+                        </button>
+                        <button class="btn-kawaii btn-success" id="btnFinalizarLive">
+                            <span>✅</span> Finalizar Live
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lista de carritos -->
+                <div class="carritos-container" id="carritosContainer">
+                    <!-- Los carritos se agregan aquí -->
+                </div>
+
+                <!-- Panel de agregar rápido -->
+                <div class="panel-rapido panel-rapido-abajo">
+                    <div class="form-rapido">
+                        <div class="form-rapido-row-full">
+                            <input type="text" id="quickCliente" placeholder="👤 Nombre del Cliente" class="input-rapido input-full-largo">
+                            <button class="btn-kawaii btn-success btn-add-cliente" id="btnAgregarClienteRapido">
+                                ➕
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN VENTAS -->
+        <section id="ventas" class="section">
+            <div class="container">
+                <button class="btn-inicio-movil" onclick="cambiarSeccion('dashboard')">
+                    <i class="fas fa-arrow-left"></i> Inicio
+                </button>
+                <div class="section-header">
+                    <h2 class="section-title">Registro de Ventas 🛍️</h2>
+                    <div class="action-buttons">
+                        <button class="btn-kawaii btn-primary" id="btnNuevaSemana">
+                            <span>✨</span> Crear Hoja Nueva
+                        </button>
+                        <button class="btn-kawaii btn-info" id="btnGenerarHojasPagados">
+                            <span>📄</span> Hojas de Entrega
+                        </button>
+                        <button class="btn-kawaii btn-success" id="btnAgregarVenta">
+                            <span>➕</span> Nueva Venta
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ✨ NUEVO: Buscador de clientes -->
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        id="buscarCliente" 
+                        placeholder="🔍 Buscar cliente por nombre..."
+                        class="search-input">
+                    <button class="btn-clear-search" id="btnLimpiarBusqueda" style="display: none;">
+                        ✖️ Limpiar
+                    </button>
+                </div>
+
+                <!-- Tabla de ventas responsive -->
+                <div class="table-container">
+                    <table class="kawaii-table" id="tablaVentas">
+                        <thead>
+                         <tr>
+                         <th>Cliente</th>
+                         <th>Recolector</th>
+                         <th>Grupo</th>
+                         <th>Producto</th>
+                         <th>Pago</th>
+                         <th>Paquetes</th>
+                         <th>Total</th>
+                         <th>Acciones</th>
+                         </tr>
+                         </thead>
+                        <tbody id="ventasBody">
+                            <!-- Las ventas se agregan dinámicamente -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="6" style="text-align: right; font-weight: bold;">TOTAL:</td>
+                                <td colspan="2" style="font-weight: bold; color: #FF8AB8;" id="totalVentas">$0.00</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN CLIENTES -->
+        <section id="clientes" class="section">
+            <div class="container">
+                <button class="btn-inicio-movil" onclick="cambiarSeccion('dashboard')">
+                    <i class="fas fa-arrow-left"></i> Inicio
+                </button>
+                <div class="section-header">
+                    <h2 class="section-title">Gestión de Clientes 👥</h2>
+                    <button class="btn-kawaii btn-primary" id="btnAgregarCliente">
+                        <span>➕</span> Nuevo Cliente
+                    </button>
+                </div>
+
+                <div class="cards-grid">
+                    <div id="listaClientes" class="lista-items">
+                        <!-- Los clientes se agregan dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN RECOLECTORES -->
+        <section id="recolectores" class="section">
+            <div class="container">
+                <button class="btn-inicio-movil" onclick="cambiarSeccion('dashboard')">
+                    <i class="fas fa-arrow-left"></i> Inicio
+                </button>
+                <div class="section-header">
+                    <h2 class="section-title">Gestión de Recolectores 🚚</h2>
+                    <button class="btn-kawaii btn-primary" id="btnAgregarRecolector">
+                        <span>➕</span> Nuevo Recolector
+                    </button>
+                </div>
+
+                <div class="cards-grid">
+                    <div id="listaRecolectores" class="lista-items">
+                        <!-- Los recolectores se agregan dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN HISTORIAL -->
+        <section id="historial" class="section">
+            <div class="container">
+                <button class="btn-inicio-movil" onclick="cambiarSeccion('dashboard')">
+                    <i class="fas fa-arrow-left"></i> Inicio
+                </button>
+                <h2 class="section-title">Historial de Semanas 📚</h2>
+                <div id="listaHistorial" class="historial-container">
+                    <!-- El historial se agrega dinámicamente -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN CALCULADORA KAWAII -->
+        <section id="calculadora" class="section">
+            <div class="container">
+                <button class="btn-inicio-movil" onclick="cambiarSeccion('dashboard')">
+                    <i class="fas fa-arrow-left"></i> Inicio
+                </button>
+                <h2 class="section-title">Calculadora Kawaii 🔢💗</h2>
+                
+                <div class="calculadora-container">
+                    <div class="calculadora-kawaii">
+                        <!-- Pantalla de la calculadora -->
+                        <div class="calc-display">
+                            <div class="calc-operation" id="calcOperation"></div>
+                            <div class="calc-result" id="calcResult">0</div>
+                        </div>
+                        
+                        <!-- Botones de la calculadora -->
+                        <div class="calc-buttons">
+                            <button class="calc-btn calc-function" onclick="calcClear()">C</button>
+                            <button class="calc-btn calc-function" onclick="calcDelete()">⌫</button>
+                            <button class="calc-btn calc-operator" onclick="calcPercent()">%</button>
+                            <button class="calc-btn calc-operator" onclick="calcOperator('÷')">÷</button>
+                            
+                            <button class="calc-btn calc-number" onclick="calcNumber('7')">7</button>
+                            <button class="calc-btn calc-number" onclick="calcNumber('8')">8</button>
+                            <button class="calc-btn calc-number" onclick="calcNumber('9')">9</button>
+                            <button class="calc-btn calc-operator" onclick="calcOperator('×')">×</button>
+                            
+                            <button class="calc-btn calc-number" onclick="calcNumber('4')">4</button>
+                            <button class="calc-btn calc-number" onclick="calcNumber('5')">5</button>
+                            <button class="calc-btn calc-number" onclick="calcNumber('6')">6</button>
+                            <button class="calc-btn calc-operator" onclick="calcOperator('-')">-</button>
+                            
+                            <button class="calc-btn calc-number" onclick="calcNumber('1')">1</button>
+                            <button class="calc-btn calc-number" onclick="calcNumber('2')">2</button>
+                            <button class="calc-btn calc-number" onclick="calcNumber('3')">3</button>
+                            <button class="calc-btn calc-operator" onclick="calcOperator('+')">+</button>
+                            
+                            <button class="calc-btn calc-number calc-zero" onclick="calcNumber('0')">0</button>
+                            <button class="calc-btn calc-number" onclick="calcNumber('.')">.</button>
+                            <button class="calc-btn calc-equals" onclick="calcEquals()">=</button>
+                        </div>
+
+                        <!-- Historial de cálculos -->
+                        <div class="calc-history-section">
+                            <div class="calc-history-header">
+                                <h4>📝 Historial</h4>
+                                <button class="btn-kawaii btn-secondary" onclick="calcClearHistory()">
+                                    🗑️ Limpiar
+                                </button>
+                            </div>
+                            <div class="calc-history" id="calcHistory">
+                                <p style="color: #999; text-align: center; padding: 20px;">
+                                    No hay cálculos aún
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <button id="btnInstalarApp" class="btn-instalar-pwa" style="display: none;">
+    📲 Instalar App
+</button>
+
+    <!-- ✨ MODAL EDITAR CLIENTE -->
+    <div id="modalEditarCliente" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Editar Cliente ✏️</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="formEditarCliente">
+                <div class="form-group">
+                    <label>Nombre del Cliente</label>
+                    <input type="text" id="editarNombreCliente" required>
+                </div>
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select id="editarTipoCliente" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="Local">Local</option>
+                        <option value="Foráneo">Foráneo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Recolector</label>
+                    <select id="editarRecolectorCliente" required>
+                        <option value="">Seleccionar recolector...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Grupo (automático)</label>
+                    <input type="text" id="editarGrupoCliente" readonly>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-kawaii btn-success">✨ Guardar Cambios</button>
+                    <button type="button" class="btn-kawaii btn-danger close-modal">❌ Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL AGREGAR CLIENTE -->
+    <div id="modalCliente" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nuevo Cliente 💗</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="formCliente">
+                <div class="form-group">
+                    <label>Nombre del Cliente</label>
+                    <input type="text" id="nombreCliente" required>
+                </div>
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select id="tipoCliente" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="Local">Local</option>
+                        <option value="Foráneo">Foráneo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Recolector</label>
+                    <select id="recolectorCliente" required>
+                        <option value="">Seleccionar recolector...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Grupo (automático)</label>
+                    <input type="text" id="grupoCliente" readonly>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-kawaii btn-success">✨ Guardar</button>
+                    <button type="button" class="btn-kawaii btn-danger close-modal">❌ Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL AGREGAR RECOLECTOR -->
+    <div id="modalRecolector" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nuevo Recolector 🚚</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="formRecolector">
+                <div class="form-group">
+                    <label>Nombre del Recolector</label>
+                    <input type="text" id="nombreRecolector" required>
+                </div>
+                <div class="form-group">
+                    <label>Grupo</label>
+                    <input type="text" id="grupoRecolector" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-kawaii btn-success">✨ Guardar</button>
+                    <button type="button" class="btn-kawaii btn-danger close-modal">❌ Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL AGREGAR VENTA -->
+    <div id="modalVenta" class="modal">
+        <div class="modal-content modal-wide">
+            <div class="modal-header">
+                <h3 id="tituloModalVenta">Nueva Venta 🛍️</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="formVenta">
+                <div class="form-grid">
+                    <!-- ✨ BUSCADOR PREDICTIVO TIPO GOOGLE PARA CLIENTES -->
+                    <div class="form-group">
+                        <label>Cliente</label>
+                        <div class="autocomplete-container">
+                            <input 
+                                type="text" 
+                                id="buscarClienteVenta" 
+                                placeholder="🔍 Escribe el nombre del cliente..."
+                                autocomplete="off"
+                                style="margin-bottom: 0; padding: 12px; border: 2px solid #FFB6D9; border-radius: 12px; width: 100%;">
+                            <div id="sugerenciasClientes" class="autocomplete-dropdown"></div>
+                        </div>
+                        <input type="hidden" id="ventaCliente" required>
+                    </div>
+                    
+                    <!-- RECOLECTOR -->
+                    <div class="form-group">
+                        <label>Recolector</label>
+                        <select id="ventaRecolector" required>
+                            <option value="">Seleccionar recolector...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Grupo (automático)</label>
+                        <input type="text" id="ventaGrupo" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Paquetes</label>
+                        <input type="number" id="ventaPaquetes" min="0" placeholder="Ej: 3">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado de Pago</label>
+                        <select id="ventaPago" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="PENDIENTE">PENDIENTE</option>
+                            <option value="PAGADO">PAGADO</option>
+                            <option value="NO REALIZÓ EL PAGO">NO REALIZÓ EL PAGO</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN DE PRODUCTOS -->
+                <div style="margin: 25px 0; padding: 20px; background: linear-gradient(145deg, #fff5f9, #ffffff); border-radius: 16px; border: 2px solid #FFB6D9;">
+                    <h4 style="color: #E91E8C; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                        🛒 Productos
+                    </h4>
+                    
+                    <!-- Formulario para agregar producto -->
+                    <div class="form-grid" style="margin-bottom: 15px;">
+                        <div class="form-group">
+                            <label>Nombre del Producto</label>
+                            <input type="text" id="nombreProducto" placeholder="Ej: Bolsa rosa">
+                        </div>
+                        <div class="form-group">
+                            <label>Cantidad</label>
+                            <input type="number" id="cantidadProducto" min="1" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Precio Unitario</label>
+                            <input type="number" id="precioProducto" min="0" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button type="button" class="btn-kawaii btn-success" id="btnAgregarProducto" style="width: 100%;">
+                                ➕ Agregar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Lista de productos agregados -->
+                    <div id="listaProductos" style="max-height: 200px; overflow-y: auto;">
+                        <p style="text-align: center; color: #999; padding: 20px;" id="msgSinProductos">
+                            No hay productos agregados
+                        </p>
+                    </div>
+
+                    <!-- Total de la venta -->
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #FFB6D9; text-align: right;">
+                        <span style="font-size: 1.2rem; font-weight: bold; color: #E91E8C;">
+                            TOTAL: <span id="totalVentaModal">$0.00</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-kawaii btn-success">✨ Guardar</button>
+                    <button type="button" class="btn-kawaii btn-primary" id="btnGenerarImagenVenta">📸 Imagen</button>
+                    <button type="button" class="btn-kawaii btn-info" id="btnImprimirTicket">🧾 Ticket</button>
+                    <button type="button" class="btn-kawaii btn-danger close-modal">❌ Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL CARRITO DEL CLIENTE -->
+    <div id="modalCarrito" class="modal">
+        <div class="modal-content modal-carrito-mini">
+            <div class="modal-header-mini">
+                <span style="font-weight: 600; color: #E91E8C;">🛒 <span id="nombreClienteCarrito"></span></span>
+                <button class="close-modal" onclick="cerrarModal('modalCarrito')">&times;</button>
+            </div>
+            
+            <div class="modal-body-mini">
+                <input type="text" id="carritoProducto" placeholder="Producto" class="input-mini input-producto-largo">
+                <div class="row-mini">
+                    <input type="number" id="carritoCantidad" min="1" placeholder="Cant" class="input-num-mini">
+                    <input type="number" id="carritoPrecio" min="0" step="0.01" placeholder="$" class="input-num-mini">
+                    <button type="button" class="btn-add-mini" id="btnAgregarAlCarrito">➕</button>
+                </div>
+                
+                <div class="lista-productos-mini" id="listaProductosCarrito">
+                    <p style="text-align: center; color: #999; padding: 10px; font-size: 0.85rem;">Sin productos</p>
+                </div>
+            </div>
+            
+            <div class="modal-footer-mini">
+                <div style="font-weight: 600; color: #E91E8C; margin-bottom: 8px;">
+                    TOTAL: <span id="totalCarrito">$0.00</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="btn-mini-action" id="btnGenerarImagen" title="Generar imagen para foráneos">📸</button>
+                    <button type="button" class="btn-mini-action" id="btnImprimirCarrito" title="Imprimir ticket para locales">🧾</button>
+                    <button type="button" class="btn-mini-action close-modal">✖️</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ÁREA DE IMPRESIÓN TICKET -->
+    <div id="ticket" class="ticket-print">
+        <!-- Contenido del ticket generado dinámicamente -->
+    </div>
+    <script src="firebase-config.js"></script>
+    <script src="app.js"></script>
+    <script src="script-forzar-grid.js"></script>
+    <script src="script-fix-layout-input.js"></script>
+    <script src="script-ocultar-cerrar.js"></script>
+    <script src="anticipo-fixed.js"></script>
+    
+    <script>
+        // ✨ NAVEGACIÓN MÓVIL OPTIMIZADA
+        function configurarNavegacionMovil() {
+            const btnRegresarMovil = document.getElementById('btnRegresarMovil');
+            const headerPrincipal = document.getElementById('headerPrincipal');
+            const navButtons = document.querySelectorAll('.nav-btn');
+            
+            navButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const seccion = this.getAttribute('data-section');
+                    
+                    // En móvil (max-width: 768px), ocultar header y mostrar botón de regreso
+                    if (window.innerWidth <= 768 && seccion !== 'dashboard') {
+                        headerPrincipal.style.display = 'none';
+                        btnRegresarMovil.style.display = 'block';
+                        
+                        // Agregar clase full-screen a la sección activa
+                        setTimeout(() => {
+                            const seccionActiva = document.querySelector('.section.active');
+                            if (seccionActiva) {
+                                seccionActiva.classList.add('mobile-fullscreen');
+                            }
+                        }, 100);
+                    }
+                });
+            });
+            
+            // Botón de regreso
+            btnRegresarMovil.addEventListener('click', function() {
+                // Quitar clase fullscreen
+                const seccionActiva = document.querySelector('.section.active');
+                if (seccionActiva) {
+                    seccionActiva.classList.remove('mobile-fullscreen');
+                }
+                
+                // Mostrar header y ocultar botón de regreso
+                headerPrincipal.style.display = 'block';
+                btnRegresarMovil.style.display = 'none';
+                
+                // Volver al dashboard
+                cambiarSeccion('dashboard');
+                
+                // Scroll al inicio
+                window.scrollTo(0, 0);
+            });
+            
+            // Detectar cambios de orientación o resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    // En PC, siempre mostrar header
+                    headerPrincipal.style.display = 'block';
+                    btnRegresarMovil.style.display = 'none';
+                    
+                    // Quitar fullscreen
+                    const seccionActiva = document.querySelector('.section.active');
+                    if (seccionActiva) {
+                        seccionActiva.classList.remove('mobile-fullscreen');
+                    }
+                }
+            });
+        }
+        
+        // Inicializar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', configurarNavegacionMovil);
+    </script>
+    
+    <!-- PWA - Registro del Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('✨ PWA: Service Worker registrado exitosamente');
+                    })
+                    .catch(error => {
+                        console.log('⚠️ Error registrando Service Worker:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

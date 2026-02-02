@@ -1,0 +1,24 @@
+/* ===== 🚫 OCULTAR BOTÓN CERRAR DE ABAJO - FINAL ===== */
+
+/* ❌ Ocultar SOLO el botón "Cerrar" que está en la sección de botones de abajo */
+.form-actions .close-modal,
+.form-actions button.close-modal,
+.modal-footer .close-modal,
+.modal-footer button.btn-danger {
+    display: none !important;
+}
+
+/* ❌ Ocultar el botón grande de "Cerrar" que tiene texto */
+button.btn-kawaii.btn-danger.close-modal {
+    display: none !important;
+}
+
+/* ✅ ASEGURAR que el botón X de arriba SÍ se muestre */
+.modal-header .btn-close,
+.btn-close,
+button[aria-label="Cerrar"]:not(.close-modal) {
+    display: flex !important;
+    position: absolute !important;
+    top: 6px !important;
+    right: 6px !important;
+}

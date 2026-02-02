@@ -1,0 +1,259 @@
+/* ===== 🎯 ARREGLO DEFINITIVO - MENÚS RESPONSIVE ===== */
+
+/* 🖥️ EN DESKTOP (MAYOR A 768px) */
+@media (min-width: 769px) {
+    /* MOSTRAR: Menú horizontal del header */
+    .main-nav {
+        display: flex !important;
+        gap: 6px !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+    }
+    
+    /* OCULTAR: Menú hamburguesa */
+    .hamburger {
+        display: none !important;
+    }
+    
+    /* OCULTAR: Botón Inicio */
+    .btn-inicio-movil,
+    .btn-regresar-movil {
+        display: none !important;
+    }
+    
+    /* OCULTAR: Menú móvil */
+    .mobile-menu {
+        display: none !important;
+    }
+    
+    /* OCULTAR: Overlay */
+    .mobile-overlay {
+        display: none !important;
+    }
+}
+
+/* 📱 EN MÓVIL (768px O MENOS) */
+@media (max-width: 768px) {
+    /* OCULTAR: Menú horizontal del header */
+    .main-nav {
+        display: none !important;
+    }
+    
+    /* MOSTRAR: Menú hamburguesa */
+    .hamburger {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 5px !important;
+        cursor: pointer !important;
+        padding: 8px !important;
+        border-radius: 12px !important;
+        background: linear-gradient(145deg, #ffffff, #F5F3FF) !important;
+        border: 2px solid rgba(139, 127, 217, 0.5) !important;
+        position: absolute !important;
+        right: 10px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+    }
+    
+    .hamburger span {
+        width: 25px !important;
+        height: 3px !important;
+        background: linear-gradient(90deg, #8B7FD9, #5FC3E4) !important;
+        border-radius: 25px !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    /* MOSTRAR: Botón Inicio SIEMPRE en móvil */
+    .btn-inicio-movil,
+    .btn-regresar-movil {
+        display: block !important;
+    }
+    
+    /* OCULTAR el botón Inicio SOLO cuando esté en Dashboard */
+    #dashboard.active ~ header .btn-inicio-movil,
+    #dashboard.active ~ header .btn-regresar-movil,
+    section#dashboard.active .btn-inicio-movil,
+    section#dashboard.active .btn-regresar-movil {
+        display: none !important;
+    }
+}
+
+/* 🍔 ESTILOS DEL MENÚ MÓVIL (SIEMPRE) */
+.mobile-menu {
+    position: fixed !important;
+    top: 0 !important;
+    right: -300px !important;
+    width: 280px !important;
+    height: 100vh !important;
+    background: linear-gradient(135deg, #B5ABEC 0%, #A4D9ED 100%) !important;
+    padding: 90px 20px 20px !important;
+    transition: all 0.4s ease-in-out !important;
+    z-index: 1050 !important;
+    box-shadow: -5px 0 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+.mobile-menu.active {
+    right: 0 !important;
+}
+
+.mobile-overlay {
+    display: none !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    z-index: 998 !important;
+}
+
+.mobile-overlay.active {
+    display: block !important;
+}
+
+/* ❌ BOTÓN X DEL MENÚ MÓVIL */
+.mobile-menu-header {
+    position: sticky !important;
+    top: 0 !important;
+    background: linear-gradient(135deg, #B5ABEC 0%, #A4D9ED 100%) !important;
+    padding: 20px !important;
+    margin: -90px -20px 20px -20px !important;
+    z-index: 100 !important;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3) !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.mobile-menu-title {
+    color: white !important;
+    font-size: 1.3rem !important;
+    font-weight: bold !important;
+}
+
+.btn-cerrar-menu {
+    background: linear-gradient(135deg, #FFCDD2, #EF5350) !important;
+    color: white !important;
+    border: none !important;
+    padding: 8px 12px !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    font-size: 1.3rem !important;
+    font-weight: bold !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-cerrar-menu:hover {
+    background: #C62828 !important;
+    transform: rotate(90deg) !important;
+}
+
+/* 🔘 BOTÓN INICIO (ESTILOS) - Ícono sin fondo */
+.btn-inicio-movil,
+.btn-regresar-movil {
+    position: fixed !important;
+    top: 6px !important;
+    left: 12px !important;
+    z-index: 2000 !important;
+    background: transparent !important;
+    color: #8B7FD9 !important;
+    border: none !important;
+    padding: 0 !important;
+    width: 32px !important;
+    height: 32px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: none !important;
+}
+
+.btn-inicio-movil:hover,
+.btn-regresar-movil:hover {
+    transform: scale(1.15) !important;
+    opacity: 0.7 !important;
+}
+
+/* 🏠 SVG de casita */
+.btn-inicio-movil::before,
+.btn-regresar-movil::before {
+    content: "" !important;
+    display: block !important;
+    width: 28px !important;
+    height: 28px !important;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%238B7FD9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>') !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+}
+
+/* Ocultar el texto original */
+.btn-inicio-movil,
+.btn-regresar-movil {
+    font-size: 0 !important;
+    text-indent: -9999px !important;
+}
+
+/* 🎨 AJUSTAR LOGO EN MÓVIL PARA QUE NO SE TRASLAPE */
+@media (max-width: 768px) {
+    .header-kawaii {
+        padding-left: 48px !important; /* Espacio para el ícono pequeño */
+        padding-right: 60px !important; /* Espacio para el hamburguesa */
+    }
+    
+    .logo {
+        margin-left: 0 !important;
+        text-align: center !important;
+    }
+    
+    .logo h1 {
+        font-size: 1.8rem !important;
+        margin: 0 !important;
+    }
+}
+
+/* 🎨 MENÚ DE NAVEGACIÓN MÓVIL */
+.mobile-nav {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+}
+
+.mobile-menu .nav-btn {
+    width: 100% !important;
+    margin-bottom: 0 !important;
+    justify-content: flex-start !important;
+    background: white !important;
+    color: #8B7FD9 !important;
+    border: 2px solid rgba(139, 127, 217, 0.3) !important;
+    padding: 15px 20px !important;
+    border-radius: 15px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+.mobile-menu .nav-btn:hover,
+.mobile-menu .nav-btn.active {
+    background: linear-gradient(135deg, #8B7FD9, #5FC3E4) !important;
+    color: white !important;
+    transform: translateX(-5px) !important;
+}
+
+/* 🚫 OCULTAR NOTIFICACIONES DE FIREBASE */
+body > div[style*="position: fixed"][style*="right"],
+body > div[style*="position: absolute"][style*="right"],
+#syncNotification,
+#firebaseSync,
+.sync-message,
+.firebase-sync {
+    display: none !important;
+}
