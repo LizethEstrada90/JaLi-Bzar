@@ -1557,3 +1557,280 @@ body > div[style*="position: fixed"][style*="right"],
     }
 }
 
+/* ============================================ */
+/* 📱 PARCHE PARA ARREGLAR RESPONSIVE EN MÓVIL */
+/* ============================================ */
+
+/* AGREGAR ESTE CSS AL FINAL DE styles.css */
+
+/* ========================================== */
+/* PROBLEMA #1: Casita se encima con título  */
+/* ========================================== */
+
+/* Ocultar el botón de inicio (casita) en TODAS las secciones en móvil */
+/* Ya tienes menú hamburguesa, no necesitas la casita */
+@media (max-width: 768px) {
+    .btn-inicio-movil {
+        display: none !important;
+    }
+    
+    /* Si quieres mostrarla, pero posicionarla mejor: */
+    /* Descomenta esto y comenta el display: none de arriba */
+    /*
+    .btn-inicio-movil {
+        position: fixed;
+        top: 60px;
+        left: 10px;
+        z-index: 999;
+        background: rgba(255, 182, 217, 0.9);
+        padding: 8px 12px;
+        border-radius: 50%;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    */
+}
+
+/* ========================================== */
+/* PROBLEMA #2: Ajustar header en móvil      */
+/* ========================================== */
+
+@media (max-width: 768px) {
+    .header-kawaii {
+        padding: 10px 15px;
+        min-height: 60px;
+    }
+    
+    .logo-section {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        margin: 0;
+    }
+    
+    .logo-text {
+        font-size: 1.3rem !important;
+        margin: 0;
+    }
+    
+    /* Asegurar que el menú hamburguesa no se encime */
+    .hamburger {
+        position: relative;
+        z-index: 1000;
+        margin-left: auto;
+    }
+}
+
+/* ========================================== */
+/* PROBLEMA #3: Secciones en móvil           */
+/* ========================================== */
+
+@media (max-width: 768px) {
+    /* Más padding para las secciones */
+    .section {
+        padding: 20px 15px !important;
+        padding-top: 80px !important; /* Espacio para el header */
+    }
+    
+    /* Títulos de sección más pequeños */
+    .section-title {
+        font-size: 1.5rem !important;
+        margin-bottom: 20px !important;
+        text-align: center;
+    }
+    
+    /* Contenedor principal */
+    .container {
+        padding: 0 10px !important;
+    }
+}
+
+/* ========================================== */
+/* PROBLEMA #4: Dashboard cards en móvil     */
+/* ========================================== */
+
+@media (max-width: 768px) {
+    /* Stats grid - 2 columnas en móvil */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+    
+    /* Stat cards más compactas */
+    .stat-card {
+        padding: 15px 10px !important;
+    }
+    
+    .stat-icon {
+        font-size: 2rem !important;
+    }
+    
+    .stat-value {
+        font-size: 1.3rem !important;
+    }
+    
+    .stat-card h3 {
+        font-size: 0.85rem !important;
+    }
+}
+
+/* ========================================== */
+/* PROBLEMA #5: Gráficas en móvil            */
+/* ========================================== */
+
+@media (max-width: 768px) {
+    .charts-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+    
+    .chart-card {
+        padding: 15px !important;
+    }
+    
+    .chart-card h3 {
+        font-size: 1rem !important;
+        margin-bottom: 15px !important;
+    }
+}
+
+/* ========================================== */
+/* PROBLEMA #6: Botones de acción en móvil   */
+/* ========================================== */
+
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column !important;
+        gap: 10px !important;
+        width: 100%;
+    }
+    
+    .action-buttons .btn-kawaii {
+        width: 100% !important;
+        justify-content: center;
+        padding: 12px 20px !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* ========================================== */
+/* PROBLEMA #7: Tabla de ventas en móvil     */
+/* ========================================== */
+
+@media (max-width: 768px) {
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -15px;
+        padding: 0 15px;
+    }
+    
+    .kawaii-table {
+        font-size: 0.85rem !important;
+        min-width: 600px; /* Para que haga scroll horizontal */
+    }
+    
+    .kawaii-table th,
+    .kawaii-table td {
+        padding: 8px 6px !important;
+    }
+}
+
+/* ========================================== */
+/* PROBLEMA #8: Calculadora en móvil         */
+/* ========================================== */
+
+@media (max-width: 768px) {
+    .calculadora-kawaii {
+        max-width: 100% !important;
+        padding: 15px !important;
+    }
+    
+    .calc-display {
+        padding: 15px !important;
+        min-height: 80px !important;
+    }
+    
+    .calc-result {
+        font-size: 2rem !important;
+    }
+    
+    .calc-btn {
+        padding: 18px !important;
+        font-size: 1.2rem !important;
+    }
+}
+
+/* ========================================== */
+/* PROBLEMA #9: Live de Ventas en móvil      */
+/* ========================================== */
+
+@media (max-width: 768px) {
+    .carritos-container {
+        gap: 15px !important;
+    }
+    
+    .panel-rapido {
+        padding: 15px !important;
+        margin: 20px 0 !important;
+    }
+    
+    .input-rapido {
+        font-size: 0.9rem !important;
+        padding: 10px !important;
+    }
+}
+
+/* ========================================== */
+/* PROBLEMA #10: Menú móvil                  */
+/* ========================================== */
+
+@media (max-width: 768px) {
+    .mobile-menu {
+        width: 80%;
+        max-width: 300px;
+    }
+    
+    .mobile-nav .nav-btn {
+        padding: 15px 20px;
+        font-size: 1rem;
+        justify-content: flex-start;
+    }
+}
+
+/* ========================================== */
+/* ASEGURAR QUE TODO SEA RESPONSIVO          */
+/* ========================================== */
+
+@media (max-width: 768px) {
+    /* Prevenir scroll horizontal */
+    body {
+        overflow-x: hidden;
+    }
+    
+    /* Asegurar que todo quepa */
+    * {
+        max-width: 100%;
+    }
+    
+    /* Ajustar imágenes */
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+/* ========================================== */
+/* FIX PARA BOTÓN PWA EN MÓVIL               */
+/* ========================================== */
+
+@media (max-width: 768px) {
+    .btn-instalar-pwa {
+        bottom: 80px !important; /* Más arriba para no chocar con menú inferior */
+        right: 10px !important;
+        padding: 10px 18px !important;
+        font-size: 0.85rem !important;
+        z-index: 9999 !important; /* Por encima de todo */
+    }
+}
+
+
