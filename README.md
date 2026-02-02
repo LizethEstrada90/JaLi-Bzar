@@ -287,7 +287,7 @@ Para preguntas o soporte:
 - 🎨 Efectos hover suaves
 - 💫 Animaciones de entrada/salida
 - 🧁 Tipografía redondeada y amigable
-- 🌈 Estados de pago con colores distintivos
+- 🌈 Estados de pago con colores distintivos♥
 - 🎪 Notificaciones kawaii animadas
 
 ---
@@ -359,4 +359,5 @@ Si tienes dudas o necesitas ayuda, no dudes en preguntar.
 
 **Versión:** 1.0.0  
 **Fecha:** Noviembre 2025  
+
 **Desarrollado para:** JaLi Bzar 🎀
