@@ -493,3 +493,46 @@
     color: #ddd;
 }
 .inv-card-noimg i { font-size: 2rem; color: #ccc; }
+
+/* ─── Fila de precios / ganancia en card ─── */
+.inv-precios-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+.inv-precio-item {
+    display: flex;
+    flex-direction: column;
+    background: #fafafa;
+    border-radius: 10px;
+    padding: 6px 10px;
+    flex: 1;
+    min-width: 70px;
+    border: 1px solid #f0f0f0;
+}
+.inv-precio-label {
+    font-size: 0.68rem;
+    color: #bbb;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.inv-precio-valor {
+    font-size: 0.95rem;
+    font-weight: 800;
+    margin-top: 2px;
+}
+.inv-precio-valor.venta  { color: #E91E8C; }
+.inv-precio-valor.costo  { color: #888; }
+.inv-precio-valor.ganancia { color: #2f9e44; }
+.inv-precio-valor.ganancia em {
+    font-style: normal;
+    font-size: 0.75rem;
+    background: #d3f9d8;
+    color: #2f9e44;
+    border-radius: 20px;
+    padding: 1px 6px;
+    margin-left: 4px;
+    font-weight: 700;
+}
