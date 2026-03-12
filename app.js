@@ -491,7 +491,8 @@ const state = {
     ventaEnEdicion: null,
     productosTemporal: [],
     carritosLive: [],
-    carritoActual: null
+    carritoActual: null,
+    inventario: []
 };
 
 // ===== INICIALIZACIÓN =====
@@ -520,6 +521,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // ✨ Inicializar buscadores en modal de ventas
     inicializarBuscadoresVenta();
+    
+    // 📦 Inicializar módulo de inventario
+    if (typeof inicializarInventario !== 'undefined') {
+        inicializarInventario();
+    }
     
     setTimeout(() => {
         agregarSonidosBotones();
@@ -711,6 +717,14 @@ function cerrarModal(modalId) {
         if (anticipoInput) {
             anticipoInput.value = '0';
         }
+        
+        // 📦 Limpiar buscador de inventario
+        const invSearch = document.getElementById('buscarInventarioVenta');
+        if (invSearch) invSearch.value = '';
+        const invDropdown = document.getElementById('dropdownInventarioVenta');
+        if (invDropdown) { invDropdown.innerHTML = ''; invDropdown.classList.remove('show'); }
+        const invIdField = document.getElementById('productoInventarioId');
+        if (invIdField) invIdField.value = '';
         
         // Limpiar todos los campos del formulario
         document.getElementById('ventaCliente').value = '';
@@ -924,8 +938,13 @@ function agregarProductoALista() {
         nombre: nombre,
         cantidad: cantidad,
         precioUnitario: precio,
-        subtotal: cantidad * precio
+        subtotal: cantidad * precio,
+        inventarioId: parseInt(document.getElementById('productoInventarioId')?.value) || null
     };
+    
+    // Limpiar el hidden field de inventario
+    const invIdField = document.getElementById('productoInventarioId');
+    if (invIdField) invIdField.value = '';
     
     console.log('➕ Agregando producto:', producto);
 
@@ -1116,10 +1135,19 @@ function guardarVenta(e) {
     if (state.ventaEnEdicion) {
         const index = state.ventasActuales.findIndex(v => v.id === state.ventaEnEdicion);
         if (index !== -1) {
+            const ventaAnterior = state.ventasActuales[index];
+            // 📦 Actualizar stock inventario: revertir anterior, aplicar nueva
+            if (typeof actualizarStockPorVenta !== 'undefined') {
+                actualizarStockPorVenta(ventaAnterior, venta);
+            }
             state.ventasActuales[index] = venta;
             mostrarNotificacion('Venta actualizada exitosamente ✨', 'success');
         }
     } else {
+        // 📦 Nueva venta: apartar/vender productos del inventario
+        if (typeof actualizarStockPorVenta !== 'undefined') {
+            actualizarStockPorVenta(null, venta);
+        }
         state.ventasActuales.push(venta);
         mostrarNotificacion('Venta registrada exitosamente ✨', 'success');
     }
@@ -1128,6 +1156,8 @@ function guardarVenta(e) {
     actualizarTablaVentas();
     actualizarDashboard();
     cerrarModal('modalVenta');
+    // 📦 Actualizar vista de inventario si está abierta
+    if (typeof renderizarInventario !== 'undefined') renderizarInventario();
 
     sonarExito();
     
@@ -1194,6 +1224,12 @@ function actualizarTablaVentas(ventasAMostrar = null) {
 
 function eliminarVenta(id) {
     if (confirm('¿Estás segura de eliminar esta venta?')) {
+        const venta = state.ventasActuales.find(v => v.id === id);
+        // 📦 Liberar stock en inventario
+        if (venta && typeof revertirStockVenta !== 'undefined') {
+            revertirStockVenta(venta);
+            if (typeof renderizarInventario !== 'undefined') renderizarInventario();
+        }
         state.ventasActuales = state.ventasActuales.filter(v => v.id !== id);
         guardarDatos();
         actualizarTablaVentas();
@@ -3361,6 +3397,10 @@ function cargarDatos() {
             state.carritosLive = [];
         }
         
+        if (!state.inventario) {
+            state.inventario = [];
+        }
+        
         console.log('✅ Datos cargados desde localStorage');
     }
     
@@ -3962,13 +4002,6 @@ window.addEventListener('load', () => {
         }
     }
 });
-
-
-
-
-
-
-
 
 
 
