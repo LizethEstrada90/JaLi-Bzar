@@ -3,23 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JaLi Bzar - Sistema Kawaii 🎀</title>
-    
-    <!-- PWA Meta Tags -->
-    <meta name="description" content="Sistema completo de gestión de ventas con estilo kawaii para tu negocio">
+    <title>JaLi Bzar - Sistema de Ventas</title>
+    <meta name="description" content="Sistema completo de gestión de ventas para tu negocio">
     <meta name="theme-color" content="#FFB6D9">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="JaLi Bzar">
-    
-    <!-- Manifest -->
     <link rel="manifest" href="manifest.json">
-    
-    <!-- Iconos -->
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
     <link rel="apple-touch-icon" href="icon-192.png">
-
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="PARCHE-FINAL-CORRECTO.css">
     <link rel="stylesheet" href="ARREGLO-MENU-RESPONSIVE.css">
@@ -29,253 +24,151 @@
     <link rel="stylesheet" href="ARREGLAR-MODAL-NUEVA-VENTA.css">
     <link rel="stylesheet" href="OCULTAR-BOTON-CERRAR-FINAL.css">
     <link rel="stylesheet" href="ESTILOS-ANTICIPO.css">
+    <link rel="stylesheet" href="inventario.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-
 </head>
 <body class="no-animations">
-    <!-- HEADER MODERNO -->
+
+    <!-- HEADER -->
     <header class="header-kawaii" id="headerPrincipal">
         <div class="container">
             <div class="header-content">
                 <div class="logo-section">
-    <h1 class="logo-text">JaLi Bzar</h1>
-</div>
-                
-                <!-- NAVEGACIÓN DESKTOP -->
+                    <h1 class="logo-text">JaLi Bzar</h1>
+                </div>
                 <nav class="main-nav">
-                    <button class="nav-btn active" data-section="dashboard">
-                        <i class="fas fa-chart-line"></i> Dashboard
-                    </button>
-                    <button class="nav-btn" data-section="live">
-                        <i class="fas fa-shopping-cart"></i> Live Ventas
-                    </button>
-                    <button class="nav-btn" data-section="ventas">
-                        <i class="fas fa-receipt"></i> Ventas
-                    </button>
-                    <button class="nav-btn" data-section="clientes">
-                        <i class="fas fa-users"></i> Clientes
-                    </button>
-                    <button class="nav-btn" data-section="recolectores">
-                        <i class="fas fa-truck"></i> Recolectores
-                    </button>
-                    <button class="nav-btn" data-section="calculadora">
-                        <i class="fas fa-calculator"></i> Calculadora
-                    </button>
-                    <button class="nav-btn" data-section="historial">
-                        <i class="fas fa-history"></i> Historial
-                    </button>
+                    <button class="nav-btn active" data-section="dashboard"><i class="fas fa-chart-line"></i> Dashboard</button>
+                    <button class="nav-btn" data-section="live"><i class="fas fa-shopping-cart"></i> Live Ventas</button>
+                    <button class="nav-btn" data-section="ventas"><i class="fas fa-receipt"></i> Ventas</button>
+                    <button class="nav-btn" data-section="clientes"><i class="fas fa-users"></i> Clientes</button>
+                    <button class="nav-btn" data-section="recolectores"><i class="fas fa-truck"></i> Recolectores</button>
+                    <button class="nav-btn" data-section="inventario"><i class="fas fa-boxes"></i> Inventario</button>
+                    <button class="nav-btn" data-section="calculadora"><i class="fas fa-calculator"></i> Calculadora</button>
+                    <button class="nav-btn" data-section="historial"><i class="fas fa-history"></i> Historial</button>
                 </nav>
-                
-                <!-- BOTÓN HAMBURGUESA (MÓVIL) -->
                 <div class="hamburger" id="hamburgerBtn">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                    <span></span><span></span><span></span>
                 </div>
             </div>
         </div>
     </header>
-    
+
     <!-- MENÚ MÓVIL -->
     <div class="mobile-menu" id="mobileMenu">
         <div class="mobile-menu-header">
             <span class="mobile-menu-title">Menú</span>
-            <button class="btn-cerrar-menu" id="btnCerrarMenu">✕</button>
+            <button class="btn-cerrar-menu" id="btnCerrarMenu"><i class="fas fa-times"></i></button>
         </div>
         <nav class="mobile-nav">
-            <button class="nav-btn active" data-section="dashboard">
-                <i class="fas fa-chart-line"></i> Dashboard
-            </button>
-            <button class="nav-btn" data-section="live">
-                <i class="fas fa-shopping-cart"></i> Live Ventas
-            </button>
-            <button class="nav-btn" data-section="ventas">
-                <i class="fas fa-receipt"></i> Ventas
-            </button>
-            <button class="nav-btn" data-section="clientes">
-                <i class="fas fa-users"></i> Clientes
-            </button>
-            <button class="nav-btn" data-section="recolectores">
-                <i class="fas fa-truck"></i> Recolectores
-            </button>
-            <button class="nav-btn" data-section="calculadora">
-                <i class="fas fa-calculator"></i> Calculadora
-            </button>
-            <button class="nav-btn" data-section="historial">
-                <i class="fas fa-history"></i> Historial
-            </button>
+            <button class="nav-btn active" data-section="dashboard"><i class="fas fa-chart-line"></i> Dashboard</button>
+            <button class="nav-btn" data-section="live"><i class="fas fa-shopping-cart"></i> Live Ventas</button>
+            <button class="nav-btn" data-section="ventas"><i class="fas fa-receipt"></i> Ventas</button>
+            <button class="nav-btn" data-section="clientes"><i class="fas fa-users"></i> Clientes</button>
+            <button class="nav-btn" data-section="recolectores"><i class="fas fa-truck"></i> Recolectores</button>
+            <button class="nav-btn" data-section="inventario"><i class="fas fa-boxes"></i> Inventario</button>
+            <button class="nav-btn" data-section="calculadora"><i class="fas fa-calculator"></i> Calculadora</button>
+            <button class="nav-btn" data-section="historial"><i class="fas fa-history"></i> Historial</button>
         </nav>
     </div>
-    
-    <!-- OVERLAY PARA CERRAR MENÚ MÓVIL -->
     <div class="mobile-overlay" id="mobileOverlay"></div>
 
-    <!-- INDICADOR DE ESTADO FIREBASE -->
-    <div id="firebaseStatus" style="position: fixed; top: 15px; right: 15px; z-index: 9999; padding: 10px 18px; border-radius: 25px; font-size: 0.85rem; font-weight: 600; background: #E0E0E0; color: #666; box-shadow: 0 4px 15px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 8px; cursor: pointer;" title="Click para más información">
-        <span id="firebaseIcon">⚠️</span>
+    <!-- ESTADO FIREBASE -->
+    <div id="firebaseStatus" style="position:fixed;top:15px;right:15px;z-index:9999;padding:10px 18px;border-radius:25px;font-size:0.85rem;font-weight:600;background:#E0E0E0;color:#666;box-shadow:0 4px 15px rgba(0,0,0,0.15);display:flex;align-items:center;gap:8px;cursor:pointer;" title="Click para más información">
+        <span id="firebaseIcon"><i class="fas fa-circle" style="color:#ccc;font-size:0.6rem;"></i></span>
         <span id="firebaseText">Verificando...</span>
     </div>
 
-    <!-- CONTENEDOR PRINCIPAL -->
     <main class="main-container">
-        <!-- SECCIÓN DASHBOARD -->
+
+        <!-- DASHBOARD -->
         <section id="dashboard" class="section active">
             <div class="container">
-                <h2 class="section-title">Dashboard Kawaii 💗</h2>
-                
-                <!-- Tarjetas de estadísticas -->
+                <h2 class="section-title">Dashboard</h2>
                 <div class="stats-grid">
-                    <div class="stat-card" onclick="verVentasDelDia()" title="Click para ver ventas de hoy">
-                        <div class="stat-icon">💰</div>
-                        <div class="stat-info">
-                            <h3>Ventas del Día</h3>
-                            <p class="stat-value" id="ventasHoy">$0</p>
-                        </div>
+                    <div class="stat-card" onclick="verVentasDelDia()" title="Ver ventas de hoy">
+                        <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                        <div class="stat-info"><h3>Ventas del Día</h3><p class="stat-value" id="ventasHoy">$0</p></div>
                     </div>
-                    <div class="stat-card" onclick="verVentasDeLaSemana()" title="Click para ver ventas de la semana">
-                        <div class="stat-icon">📅</div>
-                        <div class="stat-info">
-                            <h3>Ventas de la Semana</h3>
-                            <p class="stat-value" id="ventasSemana">$0</p>
-                        </div>
+                    <div class="stat-card" onclick="verVentasDeLaSemana()" title="Ver ventas de la semana">
+                        <div class="stat-icon"><i class="fas fa-calendar-week"></i></div>
+                        <div class="stat-info"><h3>Ventas de la Semana</h3><p class="stat-value" id="ventasSemana">$0</p></div>
                     </div>
-                    <div class="stat-card" onclick="verTodosLosClientes()" title="Click para ver todos los clientes">
-                        <div class="stat-icon">👥</div>
-                        <div class="stat-info">
-                            <h3>Total Clientes</h3>
-                            <p class="stat-value" id="totalClientes">0</p>
-                        </div>
+                    <div class="stat-card" onclick="verTodosLosClientes()" title="Ver todos los clientes">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-info"><h3>Total Clientes</h3><p class="stat-value" id="totalClientes">0</p></div>
                     </div>
-                    <div class="stat-card" onclick="verPedidosPendientes()" title="Click para ver pedidos pendientes">
-                        <div class="stat-icon">⏳</div>
-                        <div class="stat-info">
-                            <h3>Pedidos Pendientes</h3>
-                            <p class="stat-value" id="pedidosPendientes">0</p>
-                        </div>
+                    <div class="stat-card" onclick="verPedidosPendientes()" title="Ver pedidos pendientes">
+                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                        <div class="stat-info"><h3>Pedidos Pendientes</h3><p class="stat-value" id="pedidosPendientes">0</p></div>
                     </div>
-                    <div class="stat-card" onclick="verPedidosPagados()" title="Click para ver pedidos pagados">
-                        <div class="stat-icon">✅</div>
-                        <div class="stat-info">
-                            <h3>Pedidos Pagados</h3>
-                            <p class="stat-value" id="pedidosPagados">0</p>
-                        </div>
+                    <div class="stat-card" onclick="verPedidosPagados()" title="Ver pedidos pagados">
+                        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info"><h3>Pedidos Pagados</h3><p class="stat-value" id="pedidosPagados">0</p></div>
                     </div>
                 </div>
-
                 <div class="charts-grid">
-                    <div class="chart-card">
-                        <h3>Ventas por Día 📈</h3>
-                        <canvas id="chartVentasDia"></canvas>
-                    </div>
-                    <div class="chart-card">
-                        <h3>Top Clientes 👑</h3>
-                        <canvas id="chartTopClientes"></canvas>
-                    </div>
-                    <div class="chart-card">
-                        <h3>Ventas por Recolector 🚚</h3>
-                        <canvas id="chartRecolectores"></canvas>
-                    </div>
+                    <div class="chart-card"><h3><i class="fas fa-chart-bar"></i> Ventas por Día</h3><canvas id="chartVentasDia"></canvas></div>
+                    <div class="chart-card"><h3><i class="fas fa-crown"></i> Top Clientes</h3><canvas id="chartTopClientes"></canvas></div>
+                    <div class="chart-card"><h3><i class="fas fa-truck"></i> Ventas por Recolector</h3><canvas id="chartRecolectores"></canvas></div>
                 </div>
             </div>
         </section>
 
-        <!-- SECCIÓN LIVE DE VENTAS -->
+        <!-- LIVE VENTAS -->
         <section id="live" class="section">
             <div class="container">
-                <button class="btn-inicio-movil" onclick="cambiarSeccion('dashboard')">
-                    <i class="fas fa-arrow-left"></i> Inicio
-                </button>
+                <button class="btn-inicio-movil" onclick="cambiarSeccion('dashboard')"><i class="fas fa-arrow-left"></i> Inicio</button>
                 <div class="section-header">
-                    <h2 class="section-title">Live de Ventas 📹🛍️</h2>
+                    <h2 class="section-title">Live de Ventas</h2>
                     <div class="action-buttons">
-                        <button class="btn-kawaii btn-danger" id="btnLimpiarCarritos" title="Limpiar todos los carritos">
-                            <span>🗑️</span> Limpiar Todo
-                        </button>
-                        <button class="btn-kawaii btn-success" id="btnFinalizarLive">
-                            <span>✅</span> Finalizar Live
-                        </button>
+                        <button class="btn-kawaii btn-danger" id="btnLimpiarCarritos"><i class="fas fa-trash"></i> Limpiar Todo</button>
+                        <button class="btn-kawaii btn-success" id="btnFinalizarLive"><i class="fas fa-check"></i> Finalizar Live</button>
                     </div>
                 </div>
-
-                <!-- Lista de carritos -->
-                <div class="carritos-container" id="carritosContainer">
-                    <!-- Los carritos se agregan aquí -->
-                </div>
-
-                <!-- Panel de agregar rápido -->
+                <div class="carritos-container" id="carritosContainer"></div>
                 <div class="panel-rapido panel-rapido-abajo">
                     <div class="form-rapido">
                         <div class="form-rapido-row-full">
-                            <input type="text" id="quickCliente" placeholder="👤 Nombre del Cliente" class="input-rapido input-full-largo">
-                            <button class="btn-kawaii btn-success btn-add-cliente" id="btnAgregarClienteRapido">
-                                ➕
-                            </button>
+                            <input type="text" id="quickCliente" placeholder="Nombre del Cliente" class="input-rapido input-full-largo">
+                            <button class="btn-kawaii btn-success btn-add-cliente" id="btnAgregarClienteRapido"><i class="fas fa-plus"></i></button>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- SECCIÓN VENTAS -->
+        <!-- VENTAS -->
         <section id="ventas" class="section">
             <div class="container">
-                <button class="btn-inicio-movil" onclick="cambiarSeccion('dashboard')">
-                    <i class="fas fa-arrow-left"></i> Inicio
-                </button>
+                <button class="btn-inicio-movil" onclick="cambiarSeccion('dashboard')"><i class="fas fa-arrow-left"></i> Inicio</button>
                 <div class="section-header">
-                    <h2 class="section-title">Registro de Ventas 🛍️</h2>
+                    <h2 class="section-title">Registro de Ventas</h2>
                     <div class="action-buttons">
-                        <button class="btn-kawaii btn-primary" id="btnNuevaSemana">
-                            <span>✨</span> Crear Hoja Nueva
-                        </button>
-                        <button class="btn-kawaii btn-info" id="btnGenerarHojasPagados">
-                            <span>📄</span> Hojas de Entrega
-                        </button>
-                        <button class="btn-kawaii btn-success" id="btnAgregarVenta">
-                            <span>➕</span> Nueva Venta
-                        </button>
+                        <button class="btn-kawaii btn-primary" id="btnNuevaSemana"><i class="fas fa-folder-plus"></i> Crear Hoja Nueva</button>
+                        <button class="btn-kawaii btn-info" id="btnGenerarHojasPagados"><i class="fas fa-file-alt"></i> Hojas de Entrega</button>
+                        <button class="btn-kawaii btn-success" id="btnAgregarVenta"><i class="fas fa-plus"></i> Nueva Venta</button>
                     </div>
                 </div>
-
-                <!-- ✨ NUEVO: Buscador de clientes -->
                 <div class="search-box">
-                    <input 
-                        type="text" 
-                        id="buscarCliente" 
-                        placeholder="🔍 Buscar cliente por nombre..."
-                        class="search-input">
-                    <button class="btn-clear-search" id="btnLimpiarBusqueda" style="display: none;">
-                        ✖️ Limpiar
-                    </button>
+                    <input type="text" id="buscarCliente" placeholder="Buscar cliente por nombre..." class="search-input">
+                    <button class="btn-clear-search" id="btnLimpiarBusqueda" style="display:none;"><i class="fas fa-times"></i> Limpiar</button>
                 </div>
-
-                <!-- Tabla de ventas responsive -->
                 <div class="table-container">
                     <table class="kawaii-table" id="tablaVentas">
                         <thead>
-                         <tr>
-                         <th>Cliente</th>
-                         <th>Recolector</th>
-                         <th>Grupo</th>
-                         <th>Producto</th>
-                         <th>Pago</th>
-                         <th>Paquetes</th>
-                         <th>Total</th>
-                         <th>Acciones</th>
-                         </tr>
-                         </thead>
-                        <tbody id="ventasBody">
-                            <!-- Las ventas se agregan dinámicamente -->
-                        </tbody>
+                            <tr>
+                                <th>Cliente</th><th>Recolector</th><th>Grupo</th><th>Producto</th>
+                                <th>Pago</th><th>Paquetes</th><th>Total</th><th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ventasBody"></tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="6" style="text-align: right; font-weight: bold;">TOTAL:</td>
-                                <td colspan="2" style="font-weight: bold; color: #FF8AB8;" id="totalVentas">$0.00</td>
+                                <td colspan="6" style="text-align:right;font-weight:bold;">TOTAL:</td>
+                                <td colspan="2" style="font-weight:bold;color:#FF8AB8;" id="totalVentas">$0.00</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -283,77 +176,93 @@
             </div>
         </section>
 
-        <!-- SECCIÓN CLIENTES -->
+        <!-- CLIENTES -->
         <section id="clientes" class="section">
             <div class="container">
-                <button class="btn-inicio-movil" onclick="cambiarSeccion('dashboard')">
-                    <i class="fas fa-arrow-left"></i> Inicio
-                </button>
+                <button class="btn-inicio-movil" onclick="cambiarSeccion('dashboard')"><i class="fas fa-arrow-left"></i> Inicio</button>
                 <div class="section-header">
-                    <h2 class="section-title">Gestión de Clientes 👥</h2>
-                    <button class="btn-kawaii btn-primary" id="btnAgregarCliente">
-                        <span>➕</span> Nuevo Cliente
-                    </button>
+                    <h2 class="section-title">Gestión de Clientes</h2>
+                    <button class="btn-kawaii btn-primary" id="btnAgregarCliente"><i class="fas fa-plus"></i> Nuevo Cliente</button>
                 </div>
-
-                <div class="cards-grid">
-                    <div id="listaClientes" class="lista-items">
-                        <!-- Los clientes se agregan dinámicamente -->
-                    </div>
-                </div>
+                <div class="cards-grid"><div id="listaClientes" class="lista-items"></div></div>
             </div>
         </section>
 
-        <!-- SECCIÓN RECOLECTORES -->
+        <!-- RECOLECTORES -->
         <section id="recolectores" class="section">
             <div class="container">
-                <button class="btn-inicio-movil" onclick="cambiarSeccion('dashboard')">
-                    <i class="fas fa-arrow-left"></i> Inicio
-                </button>
+                <button class="btn-inicio-movil" onclick="cambiarSeccion('dashboard')"><i class="fas fa-arrow-left"></i> Inicio</button>
                 <div class="section-header">
-                    <h2 class="section-title">Gestión de Recolectores 🚚</h2>
-                    <button class="btn-kawaii btn-primary" id="btnAgregarRecolector">
-                        <span>➕</span> Nuevo Recolector
-                    </button>
+                    <h2 class="section-title">Gestión de Recolectores</h2>
+                    <button class="btn-kawaii btn-primary" id="btnAgregarRecolector"><i class="fas fa-plus"></i> Nuevo Recolector</button>
                 </div>
+                <div class="cards-grid"><div id="listaRecolectores" class="lista-items"></div></div>
+            </div>
+        </section>
 
-                <div class="cards-grid">
-                    <div id="listaRecolectores" class="lista-items">
-                        <!-- Los recolectores se agregan dinámicamente -->
+        <!-- INVENTARIO -->
+        <section id="inventario" class="section">
+            <div class="container">
+                <button class="btn-inicio-movil" onclick="cambiarSeccion('dashboard')"><i class="fas fa-arrow-left"></i> Inicio</button>
+                <div class="section-header">
+                    <h2 class="section-title">Inventario</h2>
+                    <button class="btn-kawaii btn-success" id="btnAgregarInventario"><i class="fas fa-plus"></i> Agregar Producto</button>
+                </div>
+                <div class="inv-stats-row">
+                    <div class="inv-stat-chip inv-chip-prod">
+                        <span class="inv-chip-icon"><i class="fas fa-box"></i></span>
+                        <div><span id="invStatProductos">0</span><small>Productos</small></div>
+                    </div>
+                    <div class="inv-stat-chip inv-chip-disp">
+                        <span class="inv-chip-icon"><i class="fas fa-check-circle"></i></span>
+                        <div><span id="invStatDisponible">0</span><small>Disponibles</small></div>
+                    </div>
+                    <div class="inv-stat-chip inv-chip-apart">
+                        <span class="inv-chip-icon"><i class="fas fa-lock"></i></span>
+                        <div><span id="invStatApartado">0</span><small>Apartados</small></div>
+                    </div>
+                    <div class="inv-stat-chip inv-chip-vend">
+                        <span class="inv-chip-icon"><i class="fas fa-coins"></i></span>
+                        <div><span id="invStatVendido">0</span><small>Vendidos</small></div>
                     </div>
                 </div>
+                <div class="inv-filtros">
+                    <input type="text" id="buscarInventario" placeholder="Buscar producto..." class="inv-search-input">
+                    <select id="filtroStockInv" class="inv-filter-select">
+                        <option value="todos">Todos</option>
+                        <option value="disponible">Con stock</option>
+                        <option value="agotado">Agotados</option>
+                        <option value="apartado">Con apartados</option>
+                    </select>
+                </div>
+                <div class="inv-grid" id="inventarioGrid"></div>
             </div>
         </section>
 
-        <!-- SECCIÓN HISTORIAL -->
+        <!-- HISTORIAL -->
         <section id="historial" class="section">
             <div class="container">
-                <button class="btn-inicio-movil" onclick="cambiarSeccion('dashboard')">
-                    <i class="fas fa-arrow-left"></i> Inicio
-                </button>
-                <h2 class="section-title">Historial de Semanas 📚</h2>
-                <div id="listaHistorial" class="historial-container">
-                    <!-- El historial se agrega dinámicamente -->
-                </div>
+                <button class="btn-inicio-movil" onclick="cambiarSeccion('dashboard')"><i class="fas fa-arrow-left"></i> Inicio</button>
+                <h2 class="section-title">Historial de Semanas</h2>
+                <div id="listaHistorial" class="historial-container"></div>
             </div>
         </section>
 
-    <button id="btnInstalarApp" class="btn-instalar-pwa" style="display: none;">
-    📲 Instalar App
-</button>
+    </main>
 
-    <!-- ✨ MODAL EDITAR CLIENTE -->
+    <button id="btnInstalarApp" class="btn-instalar-pwa" style="display:none;">
+        <i class="fas fa-download"></i> Instalar App
+    </button>
+
+    <!-- MODAL EDITAR CLIENTE -->
     <div id="modalEditarCliente" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Editar Cliente ✏️</h3>
+                <h3><i class="fas fa-user-edit"></i> Editar Cliente</h3>
                 <button class="close-modal">&times;</button>
             </div>
             <form id="formEditarCliente">
-                <div class="form-group">
-                    <label>Nombre del Cliente</label>
-                    <input type="text" id="editarNombreCliente" required>
-                </div>
+                <div class="form-group"><label>Nombre del Cliente</label><input type="text" id="editarNombreCliente" required></div>
                 <div class="form-group">
                     <label>Tipo</label>
                     <select id="editarTipoCliente" required>
@@ -364,34 +273,26 @@
                 </div>
                 <div class="form-group">
                     <label>Recolector</label>
-                    <select id="editarRecolectorCliente" required>
-                        <option value="">Seleccionar recolector...</option>
-                    </select>
+                    <select id="editarRecolectorCliente" required><option value="">Seleccionar recolector...</option></select>
                 </div>
-                <div class="form-group">
-                    <label>Grupo (automático)</label>
-                    <input type="text" id="editarGrupoCliente" readonly>
-                </div>
+                <div class="form-group"><label>Grupo (automático)</label><input type="text" id="editarGrupoCliente" readonly></div>
                 <div class="form-actions">
-                    <button type="submit" class="btn-kawaii btn-success">✨ Guardar Cambios</button>
-                    <button type="button" class="btn-kawaii btn-danger close-modal">❌ Cerrar</button>
+                    <button type="submit" class="btn-kawaii btn-success"><i class="fas fa-save"></i> Guardar Cambios</button>
+                    <button type="button" class="btn-kawaii btn-danger close-modal"><i class="fas fa-times"></i> Cerrar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL AGREGAR CLIENTE -->
+    <!-- MODAL NUEVO CLIENTE -->
     <div id="modalCliente" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Nuevo Cliente 💗</h3>
+                <h3><i class="fas fa-user-plus"></i> Nuevo Cliente</h3>
                 <button class="close-modal">&times;</button>
             </div>
             <form id="formCliente">
-                <div class="form-group">
-                    <label>Nombre del Cliente</label>
-                    <input type="text" id="nombreCliente" required>
-                </div>
+                <div class="form-group"><label>Nombre del Cliente</label><input type="text" id="nombreCliente" required></div>
                 <div class="form-group">
                     <label>Tipo</label>
                     <select id="tipoCliente" required>
@@ -402,86 +303,58 @@
                 </div>
                 <div class="form-group">
                     <label>Recolector</label>
-                    <select id="recolectorCliente" required>
-                        <option value="">Seleccionar recolector...</option>
-                    </select>
+                    <select id="recolectorCliente" required><option value="">Seleccionar recolector...</option></select>
                 </div>
-                <div class="form-group">
-                    <label>Grupo (automático)</label>
-                    <input type="text" id="grupoCliente" readonly>
-                </div>
+                <div class="form-group"><label>Grupo (automático)</label><input type="text" id="grupoCliente" readonly></div>
                 <div class="form-actions">
-                    <button type="submit" class="btn-kawaii btn-success">✨ Guardar</button>
-                    <button type="button" class="btn-kawaii btn-danger close-modal">❌ Cerrar</button>
+                    <button type="submit" class="btn-kawaii btn-success"><i class="fas fa-save"></i> Guardar</button>
+                    <button type="button" class="btn-kawaii btn-danger close-modal"><i class="fas fa-times"></i> Cerrar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL AGREGAR RECOLECTOR -->
+    <!-- MODAL NUEVO RECOLECTOR -->
     <div id="modalRecolector" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Nuevo Recolector 🚚</h3>
+                <h3><i class="fas fa-truck"></i> Nuevo Recolector</h3>
                 <button class="close-modal">&times;</button>
             </div>
             <form id="formRecolector">
-                <div class="form-group">
-                    <label>Nombre del Recolector</label>
-                    <input type="text" id="nombreRecolector" required>
-                </div>
-                <div class="form-group">
-                    <label>Grupo</label>
-                    <input type="text" id="grupoRecolector" required>
-                </div>
+                <div class="form-group"><label>Nombre del Recolector</label><input type="text" id="nombreRecolector" required></div>
+                <div class="form-group"><label>Grupo</label><input type="text" id="grupoRecolector" required></div>
                 <div class="form-actions">
-                    <button type="submit" class="btn-kawaii btn-success">✨ Guardar</button>
-                    <button type="button" class="btn-kawaii btn-danger close-modal">❌ Cerrar</button>
+                    <button type="submit" class="btn-kawaii btn-success"><i class="fas fa-save"></i> Guardar</button>
+                    <button type="button" class="btn-kawaii btn-danger close-modal"><i class="fas fa-times"></i> Cerrar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL AGREGAR VENTA -->
+    <!-- MODAL NUEVA VENTA -->
     <div id="modalVenta" class="modal">
         <div class="modal-content modal-wide">
             <div class="modal-header">
-                <h3 id="tituloModalVenta">Nueva Venta 🛍️</h3>
+                <h3 id="tituloModalVenta"><i class="fas fa-receipt"></i> Nueva Venta</h3>
                 <button class="close-modal">&times;</button>
             </div>
             <form id="formVenta">
                 <div class="form-grid">
-                    <!-- ✨ BUSCADOR PREDICTIVO TIPO GOOGLE PARA CLIENTES -->
                     <div class="form-group">
                         <label>Cliente</label>
                         <div class="autocomplete-container">
-                            <input 
-                                type="text" 
-                                id="buscarClienteVenta" 
-                                placeholder="🔍 Escribe el nombre del cliente..."
-                                autocomplete="off"
-                                style="margin-bottom: 0; padding: 12px; border: 2px solid #FFB6D9; border-radius: 12px; width: 100%;">
+                            <input type="text" id="buscarClienteVenta" placeholder="Escribe el nombre del cliente..." autocomplete="off" style="margin-bottom:0;padding:12px;border:2px solid #FFB6D9;border-radius:12px;width:100%;">
                             <div id="sugerenciasClientes" class="autocomplete-dropdown"></div>
                         </div>
                         <input type="hidden" id="ventaCliente" required>
                     </div>
-                    
-                    <!-- RECOLECTOR -->
                     <div class="form-group">
                         <label>Recolector</label>
-                        <select id="ventaRecolector" required>
-                            <option value="">Seleccionar recolector...</option>
-                        </select>
+                        <select id="ventaRecolector" required><option value="">Seleccionar recolector...</option></select>
                     </div>
-                    
-                    <div class="form-group">
-                        <label>Grupo (automático)</label>
-                        <input type="text" id="ventaGrupo" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Paquetes</label>
-                        <input type="number" id="ventaPaquetes" min="0" placeholder="Ej: 3">
-                    </div>
+                    <div class="form-group"><label>Grupo (automático)</label><input type="text" id="ventaGrupo" readonly></div>
+                    <div class="form-group"><label>Paquetes</label><input type="number" id="ventaPaquetes" min="0" placeholder="Ej: 3"></div>
                     <div class="form-group">
                         <label>Estado de Pago</label>
                         <select id="ventaPago" required>
@@ -494,182 +367,180 @@
                 </div>
 
                 <!-- SECCIÓN DE PRODUCTOS -->
-                <div style="margin: 25px 0; padding: 20px; background: linear-gradient(145deg, #fff5f9, #ffffff); border-radius: 16px; border: 2px solid #FFB6D9;">
-                    <h4 style="color: #E91E8C; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                        🛒 Productos
+                <div style="margin:25px 0;padding:20px;background:linear-gradient(145deg,#fff5f9,#ffffff);border-radius:16px;border:2px solid #FFB6D9;">
+                    <h4 style="color:#E91E8C;margin-bottom:15px;display:flex;align-items:center;gap:8px;">
+                        <i class="fas fa-shopping-cart"></i> Productos
                     </h4>
-                    
-                    <!-- Formulario para agregar producto -->
-                    <div class="form-grid" style="margin-bottom: 15px;">
-                        <div class="form-group">
-                            <label>Nombre del Producto</label>
-                            <input type="text" id="nombreProducto" placeholder="Ej: Bolsa rosa">
+                    <div style="margin-bottom:12px;position:relative;">
+                        <label style="font-size:0.82rem;color:#888;font-weight:600;display:block;margin-bottom:5px;">
+                            <i class="fas fa-box" style="color:#a78bfa;"></i> Buscar en Inventario (opcional — precio se auto-llena)
+                        </label>
+                        <input type="text" id="buscarInventarioVenta" placeholder="Escribe el nombre del producto..." style="width:100%;padding:10px 14px;border:2px solid #FFB6D9;border-radius:12px;font-size:0.9rem;outline:none;box-sizing:border-box;transition:border-color 0.2s;">
+                        <div id="dropdownInventarioVenta" class="inv-dropdown-venta"></div>
+                    </div>
+                    <input type="hidden" id="productoInventarioId" value="">
+                    <div id="prod-row-inline">
+                        <div class="prod-col-nombre">
+                            <label>Producto</label>
+                            <input type="text" id="nombreProducto" placeholder="Nombre del producto">
                         </div>
-                        <div class="form-group">
-                            <label>Cantidad</label>
-                            <input type="number" id="cantidadProducto" min="1" value="1">
+                        <div class="prod-col-cant">
+                            <label>Cant.</label>
+                            <input type="number" id="cantidadProducto" min="1" value="1" style="text-align:center;">
                         </div>
-                        <div class="form-group">
-                            <label>Precio Unitario</label>
-                            <input type="number" id="precioProducto" min="0" step="0.01" placeholder="0.00">
+                        <div class="prod-col-precio">
+                            <label>Precio $</label>
+                            <input type="number" id="precioProducto" min="0" step="0.01" placeholder="0.00" style="text-align:right;">
                         </div>
-                        <div class="form-group" style="display: flex; align-items: flex-end;">
-                            <button type="button" class="btn-kawaii btn-success" id="btnAgregarProducto" style="width: 100%;">
-                                ➕ Agregar
-                            </button>
+                        <div class="prod-col-btn">
+                            <button type="button" id="btnAgregarProducto"><i class="fas fa-plus"></i> Agregar</button>
                         </div>
                     </div>
-
-                    <!-- Lista de productos agregados -->
-                    <div id="listaProductos" style="max-height: 200px; overflow-y: auto;">
-                        <p style="text-align: center; color: #999; padding: 20px;" id="msgSinProductos">
-                            No hay productos agregados
-                        </p>
+                    <div id="listaProductos" style="max-height:200px;overflow-y:auto;">
+                        <p style="text-align:center;color:#999;padding:20px;" id="msgSinProductos">No hay productos agregados</p>
                     </div>
-
-                    <!-- Total de la venta -->
-                    <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #FFB6D9; text-align: right;">
-                        <span style="font-size: 1.2rem; font-weight: bold; color: #E91E8C;">
-                            TOTAL: <span id="totalVentaModal">$0.00</span>
-                        </span>
+                    <div style="margin-top:15px;padding-top:15px;border-top:2px solid #FFB6D9;text-align:right;">
+                        <span style="font-size:1.2rem;font-weight:bold;color:#E91E8C;">TOTAL: <span id="totalVentaModal">$0.00</span></span>
                     </div>
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn-kawaii btn-success">✨ Guardar</button>
-                    <button type="button" class="btn-kawaii btn-primary" id="btnGenerarImagenVenta">📸 Imagen</button>
-                    <button type="button" class="btn-kawaii btn-info" id="btnImprimirTicket">🧾 Ticket</button>
-                    <button type="button" class="btn-kawaii btn-danger close-modal">❌ Cerrar</button>
+                    <button type="submit" class="btn-kawaii btn-success"><i class="fas fa-save"></i> Guardar</button>
+                    <button type="button" class="btn-kawaii btn-primary" id="btnGenerarImagenVenta"><i class="fas fa-camera"></i> Imagen</button>
+                    <button type="button" class="btn-kawaii btn-info" id="btnImprimirTicket"><i class="fas fa-receipt"></i> Ticket</button>
+                    <button type="button" class="btn-kawaii btn-danger close-modal"><i class="fas fa-times"></i> Cerrar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL CARRITO DEL CLIENTE -->
+    <!-- MODAL CARRITO LIVE -->
     <div id="modalCarrito" class="modal">
         <div class="modal-content modal-carrito-mini">
             <div class="modal-header-mini">
-                <span style="font-weight: 600; color: #E91E8C;">🛒 <span id="nombreClienteCarrito"></span></span>
+                <span style="font-weight:600;color:#E91E8C;"><i class="fas fa-shopping-cart"></i> <span id="nombreClienteCarrito"></span></span>
                 <button class="close-modal" onclick="cerrarModal('modalCarrito')">&times;</button>
             </div>
-            
             <div class="modal-body-mini">
                 <input type="text" id="carritoProducto" placeholder="Producto" class="input-mini input-producto-largo">
                 <div class="row-mini">
                     <input type="number" id="carritoCantidad" min="1" placeholder="Cant" class="input-num-mini">
                     <input type="number" id="carritoPrecio" min="0" step="0.01" placeholder="$" class="input-num-mini">
-                    <button type="button" class="btn-add-mini" id="btnAgregarAlCarrito">➕</button>
+                    <button type="button" class="btn-add-mini" id="btnAgregarAlCarrito"><i class="fas fa-plus"></i></button>
                 </div>
-                
                 <div class="lista-productos-mini" id="listaProductosCarrito">
-                    <p style="text-align: center; color: #999; padding: 10px; font-size: 0.85rem;">Sin productos</p>
+                    <p style="text-align:center;color:#999;padding:10px;font-size:0.85rem;">Sin productos</p>
                 </div>
             </div>
-            
             <div class="modal-footer-mini">
-                <div style="font-weight: 600; color: #E91E8C; margin-bottom: 8px;">
-                    TOTAL: <span id="totalCarrito">$0.00</span>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <button type="button" class="btn-mini-action" id="btnGenerarImagen" title="Generar imagen para foráneos">📸</button>
-                    <button type="button" class="btn-mini-action" id="btnImprimirCarrito" title="Imprimir ticket para locales">🧾</button>
-                    <button type="button" class="btn-mini-action close-modal">✖️</button>
+                <div style="font-weight:600;color:#E91E8C;margin-bottom:8px;">TOTAL: <span id="totalCarrito">$0.00</span></div>
+                <div style="display:flex;gap:8px;">
+                    <button type="button" class="btn-mini-action" id="btnGenerarImagen" title="Imagen para foráneos"><i class="fas fa-camera"></i></button>
+                    <button type="button" class="btn-mini-action" id="btnImprimirCarrito" title="Ticket para locales"><i class="fas fa-receipt"></i></button>
+                    <button type="button" class="btn-mini-action close-modal"><i class="fas fa-times"></i></button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ÁREA DE IMPRESIÓN TICKET -->
-    <div id="ticket" class="ticket-print">
-        <!-- Contenido del ticket generado dinámicamente -->
+    <div id="ticket" class="ticket-print"></div>
+
+    <!-- MODAL INVENTARIO -->
+    <div id="modalInventario" class="modal">
+        <div class="modal-content" style="max-width:520px;">
+            <div class="modal-header">
+                <h3 id="tituloModalInventario"><i class="fas fa-box"></i> Nuevo Producto</h3>
+                <button id="btnCerrarModalInventario" class="close-modal">&times;</button>
+            </div>
+            <form id="formInventario" style="padding:20px;">
+                <div class="form-group">
+                    <label><i class="fas fa-camera"></i> Foto del Producto</label>
+                    <input type="file" id="invFoto" accept="image/*" style="display:none;">
+                    <input type="hidden" id="invFotoBase64">
+                    <div onclick="document.getElementById('invFoto').click()" class="inv-foto-dropzone" id="invFotoDropzone">
+                        <img id="invFotoPreview" src="" alt="Preview" style="display:none;max-height:160px;border-radius:12px;object-fit:cover;">
+                        <div id="invFotoPlaceholder">
+                            <i class="fas fa-camera" style="font-size:2.5rem;color:#ddd;"></i>
+                            <p style="margin:10px 0 0;color:#aaa;font-size:0.9rem;">Toca para subir foto</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group"><label>Nombre del Producto *</label><input type="text" id="invNombre" placeholder="Ej: Bolsa tela rosa" required></div>
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea id="invDescripcion" placeholder="Medida, color, material..." rows="2" style="width:100%;padding:10px;border:2px solid #FFB6D9;border-radius:12px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Precio Unitario *</label><input type="number" id="invPrecio" min="0" step="0.01" placeholder="0.00" required></div>
+                    <div class="form-group"><label>Stock Total (piezas) *</label><input type="number" id="invStock" min="1" placeholder="0" required></div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-kawaii btn-success"><i class="fas fa-save"></i> Guardar</button>
+                    <button type="button" class="btn-kawaii btn-danger" onclick="cerrarModalInventario()"><i class="fas fa-times"></i> Cancelar</button>
+                </div>
+            </form>
+        </div>
     </div>
+
+    <!-- OVERLAY FOTO -->
+    <div id="fotoOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;align-items:center;justify-content:center;flex-direction:column;cursor:pointer;">
+        <img id="fotoOverlayImg" src="" alt="" style="max-width:90vw;max-height:80vh;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,0.5);">
+        <p id="fotoOverlayNombre" style="color:white;margin-top:14px;font-size:1.1rem;font-weight:600;"></p>
+        <p style="color:#ccc;font-size:0.85rem;margin-top:4px;">Toca para cerrar</p>
+    </div>
+
     <script src="firebase-config.js"></script>
     <script src="app.js"></script>
+    <script src="inventario.js"></script>
     <script src="script-forzar-grid.js"></script>
     <script src="script-fix-layout-input.js"></script>
     <script src="script-ocultar-cerrar.js"></script>
     <script src="anticipo-fixed.js"></script>
     
     <script>
-        // ✨ NAVEGACIÓN MÓVIL OPTIMIZADA
         function configurarNavegacionMovil() {
             const btnRegresarMovil = document.getElementById('btnRegresarMovil');
             const headerPrincipal = document.getElementById('headerPrincipal');
-            const navButtons = document.querySelectorAll('.nav-btn');
-            
-            navButtons.forEach(btn => {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const seccion = this.getAttribute('data-section');
-                    
-                    // En móvil (max-width: 768px), ocultar header y mostrar botón de regreso
                     if (window.innerWidth <= 768 && seccion !== 'dashboard') {
                         headerPrincipal.style.display = 'none';
                         btnRegresarMovil.style.display = 'block';
-                        
-                        // Agregar clase full-screen a la sección activa
                         setTimeout(() => {
-                            const seccionActiva = document.querySelector('.section.active');
-                            if (seccionActiva) {
-                                seccionActiva.classList.add('mobile-fullscreen');
-                            }
+                            const s = document.querySelector('.section.active');
+                            if (s) s.classList.add('mobile-fullscreen');
                         }, 100);
                     }
                 });
             });
-            
-            // Botón de regreso
             btnRegresarMovil.addEventListener('click', function() {
-                // Quitar clase fullscreen
-                const seccionActiva = document.querySelector('.section.active');
-                if (seccionActiva) {
-                    seccionActiva.classList.remove('mobile-fullscreen');
-                }
-                
-                // Mostrar header y ocultar botón de regreso
+                const s = document.querySelector('.section.active');
+                if (s) s.classList.remove('mobile-fullscreen');
                 headerPrincipal.style.display = 'block';
                 btnRegresarMovil.style.display = 'none';
-                
-                // Volver al dashboard
                 cambiarSeccion('dashboard');
-                
-                // Scroll al inicio
                 window.scrollTo(0, 0);
             });
-            
-            // Detectar cambios de orientación o resize
             window.addEventListener('resize', function() {
                 if (window.innerWidth > 768) {
-                    // En PC, siempre mostrar header
                     headerPrincipal.style.display = 'block';
                     btnRegresarMovil.style.display = 'none';
-                    
-                    // Quitar fullscreen
-                    const seccionActiva = document.querySelector('.section.active');
-                    if (seccionActiva) {
-                        seccionActiva.classList.remove('mobile-fullscreen');
-                    }
+                    const s = document.querySelector('.section.active');
+                    if (s) s.classList.remove('mobile-fullscreen');
                 }
             });
         }
-        
-        // Inicializar cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', configurarNavegacionMovil);
     </script>
-    
-    <!-- PWA - Registro del Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
-                    .then(registration => {
-                        console.log('✨ PWA: Service Worker registrado exitosamente');
-                    })
-                    .catch(error => {
-                        console.log('⚠️ Error registrando Service Worker:', error);
-                    });
+                    .catch(err => console.log('SW error:', err));
             });
         }
     </script>
 </body>
-
 </html>
+
