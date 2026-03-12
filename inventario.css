@@ -1,0 +1,495 @@
+/* ===== 📦 ESTILOS INVENTARIO - JALI BZAR ===== */
+
+/* ─── Estadísticas rápidas ─── */
+.inv-stats-row {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.inv-stat-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    min-width: 0;
+    overflow: hidden;
+}
+
+.inv-chip-icon { font-size: 1.4rem; flex-shrink: 0; }
+
+.inv-stat-chip div { display: flex; flex-direction: column; min-width: 0; }
+.inv-stat-chip span { font-size: 1.3rem; font-weight: 800; line-height: 1; }
+.inv-stat-chip small { font-size: 0.72rem; color: #999; font-weight: 500; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.inv-chip-prod { border-left: 4px solid #a78bfa; }
+.inv-chip-prod span { color: #7c3aed; }
+.inv-chip-disp { border-left: 4px solid #51cf66; }
+.inv-chip-disp span { color: #2f9e44; }
+.inv-chip-apart { border-left: 4px solid #ffa94d; }
+.inv-chip-apart span { color: #e67700; }
+.inv-chip-vend { border-left: 4px solid #74c0fc; }
+.inv-chip-vend span { color: #1971c2; }
+
+/* ─── Filtros ─── */
+.inv-filtros {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.inv-search-input {
+    flex: 1;
+    min-width: 180px;
+    padding: 10px 16px;
+    border: 2px solid #FFB6D9;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.inv-search-input:focus { border-color: #E91E8C; }
+
+.inv-filter-select {
+    padding: 10px 14px;
+    border: 2px solid #FFB6D9;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    background: white;
+    cursor: pointer;
+    outline: none;
+    color: #555;
+}
+
+/* ─── Grid de productos ─── */
+.inv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 18px;
+    margin-top: 4px;
+}
+
+/* ─── Card de producto ─── */
+.inv-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 2px solid #f9f0ff;
+}
+.inv-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(233,30,140,0.13);
+    border-color: #FFB6D9;
+}
+
+.inv-card-img-wrap {
+    position: relative;
+    height: 180px;
+    background: linear-gradient(145deg, #fff5f9, #f3e8ff);
+    overflow: hidden;
+}
+
+.inv-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: zoom-in;
+    transition: transform 0.3s;
+}
+.inv-card-img:hover { transform: scale(1.04); }
+
+.inv-card-noimg {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    color: #ddd;
+}
+
+.inv-badge-status {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.inv-card-body {
+    padding: 14px 16px;
+}
+
+.inv-card-nombre {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 4px;
+    line-height: 1.3;
+}
+
+.inv-card-desc {
+    font-size: 0.82rem;
+    color: #888;
+    margin: 0 0 8px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.inv-card-precio {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #E91E8C;
+    margin: 0 0 12px;
+}
+
+/* ─── Barra de stock ─── */
+.inv-stock-bar-wrap { margin-bottom: 10px; }
+
+.inv-stock-bar {
+    height: 8px;
+    background: #f0f0f0;
+    border-radius: 999px;
+    overflow: hidden;
+    display: flex;
+    margin-bottom: 8px;
+}
+
+.inv-bar-vendido {
+    background: #74c0fc;
+    height: 100%;
+    transition: width 0.4s;
+}
+.inv-bar-apartado {
+    background: #ffa94d;
+    height: 100%;
+    transition: width 0.4s;
+}
+
+.inv-stock-nums {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.inv-num {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 20px;
+}
+.inv-num.disponible { background: #d3f9d8; color: #2f9e44; }
+.inv-num.apartado { background: #fff3cd; color: #e67700; }
+.inv-num.vendido { background: #d0ebff; color: #1971c2; }
+.inv-num.total { background: #f3f0ff; color: #7c3aed; }
+
+/* ─── Acciones card ─── */
+.inv-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #f8e8f0;
+}
+
+.btn-inv-edit {
+    flex: 1;
+    padding: 8px;
+    background: linear-gradient(135deg, #e0d4ff, #f8e8f0);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #7c3aed;
+    transition: background 0.2s, transform 0.1s;
+}
+.btn-inv-edit:hover {
+    background: linear-gradient(135deg, #d0b4ff, #FFB6D9);
+    transform: scale(1.02);
+}
+
+.btn-inv-delete {
+    padding: 8px 12px;
+    background: #ffe3e3;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s, transform 0.1s;
+}
+.btn-inv-delete:hover {
+    background: #ffa8a8;
+    transform: scale(1.05);
+}
+
+/* ─── Modal Inventario ─── */
+.inv-foto-dropzone {
+    border: 2px dashed #FFB6D9;
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff5f9;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+.inv-foto-dropzone:hover {
+    border-color: #E91E8C;
+    background: #ffe8f2;
+}
+.inv-foto-dropzone img {
+    width: 100%;
+    max-height: 160px;
+    object-fit: cover;
+}
+
+/* ─── Dropdown inventario en modal venta ─── */
+.inv-dropdown-venta {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #FFB6D9;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(233,30,140,0.12);
+    z-index: 10000;
+    max-height: 280px;
+    overflow-y: auto;
+    display: none;
+}
+.inv-dropdown-venta.show { display: block; }
+
+.inv-autocomplete-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    border-bottom: 1px solid #ffe8f2;
+    transition: background 0.15s;
+}
+.inv-autocomplete-item:last-child { border-bottom: none; }
+.inv-autocomplete-item:hover { background: #fff5fa; }
+.inv-autocomplete-item.no-results {
+    color: #999;
+    cursor: default;
+    justify-content: center;
+    font-size: 0.9rem;
+}
+
+.inv-autocomplete-img {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid #ffe8f2;
+    flex-shrink: 0;
+}
+.inv-autocomplete-noimg {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    background: #fff5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    border: 1px solid #ffe8f2;
+}
+.inv-autocomplete-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.inv-autocomplete-info strong {
+    font-size: 0.9rem;
+    color: #333;
+}
+.inv-autocomplete-desc {
+    font-size: 0.76rem;
+    color: #aaa;
+    font-style: normal;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+.inv-autocomplete-info span {
+    font-size: 0.78rem;
+    color: #888;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 600px) {
+    .inv-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 12px;
+    }
+    .inv-card-img-wrap { height: 130px; }
+
+    /* 2x2 grid en móvil */
+    .inv-stats-row {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px;
+    }
+    .inv-stat-chip { padding: 10px 12px; gap: 8px; }
+    .inv-chip-icon { font-size: 1.2rem; }
+    .inv-stat-chip span { font-size: 1.1rem; }
+    .inv-stat-chip small { font-size: 0.7rem; }
+}
+
+/* ─── FORZAR fila de productos en horizontal — override parches ─── */
+#prod-row-inline,
+#prod-row-inline * {
+    box-sizing: border-box !important;
+}
+#prod-row-inline {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    align-items: flex-end !important;
+    width: 100% !important;
+    margin-bottom: 14px !important;
+}
+#prod-row-inline .prod-col-nombre { flex: 3 !important; min-width: 0 !important; }
+#prod-row-inline .prod-col-cant   { flex: 1 !important; min-width: 58px !important; max-width: 80px !important; }
+#prod-row-inline .prod-col-precio { flex: 1.5 !important; min-width: 75px !important; max-width: 110px !important; }
+#prod-row-inline .prod-col-btn    { flex-shrink: 0 !important; }
+
+#prod-row-inline label {
+    font-size: 0.76rem !important;
+    color: #bbb !important;
+    font-weight: 600 !important;
+    display: block !important;
+    margin-bottom: 4px !important;
+}
+#prod-row-inline input {
+    width: 100% !important;
+    padding: 9px 10px !important;
+    border: 2px solid #FFB6D9 !important;
+    border-radius: 10px !important;
+    font-size: 0.88rem !important;
+    outline: none !important;
+    display: block !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+#prod-row-inline input:focus {
+    border-color: #E91E8C !important;
+    box-shadow: 0 0 0 3px rgba(233,30,140,0.1) !important;
+}
+
+/* Animación cuando se auto-llena precio desde inventario */
+#precioProducto.precio-autofill {
+    border-color: #51cf66 !important;
+    box-shadow: 0 0 0 3px rgba(81,207,102,0.2) !important;
+    background: #f4fff6 !important;
+}
+
+#btnAgregarProducto {
+    padding: 9px 16px !important;
+    background: linear-gradient(135deg, #6fcf97, #43b97f) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    box-shadow: 0 3px 10px rgba(67,185,127,0.3) !important;
+    transition: transform 0.1s, box-shadow 0.2s !important;
+}
+#btnAgregarProducto:hover {
+    transform: scale(1.03) !important;
+    box-shadow: 0 5px 15px rgba(67,185,127,0.4) !important;
+}
+
+@media (max-width: 480px) {
+    #prod-row-inline { flex-wrap: wrap !important; }
+    #prod-row-inline .prod-col-nombre { flex: 100% !important; }
+    #prod-row-inline .prod-col-cant,
+    #prod-row-inline .prod-col-precio { flex: 1 !important; }
+}
+
+/* ─── FIX: Menú móvil header — evitar recorte del botón X ─── */
+.mobile-menu {
+    padding: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+.mobile-menu-header {
+    position: relative !important;
+    top: auto !important;
+    margin: 0 !important;
+    padding: 18px 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    background: linear-gradient(135deg, #B5ABEC 0%, #A4D9ED 100%) !important;
+    border-bottom: 2px solid rgba(255,255,255,0.3) !important;
+    flex-shrink: 0 !important;
+    min-height: 60px !important;
+}
+.mobile-menu-title {
+    color: white !important;
+    font-size: 1.2rem !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+}
+.btn-cerrar-menu {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    width: 38px !important;
+    height: 38px !important;
+    flex-shrink: 0 !important;
+    font-size: 1rem !important;
+}
+.mobile-nav {
+    padding: 16px 20px !important;
+    overflow-y: auto !important;
+    flex: 1 !important;
+}
+
+/* ─── Stat icon con FA en lugar de emoji ─── */
+.stat-icon {
+    font-size: 1.6rem !important;
+    color: #8B7FD9 !important;
+}
+.stat-icon i { font-size: 1.4rem; }
+.inv-chip-icon i { font-size: 1.2rem; }
+
+/* ─── Inventario cards sin emojis ─── */
+.inv-card-noimg {
+    font-size: 2.5rem;
+    color: #ddd;
+}
+.inv-card-noimg i { font-size: 2rem; color: #ccc; }
