@@ -42,7 +42,22 @@ function renderizarInventario() {
             <div class="inv-card-body">
                 <h3 class="inv-card-nombre">${prod.nombre}</h3>
                 ${prod.descripcion ? `<p class="inv-card-desc">${prod.descripcion}</p>` : ''}
-                <p class="inv-card-precio">$${parseFloat(prod.precio).toFixed(2)}</p>
+
+                <div class="inv-precios-row">
+                    <div class="inv-precio-item">
+                        <span class="inv-precio-label">Precio venta</span>
+                        <span class="inv-precio-valor venta">$${parseFloat(prod.precio).toFixed(2)}</span>
+                    </div>
+                    ${prod.costo > 0 ? `
+                    <div class="inv-precio-item">
+                        <span class="inv-precio-label">Costo</span>
+                        <span class="inv-precio-valor costo">$${parseFloat(prod.costo).toFixed(2)}</span>
+                    </div>
+                    <div class="inv-precio-item">
+                        <span class="inv-precio-label">Ganancia</span>
+                        <span class="inv-precio-valor ganancia">$${(prod.precio - prod.costo).toFixed(2)} <em>${Math.round(((prod.precio - prod.costo) / prod.precio) * 100)}%</em></span>
+                    </div>` : ''}
+                </div>
 
                 <div class="inv-stock-bar-wrap">
                     <div class="inv-stock-bar">
@@ -109,6 +124,7 @@ function abrirModalInventario(idProducto = null) {
         document.getElementById('invNombre').value = prod.nombre;
         document.getElementById('invDescripcion').value = prod.descripcion || '';
         document.getElementById('invPrecio').value = prod.precio;
+        document.getElementById('invCosto').value = prod.costo || '';
         document.getElementById('invStock').value = prod.stockTotal;
         if (prod.foto) {
             document.getElementById('invFotoBase64').value = prod.foto;
@@ -132,6 +148,7 @@ function guardarProductoInventario(e) {
     const nombre = document.getElementById('invNombre').value.trim();
     const descripcion = document.getElementById('invDescripcion').value.trim();
     const precio = parseFloat(document.getElementById('invPrecio').value) || 0;
+    const costo = parseFloat(document.getElementById('invCosto').value) || 0;
     const stockTotal = parseInt(document.getElementById('invStock').value) || 0;
     const foto = document.getElementById('invFotoBase64').value;
 
@@ -145,22 +162,21 @@ function guardarProductoInventario(e) {
     if (inventarioEnEdicion) {
         const idx = state.inventario.findIndex(p => p.id === inventarioEnEdicion);
         if (idx !== -1) {
-            // Mantener apartado y vendido al editar
             state.inventario[idx] = {
                 ...state.inventario[idx],
-                nombre, descripcion, precio, stockTotal, foto
+                nombre, descripcion, precio, costo, stockTotal, foto
             };
-            mostrarNotificacion('Producto actualizado ✨', 'success');
+            mostrarNotificacion('Producto actualizado', 'success');
         }
     } else {
         state.inventario.push({
             id: Date.now(),
-            nombre, descripcion, precio, stockTotal,
+            nombre, descripcion, precio, costo, stockTotal,
             foto,
             apartado: 0,
             vendido: 0
         });
-        mostrarNotificacion('Producto agregado al inventario 📦', 'success');
+        mostrarNotificacion('Producto agregado al inventario', 'success');
     }
 
     guardarDatos();
