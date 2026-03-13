@@ -135,7 +135,8 @@ async function sincronizarTodo() {
             guardarEnFirebase('ventasActuales', state.ventasActuales),
             guardarEnFirebase('historialSemanas', state.historialSemanas),
             guardarEnFirebase('semanaActual', state.semanaActual),
-            guardarEnFirebase('carritosLive', state.carritosLive)
+            guardarEnFirebase('carritosLive', state.carritosLive),
+            guardarEnFirebase('inventario', state.inventario || [])
         ]);
         
         console.log('✅ Todos los datos sincronizados con Firebase');
@@ -146,7 +147,7 @@ async function sincronizarTodo() {
     }
 }
 
-// Cargar todo desde Firebase
+// Cargar todo desde Firebase con escucha en TIEMPO REAL
 async function cargarTodoDesdeFirebase() {
     if (!firebaseInitialized) {
         console.warn('⚠️ Firebase no está configurado. Cargando desde localStorage.');
@@ -154,38 +155,34 @@ async function cargarTodoDesdeFirebase() {
     }
     
     try {
-        const [clientes, recolectores, ventasActuales, historialSemanas, semanaActual, carritosLive] = await Promise.all([
-            cargarDeFirebase('clientes'),
-            cargarDeFirebase('recolectores'),
-            cargarDeFirebase('ventasActuales'),
-            cargarDeFirebase('historialSemanas'),
-            cargarDeFirebase('semanaActual'),
-            cargarDeFirebase('carritosLive')
-        ]);
-        
-        // Actualizar estado si hay datos
-        if (clientes) state.clientes = clientes;
-        if (recolectores) state.recolectores = recolectores;
-        if (ventasActuales) state.ventasActuales = ventasActuales;
-        if (historialSemanas) state.historialSemanas = historialSemanas;
-        if (semanaActual) state.semanaActual = semanaActual;
-        if (carritosLive) state.carritosLive = carritosLive || [];
-        
-        console.log('✅ Todos los datos cargados desde Firebase');
-        
-        // IMPORTANTE: Actualizar la interfaz después de cargar
-        setTimeout(() => {
-            actualizarDashboard();
-            actualizarTablaVentas();
-            actualizarListaClientes();
-            actualizarListaRecolectores();
-            actualizarHistorial();
-            actualizarCarritosGrid();
-        }, 100);
-        
+        // ✅ ESCUCHA EN TIEMPO REAL — cualquier cambio de otro dispositivo se refleja automáticamente
+        const rutas = [
+            { ruta: 'clientes',        setter: (v) => { state.clientes = v || []; actualizarListaClientes(); actualizarDashboard(); } },
+            { ruta: 'recolectores',    setter: (v) => { state.recolectores = v || []; actualizarListaRecolectores(); } },
+            { ruta: 'ventasActuales',  setter: (v) => { state.ventasActuales = v || []; actualizarTablaVentas(); actualizarDashboard(); } },
+            { ruta: 'historialSemanas',setter: (v) => { state.historialSemanas = v || []; actualizarHistorial(); } },
+            { ruta: 'semanaActual',    setter: (v) => { if (v) state.semanaActual = v; } },
+            { ruta: 'carritosLive',    setter: (v) => { state.carritosLive = v || []; actualizarCarritosGrid(); } },
+            { ruta: 'inventario',      setter: (v) => { state.inventario = v || []; if (typeof renderizarInventario !== 'undefined') renderizarInventario(); } },
+        ];
+
+        rutas.forEach(({ ruta, setter }) => {
+            database.ref(ruta).on('value', (snapshot) => {
+                const datos = snapshot.val();
+                // Convertir objeto Firebase a array si es necesario
+                const valor = datos && !Array.isArray(datos) && typeof datos === 'object'
+                    ? Object.values(datos)
+                    : datos;
+                setter(valor);
+                console.log(`🔄 Actualización en tiempo real: ${ruta}`);
+            });
+        });
+
+        console.log('✅ Escucha en tiempo real activada para todos los datos');
         return true;
+
     } catch (error) {
-        console.error('❌ Error al cargar desde Firebase:', error);
+        console.error('❌ Error al configurar escucha en tiempo real:', error);
         return false;
     }
 }
