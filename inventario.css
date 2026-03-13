@@ -536,3 +536,25 @@
     margin-left: 4px;
     font-weight: 700;
 }
+
+/* ─── Badges talla / color ─── */
+.inv-badges-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+.inv-badge-dato {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #f3f0ff;
+    color: #7c3aed;
+    border: 1px solid #e0d9ff;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.inv-badge-dato i { font-size: 0.7rem; }
+
