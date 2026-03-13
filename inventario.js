@@ -41,6 +41,11 @@ function renderizarInventario() {
             </div>
             <div class="inv-card-body">
                 <h3 class="inv-card-nombre">${prod.nombre}</h3>
+                ${(prod.talla || prod.color) ? `
+                <div class="inv-badges-row">
+                    ${prod.talla ? `<span class="inv-badge-dato"><i class="fas fa-ruler"></i> ${prod.talla}</span>` : ''}
+                    ${prod.color ? `<span class="inv-badge-dato"><i class="fas fa-palette"></i> ${prod.color}</span>` : ''}
+                </div>` : ''}
                 ${prod.descripcion ? `<p class="inv-card-desc">${prod.descripcion}</p>` : ''}
 
                 <div class="inv-precios-row">
@@ -123,6 +128,8 @@ function abrirModalInventario(idProducto = null) {
         titulo.textContent = 'Editar Producto ✏️';
         document.getElementById('invNombre').value = prod.nombre;
         document.getElementById('invDescripcion').value = prod.descripcion || '';
+        document.getElementById('invTalla').value = prod.talla || '';
+        document.getElementById('invColor').value = prod.color || '';
         document.getElementById('invPrecio').value = prod.precio;
         document.getElementById('invCosto').value = prod.costo || '';
         document.getElementById('invStock').value = prod.stockTotal;
@@ -147,6 +154,8 @@ function guardarProductoInventario(e) {
     e.preventDefault();
     const nombre = document.getElementById('invNombre').value.trim();
     const descripcion = document.getElementById('invDescripcion').value.trim();
+    const talla = document.getElementById('invTalla').value.trim();
+    const color = document.getElementById('invColor').value.trim();
     const precio = parseFloat(document.getElementById('invPrecio').value) || 0;
     const costo = parseFloat(document.getElementById('invCosto').value) || 0;
     const stockTotal = parseInt(document.getElementById('invStock').value) || 0;
@@ -164,14 +173,14 @@ function guardarProductoInventario(e) {
         if (idx !== -1) {
             state.inventario[idx] = {
                 ...state.inventario[idx],
-                nombre, descripcion, precio, costo, stockTotal, foto
+                nombre, descripcion, talla, color, precio, costo, stockTotal, foto
             };
             mostrarNotificacion('Producto actualizado', 'success');
         }
     } else {
         state.inventario.push({
             id: Date.now(),
-            nombre, descripcion, precio, costo, stockTotal,
+            nombre, descripcion, talla, color, precio, costo, stockTotal,
             foto,
             apartado: 0,
             vendido: 0
