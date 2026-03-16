@@ -558,3 +558,23 @@
 }
 .inv-badge-dato i { font-size: 0.7rem; }
 
+/* ─── Botón sync header ─── */
+.btn-sync-header {
+    background: rgba(255,255,255,0.25) !important;
+    border: 2px solid rgba(255,255,255,0.5) !important;
+    color: white !important;
+    border-radius: 50% !important;
+    width: 38px !important;
+    height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    font-size: 0.9rem !important;
+    transition: all 0.3s !important;
+    flex-shrink: 0 !important;
+}
+.btn-sync-header:hover {
+    background: rgba(255,255,255,0.4) !important;
+    transform: rotate(180deg) !important;
+}
