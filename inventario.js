@@ -154,10 +154,13 @@ function guardarProductoInventario(e) {
     e.preventDefault();
     const nombre = document.getElementById('invNombre').value.trim();
     const descripcion = document.getElementById('invDescripcion').value.trim();
-    const talla = document.getElementById('invTalla').value.trim();
-    const color = document.getElementById('invColor').value.trim();
+    const tallaEl = document.getElementById('invTalla');
+    const colorEl = document.getElementById('invColor');
+    const talla = tallaEl ? tallaEl.value.trim() : '';
+    const color = colorEl ? colorEl.value.trim() : '';
     const precio = parseFloat(document.getElementById('invPrecio').value) || 0;
-    const costo = parseFloat(document.getElementById('invCosto').value) || 0;
+    const costoEl = document.getElementById('invCosto');
+    const costo = costoEl ? parseFloat(costoEl.value) || 0 : 0;
     const stockTotal = parseInt(document.getElementById('invStock').value) || 0;
     const foto = document.getElementById('invFotoBase64').value;
 
