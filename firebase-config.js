@@ -147,65 +147,58 @@ async function sincronizarTodo() {
     }
 }
 
-// Cargar todo desde Firebase con escucha en TIEMPO REAL
+// Cargar todo desde Firebase (una sola vez al iniciar)
 async function cargarTodoDesdeFirebase() {
     if (!firebaseInitialized) {
         console.warn('⚠️ Firebase no está configurado. Cargando desde localStorage.');
         return false;
     }
+
+    // Función para convertir objeto Firebase a array correctamente
+    function toArray(datos) {
+        if (!datos) return [];
+        if (Array.isArray(datos)) return datos;
+        if (typeof datos === 'object') return Object.values(datos).filter(v => v !== null);
+        return [];
+    }
     
     try {
-        // Función para convertir correctamente lo que devuelve Firebase (puede ser objeto o array)
-        function toArray(datos) {
-            if (!datos) return [];
-            if (Array.isArray(datos)) return datos;
-            if (typeof datos === 'object') return Object.values(datos);
-            return [];
-        }
+        const [clientes, recolectores, ventasActuales, historialSemanas, semanaActual, carritosLive, inventario] = await Promise.all([
+            cargarDeFirebase('clientes'),
+            cargarDeFirebase('recolectores'),
+            cargarDeFirebase('ventasActuales'),
+            cargarDeFirebase('historialSemanas'),
+            cargarDeFirebase('semanaActual'),
+            cargarDeFirebase('carritosLive'),
+            cargarDeFirebase('inventario')
+        ]);
+        
+        if (clientes)        state.clientes        = toArray(clientes);
+        if (recolectores)    state.recolectores    = toArray(recolectores);
+        if (ventasActuales)  state.ventasActuales  = toArray(ventasActuales);
+        if (historialSemanas)state.historialSemanas= toArray(historialSemanas);
+        if (semanaActual)    state.semanaActual    = semanaActual;
+        if (carritosLive)    state.carritosLive    = toArray(carritosLive);
+        if (inventario)      state.inventario      = toArray(inventario);
 
-        // ✅ ESCUCHA EN TIEMPO REAL
-        database.ref('clientes').on('value', (snap) => {
-            state.clientes = toArray(snap.val());
-            actualizarListaClientes();
+        // Guardar en localStorage para respaldo local
+        localStorage.setItem('jali_bzar_data', JSON.stringify(state));
+        
+        console.log('✅ Datos cargados desde Firebase');
+        
+        setTimeout(() => {
             actualizarDashboard();
-        });
-
-        database.ref('recolectores').on('value', (snap) => {
-            state.recolectores = toArray(snap.val());
-            actualizarListaRecolectores();
-        });
-
-        database.ref('ventasActuales').on('value', (snap) => {
-            state.ventasActuales = toArray(snap.val());
             actualizarTablaVentas();
-            actualizarDashboard();
-        });
-
-        database.ref('historialSemanas').on('value', (snap) => {
-            state.historialSemanas = toArray(snap.val());
+            actualizarListaClientes();
+            actualizarListaRecolectores();
             actualizarHistorial();
-        });
-
-        database.ref('semanaActual').on('value', (snap) => {
-            const v = snap.val();
-            if (v) state.semanaActual = v;
-        });
-
-        database.ref('carritosLive').on('value', (snap) => {
-            state.carritosLive = toArray(snap.val());
             actualizarCarritosGrid();
-        });
-
-        database.ref('inventario').on('value', (snap) => {
-            state.inventario = toArray(snap.val());
             if (typeof renderizarInventario !== 'undefined') renderizarInventario();
-        });
-
-        console.log('✅ Escucha en tiempo real activada');
+        }, 100);
+        
         return true;
-
     } catch (error) {
-        console.error('❌ Error al configurar escucha en tiempo real:', error);
+        console.error('❌ Error al cargar desde Firebase:', error);
         return false;
     }
 }
