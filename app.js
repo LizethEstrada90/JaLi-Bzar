@@ -3375,12 +3375,17 @@ function generarPDFGrupo(nombreGrupo, ventas) {
 let timeoutGuardar = null;
 
 function guardarDatos() {
-    localStorage.setItem('jali_bzar_data', JSON.stringify(state));
+    // Intentar guardar en localStorage, si está lleno no importa — Firebase tiene todo
+    try {
+        localStorage.setItem('jali_bzar_data', JSON.stringify(state));
+    } catch (e) {
+        console.warn('⚠️ localStorage lleno, guardando solo en Firebase.');
+        // Limpiar localStorage para liberar espacio
+        try { localStorage.removeItem('jali_bzar_data'); } catch(e2) {}
+    }
     
     if (typeof firebaseInitialized !== 'undefined' && firebaseInitialized) {
-        if (timeoutGuardar) {
-            clearTimeout(timeoutGuardar);
-        }
+        if (timeoutGuardar) clearTimeout(timeoutGuardar);
         timeoutGuardar = setTimeout(() => {
             sincronizarTodo();
         }, 1000);
@@ -4002,6 +4007,13 @@ window.addEventListener('load', () => {
         }
     }
 });
+
+
+
+
+
+
+
 
 
 
