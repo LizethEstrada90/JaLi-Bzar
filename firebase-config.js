@@ -155,30 +155,53 @@ async function cargarTodoDesdeFirebase() {
     }
     
     try {
-        // ✅ ESCUCHA EN TIEMPO REAL — cualquier cambio de otro dispositivo se refleja automáticamente
-        const rutas = [
-            { ruta: 'clientes',        setter: (v) => { state.clientes = v || []; actualizarListaClientes(); actualizarDashboard(); } },
-            { ruta: 'recolectores',    setter: (v) => { state.recolectores = v || []; actualizarListaRecolectores(); } },
-            { ruta: 'ventasActuales',  setter: (v) => { state.ventasActuales = v || []; actualizarTablaVentas(); actualizarDashboard(); } },
-            { ruta: 'historialSemanas',setter: (v) => { state.historialSemanas = v || []; actualizarHistorial(); } },
-            { ruta: 'semanaActual',    setter: (v) => { if (v) state.semanaActual = v; } },
-            { ruta: 'carritosLive',    setter: (v) => { state.carritosLive = v || []; actualizarCarritosGrid(); } },
-            { ruta: 'inventario',      setter: (v) => { state.inventario = v || []; if (typeof renderizarInventario !== 'undefined') renderizarInventario(); } },
-        ];
+        // Función para convertir correctamente lo que devuelve Firebase (puede ser objeto o array)
+        function toArray(datos) {
+            if (!datos) return [];
+            if (Array.isArray(datos)) return datos;
+            if (typeof datos === 'object') return Object.values(datos);
+            return [];
+        }
 
-        rutas.forEach(({ ruta, setter }) => {
-            database.ref(ruta).on('value', (snapshot) => {
-                const datos = snapshot.val();
-                // Convertir objeto Firebase a array si es necesario
-                const valor = datos && !Array.isArray(datos) && typeof datos === 'object'
-                    ? Object.values(datos)
-                    : datos;
-                setter(valor);
-                console.log(`🔄 Actualización en tiempo real: ${ruta}`);
-            });
+        // ✅ ESCUCHA EN TIEMPO REAL
+        database.ref('clientes').on('value', (snap) => {
+            state.clientes = toArray(snap.val());
+            actualizarListaClientes();
+            actualizarDashboard();
         });
 
-        console.log('✅ Escucha en tiempo real activada para todos los datos');
+        database.ref('recolectores').on('value', (snap) => {
+            state.recolectores = toArray(snap.val());
+            actualizarListaRecolectores();
+        });
+
+        database.ref('ventasActuales').on('value', (snap) => {
+            state.ventasActuales = toArray(snap.val());
+            actualizarTablaVentas();
+            actualizarDashboard();
+        });
+
+        database.ref('historialSemanas').on('value', (snap) => {
+            state.historialSemanas = toArray(snap.val());
+            actualizarHistorial();
+        });
+
+        database.ref('semanaActual').on('value', (snap) => {
+            const v = snap.val();
+            if (v) state.semanaActual = v;
+        });
+
+        database.ref('carritosLive').on('value', (snap) => {
+            state.carritosLive = toArray(snap.val());
+            actualizarCarritosGrid();
+        });
+
+        database.ref('inventario').on('value', (snap) => {
+            state.inventario = toArray(snap.val());
+            if (typeof renderizarInventario !== 'undefined') renderizarInventario();
+        });
+
+        console.log('✅ Escucha en tiempo real activada');
         return true;
 
     } catch (error) {
