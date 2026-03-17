@@ -512,7 +512,7 @@
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const seccion = this.getAttribute('data-section');
-                    if (window.innerWidth <= 768 && seccion !== 'dashboard') {
+                    if (window.innerWidth <= 768 && seccion !== 'dashboard' && btnRegresarMovil) {
                         headerPrincipal.style.display = 'none';
                         btnRegresarMovil.style.display = 'block';
                         setTimeout(() => {
@@ -522,18 +522,20 @@
                     }
                 });
             });
-            btnRegresarMovil.addEventListener('click', function() {
-                const s = document.querySelector('.section.active');
-                if (s) s.classList.remove('mobile-fullscreen');
-                headerPrincipal.style.display = 'block';
-                btnRegresarMovil.style.display = 'none';
-                cambiarSeccion('dashboard');
-                window.scrollTo(0, 0);
-            });
+            if (btnRegresarMovil) {
+                btnRegresarMovil.addEventListener('click', function() {
+                    const s = document.querySelector('.section.active');
+                    if (s) s.classList.remove('mobile-fullscreen');
+                    headerPrincipal.style.display = 'block';
+                    btnRegresarMovil.style.display = 'none';
+                    cambiarSeccion('dashboard');
+                    window.scrollTo(0, 0);
+                });
+            }
             window.addEventListener('resize', function() {
                 if (window.innerWidth > 768) {
                     headerPrincipal.style.display = 'block';
-                    btnRegresarMovil.style.display = 'none';
+                    if (btnRegresarMovil) btnRegresarMovil.style.display = 'none';
                     const s = document.querySelector('.section.active');
                     if (s) s.classList.remove('mobile-fullscreen');
                 }
@@ -551,5 +553,6 @@
     </script>
 </body>
 </html>
+
 
 
