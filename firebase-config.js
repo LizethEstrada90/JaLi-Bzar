@@ -180,9 +180,6 @@ async function cargarTodoDesdeFirebase() {
         if (semanaActual)    state.semanaActual    = semanaActual;
         if (carritosLive)    state.carritosLive    = toArray(carritosLive);
         if (inventario)      state.inventario      = toArray(inventario);
-
-        // Guardar en localStorage para respaldo local
-        localStorage.setItem('jali_bzar_data', JSON.stringify(state));
         
         console.log('✅ Datos cargados desde Firebase');
         
